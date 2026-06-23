@@ -306,14 +306,17 @@ function paintLand(){
     <a class="row call ${n.soft?'soft':''}" href="tel:${n.num.replace(/\s/g,'')}">
       <div class="main"><b>${n.label}</b></div><div class="num">${n.num}</div>
     </a>`).join('');
-  // Fahrplan: landesweiter Planer + ortsbezogene Haltestellensuche
-  document.getElementById('fahrRows').innerHTML = L.fahr.map(f=>`
-    <a class="row" href="${f.url}" target="_blank" rel="noopener">
-      <div class="main"><b>${f.b}</b><small>${f.s}</small></div><div class="go">Öffnen ›</div>
-    </a>`).join('') + `
+  // Fahrplan: Verbindung von hier aus (mit Abfahrtszeiten) + landesweiter Planer
+  document.getElementById('fahrRows').innerHTML = `
+    <a class="row" href="javascript:void(0)" onclick="planRoute()">
+      <div class="main"><b>Verbindung von hier aus</b><small>Ziel eingeben – zeigt die nächsten Abfahrten mit Bus &amp; Bahn</small></div><div class="go">Suchen ›</div>
+    </a>
     <a class="row" href="javascript:void(0)" onclick="nearStops()">
-      <div class="main"><b>Haltestelle in der Nähe</b><small>Bus &amp; Bahn um Sie herum auf der Karte</small></div><div class="go">Zeigen ›</div>
-    </a>`;
+      <div class="main"><b>Abfahrten an Haltestelle</b><small>Nächste Station antippen – dann erscheinen die Abfahrtszeiten</small></div><div class="go">Zeigen ›</div>
+    </a>` + L.fahr.map(f=>`
+    <a class="row" href="${f.url}" target="_blank" rel="noopener">
+      <div class="main"><b>${f.b}</b><small>${f.s} &amp; Tickets</small></div><div class="go">Öffnen ›</div>
+    </a>`).join('');
 }
 function toggleLand(){
   STATE.land = STATE.land==='DE' ? 'AT' : 'DE';
@@ -404,6 +407,10 @@ function doSearch(){
 }
 function quick(t){ document.getElementById('q').value=t; doSearch(); }
 function nearStops(){ window.open(mapsAround('Haltestelle'),'_blank','noopener'); }
+function planRoute(){
+  // Verbindungssuche im Öffi-Modus, Start = aktueller Standort; Ziel tippt der Nutzer ein
+  window.open(`https://www.google.com/maps/dir/?api=1&origin=${STATE.lat},${STATE.lon}&travelmode=transit`,'_blank','noopener');
+}
 document.addEventListener('keydown',e=>{ if(e.key==='Enter' && document.activeElement && document.activeElement.id==='q') doSearch(); });
 
 /* ---------- Start ---------- */
