@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d2f3f">
+<title>Lotse</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lotse">
+<style>
+  :root{
+    --ground:#0d2f3f;        /* tiefes Seewasser – Kopf & Akzent */
+    --ground-2:#13455a;      /* helleres Wasser */
+    --surface:#f4f6f7;       /* heller Hintergrund */
+    --card:#ffffff;          /* Knopf-Fläche */
+    --ink:#0f2630;           /* fast schwarz, leichter Blaustich */
+    --ink-soft:#476370;      /* gedämpfte Schrift */
+    --line:#d7dee1;          /* feine Linien */
+    --alarm:#c5362c;         /* Notruf-Rot */
+    --alarm-dark:#9c271f;
+    --sea:#1d6e8c;           /* Lotsen-Blau für Aktionen */
+    --buoy:#d98324;          /* warmer Bojen-Akzent, sparsam */
+    --radius:18px;
+    --tap:#e9eef0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--surface);
+    color:var(--ink);
+    font-size:19px;
+    line-height:1.4;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:32px;
+  }
+  .wrap{max-width:560px;margin:0 auto}
+
+  /* --- Instrumenten-Leiste: wo bin ich, welches Land --- */
+  header{
+    background:var(--ground);
+    color:#eaf2f5;
+    padding:14px 18px calc(14px + env(safe-area-inset-top));
+    padding-top:calc(14px + env(safe-area-inset-top));
+  }
+  .brand{display:flex;align-items:baseline;gap:10px}
+  .brand b{font-size:1.5rem;letter-spacing:.5px;font-weight:800}
+  .brand span{font-size:.95rem;color:#9fc0cd}
+  .where{
+    margin-top:12px;display:flex;align-items:center;gap:12px;
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
+    border-radius:14px;padding:12px 14px;
+  }
+  .where .dot{width:12px;height:12px;border-radius:50%;background:#5ec27a;flex:0 0 auto;box-shadow:0 0 0 4px rgba(94,194,122,.25)}
+  .where .dot.off{background:var(--buoy);box-shadow:0 0 0 4px rgba(217,131,36,.25)}
+  .where .txt{flex:1;min-width:0}
+  .where .txt small{display:block;color:#9fc0cd;font-size:.78rem;text-transform:uppercase;letter-spacing:.6px}
+  .where .txt strong{font-size:1.05rem;font-weight:700;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .where button{
+    background:#fff;color:var(--ground);border:0;border-radius:10px;
+    padding:9px 12px;font-size:.92rem;font-weight:700;cursor:pointer;flex:0 0 auto;
+  }
+
+  main{padding:18px}
+  h2{font-size:1.25rem;margin:4px 2px 14px;font-weight:800}
+
+  /* --- Heim-Kacheln --- */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .tile{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px 16px;cursor:pointer;text-align:left;
+    box-shadow:0 1px 0 rgba(15,38,48,.04),0 6px 16px rgba(15,38,48,.05);
+    display:flex;flex-direction:column;gap:10px;min-height:128px;
+    transition:transform .05s ease, box-shadow .15s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .tile:active{transform:translateY(1px);box-shadow:0 1px 0 rgba(15,38,48,.04)}
+  .tile .ic{width:40px;height:40px}
+  .tile .lbl{font-size:1.18rem;font-weight:800;line-height:1.2}
+  .tile .sub{font-size:.92rem;color:var(--ink-soft);margin-top:-4px}
+  .tile.alarm{grid-column:1 / -1;background:var(--alarm);border-color:var(--alarm-dark);color:#fff;min-height:auto;flex-direction:row;align-items:center;gap:16px}
+  .tile.alarm .lbl{font-size:1.35rem}
+  .tile.alarm .sub{color:#ffd9d5}
+  .tile.alarm .ic *{stroke:#fff}
+
+  /* --- Unterseiten --- */
+  .view{display:none}
+  .view.active{display:block;animation:in .18s ease}
+  @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .back{
+    display:inline-flex;align-items:center;gap:8px;background:none;border:0;
+    color:var(--sea);font-size:1.05rem;font-weight:700;cursor:pointer;padding:6px 2px;margin-bottom:6px;
+  }
+
+  /* --- Listen / Aktionsknöpfe --- */
+  .rows{display:flex;flex-direction:column;gap:12px}
+  .row{
+    display:flex;align-items:center;gap:14px;background:var(--card);
+    border:1px solid var(--line);border-radius:14px;padding:16px;
+    text-decoration:none;color:var(--ink);cursor:pointer;
+    box-shadow:0 4px 12px rgba(15,38,48,.04);
+  }
+  .row:active{background:var(--tap)}
+  .row .ic{width:30px;height:30px;flex:0 0 auto}
+  .row .main{flex:1;min-width:0}
+  .row .main b{display:block;font-size:1.1rem;font-weight:700}
+  .row .main small{color:var(--ink-soft);font-size:.92rem}
+  .row .go{color:var(--sea);font-weight:800;font-size:.95rem;white-space:nowrap}
+
+  .call{background:var(--alarm);border-color:var(--alarm-dark);color:#fff}
+  .call:active{background:var(--alarm-dark)}
+  .call .main small{color:#ffd9d5}
+  .call .num{font-size:1.7rem;font-weight:800;letter-spacing:1px}
+  .call.soft{background:var(--card);color:var(--ink);border-color:var(--line)}
+  .call.soft .num{color:var(--sea);font-size:1.4rem}
+  .call.soft .main small{color:var(--ink-soft)}
+
+  .note{background:#fff7ec;border:1px solid #f0d9b6;border-radius:12px;padding:14px 16px;font-size:.95rem;color:#6b4b1e;margin:14px 0}
+  .card-info{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+  .card-info h3{margin:0 0 6px;font-size:1.12rem}
+  .card-info p{margin:0;color:var(--ink-soft);font-size:.98rem}
+  .card-info ol{margin:8px 0 0;padding-left:20px;color:var(--ink-soft)}
+  .card-info li{margin:4px 0}
+
+  .cats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:6px}
+  .cat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 12px;cursor:pointer;text-align:center;font-weight:700;font-size:1.05rem;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(15,38,48,.04)}
+  .cat:active{background:var(--tap)}
+
+  .status{text-align:center;color:var(--ink-soft);padding:26px 10px;font-size:1rem}
+  .spin{width:30px;height:30px;border:3px solid var(--line);border-top-color:var(--sea);border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 12px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  .search-box{display:flex;gap:10px;margin-bottom:14px}
+  .search-box input{flex:1;font-size:1.1rem;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
+  .search-box button{background:var(--sea);color:#fff;border:0;border-radius:12px;padding:0 20px;font-size:1.05rem;font-weight:700;cursor:pointer}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 15px;font-size:.98rem;cursor:pointer}
+  .chip:active{background:var(--tap)}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  button:focus-visible,.row:focus-visible,.tile:focus-visible{outline:3px solid var(--buoy);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><b>Lotse</b><span>Die Anlaufstelle für alles</span></div>
+    <div class="where" id="where">
+      <span class="dot off" id="dot"></span>
+      <div class="txt"><small id="land">Standort wird gesucht…</small><strong id="ort">Einen Moment</strong></div>
+      <button id="locBtn" onclick="toggleLand()">Land</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- HEIM -->
+    <section class="view active" id="v-home">
+      <div class="grid">
+        <button class="tile alarm" onclick="go('notruf')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5c0 8 8 16 16 16l-2-5-4 1-3-3 1-4-5-2z"/></svg></span>
+          <span><span class="lbl">Notruf & Erste Hilfe</span><span class="sub">Schnell Hilfe holen</span></span>
+        </button>
+
+        <button class="tile" onclick="go('nearby')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+          <span class="lbl">In der Nähe</span>
+          <span class="sub">Toilette, Apotheke, Bank, Wasser</span>
+        </button>
+
+        <button class="tile" onclick="go('fahrplan')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 9h14"/><circle cx="8.5" cy="13" r="1.2"/><circle cx="15.5" cy="13" r="1.2"/><path d="M8 17l-2 4M16 17l2 4"/></svg></span>
+          <span class="lbl">Fahrplan & Bus</span>
+          <span class="sub">Bahn und Bus in der Region</span>
+        </button>
+
+        <button class="tile" onclick="go('suchen')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+          <span class="lbl">Suchen</span>
+          <span class="sub">Geschäft & Öffnungszeiten</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- NOTRUF -->
+    <section class="view" id="v-notruf">
+      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <h2>Notruf & Erste Hilfe</h2>
+      <div class="rows" id="notrufNums"></div>
+      <div class="note">Im Zweifel immer den <b>Notruf 112</b> wählen. Lieber einmal zu viel anrufen als zu wenig.</div>
+
+      <h2 style="margin-top:22px">Im Ernstfall</h2>
+      <div class="card-info">
+        <h3>Notruf absetzen</h3>
+        <p>Ruhig bleiben und sagen:</p>
+        <ol><li><b>Wo</b> ist es passiert?</li><li><b>Was</b> ist passiert?</li><li><b>Wie viele</b> sind betroffen?</li><li><b>Warten</b> – auflegen erst, wenn die Leitstelle es sagt.</li></ol>
+      </div>
+      <div class="card-info">
+        <h3>Schlaganfall erkennen – Test</h3>
+        <p><b>Gesicht:</b> Lächeln – hängt eine Seite?<br><b>Arme:</b> Beide heben – sinkt einer ab?<br><b>Sprache:</b> Satz nachsprechen – klingt sie verwaschen?<br><b>Zeit:</b> Bei einem „Ja" sofort 112 anrufen.</p>
+      </div>
+      <div class="card-info">
+        <h3>Wiederbelebung</h3>
+        <p>Keine Atmung? Fest und schnell in die Mitte des Brustkorbs drücken – etwa zweimal pro Sekunde, ohne Pause, bis Hilfe kommt.</p>
+      </div>
+    </section>
+
+    <!-- IN DER NÄHE -->
+    <section class="view" id="v-nearby">
+      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <h2>In der Nähe</h2>
+      <div class="cats">
+        <button class="cat" onclick="findNear('toilets')"><span style="font-size:1.7rem">🚻</span>Toilette</button>
+        <button class="cat" onclick="findNear('pharmacy')"><span style="font-size:1.7rem">💊</span>Apotheke</button>
+        <button class="cat" onclick="findNear('bench')"><span style="font-size:1.7rem">🪑</span>Sitzbank</button>
+        <button class="cat" onclick="findNear('water')"><span style="font-size:1.7rem">🚰</span>Trinkwasser</button>
+      </div>
+    </section>
+
+    <!-- ERGEBNISSE -->
+    <section class="view" id="v-results">
+      <button class="back" onclick="go('nearby')">‹ Zurück</button>
+      <h2 id="resTitle">In der Nähe</h2>
+      <div id="resBody"></div>
+    </section>
+
+    <!-- FAHRPLAN -->
+    <section class="view" id="v-fahrplan">
+      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <h2>Fahrplan & Bus</h2>
+      <div class="rows" id="fahrRows"></div>
+    </section>
+
+    <!-- SUCHEN -->
+    <section class="view" id="v-suchen">
+      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <h2>Suchen</h2>
+      <div class="search-box">
+        <input id="q" type="text" placeholder="z. B. Bäckerei, Arzt, Edeka" enterkeyhint="search">
+        <button onclick="doSearch()">Los</button>
+      </div>
+      <div class="chips">
+        <span class="chip" onclick="quick('Bäckerei')">Bäckerei</span>
+        <span class="chip" onclick="quick('Supermarkt')">Supermarkt</span>
+        <span class="chip" onclick="quick('Arzt')">Arzt</span>
+        <span class="chip" onclick="quick('Restaurant')">Restaurant</span>
+        <span class="chip" onclick="quick('Bank Geldautomat')">Geldautomat</span>
+      </div>
+      <div class="note">Öffnet die Karte mit Adresse, Öffnungszeiten und Weg.</div>
+    </section>
+  </main>
+</div>
+
+<script>
+/* ---------- Länderdaten: hier wächst der Lotse pro Land ---------- */
+const LAENDER = {
+  DE: {
+    name:"Deutschland",
+    notruf:[
+      {label:"Notruf – Rettung & Feuerwehr", num:"112", big:true},
+      {label:"Polizei", num:"110", big:true},
+      {label:"Ärztlicher Bereitschaftsdienst", num:"116117", soft:true},
+      {label:"Giftnotruf (Baden-Württemberg)", num:"0761 19240", soft:true}
+    ],
+    fahr:[
+      {b:"Bahn & Bus (DB)", s:"Verbindung suchen", url:"https://www.bahn.de"},
+      {b:"bodo – Verkehrsverbund Bodensee", s:"Busse & Fahrpläne der Region", url:"https://www.bodo.de/fahrplanauskunft"}
+    ]
+  },
+  AT: {
+    name:"Österreich",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"Rettung", num:"144", big:true},
+      {label:"Polizei", num:"133", soft:true},
+      {label:"Feuerwehr", num:"122", soft:true},
+      {label:"Gesundheitsberatung", num:"1450", soft:true},
+      {label:"Vergiftungs­zentrale", num:"01 406 43 43", soft:true}
+    ],
+    fahr:[
+      {b:"ÖBB – Bahn & Bus", s:"Verbindung suchen", url:"https://www.oebb.at"},
+      {b:"VVV – Verkehrsverbund Vorarlberg", s:"Busse & Fahrpläne der Region", url:"https://www.vmobil.at"}
+    ]
+  }
+};
+
+let STATE = { lat:47.5996, lon:9.5566, ort:"Langenargen", land:"DE", located:false };
+
+/* ---------- Navigation ---------- */
+function go(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('v-'+name).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ---------- Land anzeigen & umschalten ---------- */
+function paintLand(){
+  const L = LAENDER[STATE.land];
+  document.getElementById('land').textContent = STATE.located ? L.name : "Standort nicht aktiv – "+L.name;
+  document.getElementById('ort').textContent = STATE.ort;
+  document.getElementById('dot').classList.toggle('off', !STATE.located);
+  // Notrufnummern
+  document.getElementById('notrufNums').innerHTML = L.notruf.map(n=>`
+    <a class="row call ${n.soft?'soft':''}" href="tel:${n.num.replace(/\s/g,'')}">
+      <div class="main"><b>${n.label}</b></div><div class="num">${n.num}</div>
+    </a>`).join('');
+  // Fahrplan
+  document.getElementById('fahrRows').innerHTML = L.fahr.map(f=>`
+    <a class="row" href="${f.url}" target="_blank" rel="noopener">
+      <div class="main"><b>${f.b}</b><small>${f.s}</small></div><div class="go">Öffnen ›</div>
+    </a>`).join('');
+}
+function toggleLand(){
+  STATE.land = STATE.land==='DE' ? 'AT' : 'DE';
+  paintLand();
+}
+
+/* ---------- Standort holen ---------- */
+function locate(){
+  if(!navigator.geolocation){ paintLand(); return; }
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    STATE.lat = pos.coords.latitude;
+    STATE.lon = pos.coords.longitude;
+    STATE.located = true;
+    try{
+      const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&zoom=12&lat=${STATE.lat}&lon=${STATE.lon}`,{headers:{'Accept-Language':'de'}});
+      const d = await r.json();
+      const cc = (d.address && d.address.country_code || 'de').toUpperCase();
+      if(LAENDER[cc]) STATE.land = cc;
+      STATE.ort = d.address && (d.address.city||d.address.town||d.address.village||d.address.municipality||d.address.county) || "Ihr Standort";
+    }catch(e){ STATE.ort = "Ihr Standort"; }
+    paintLand();
+  }, err=>{
+    STATE.located = false;
+    document.getElementById('land').textContent = "Standort nicht aktiv – "+LAENDER[STATE.land].name;
+    paintLand();
+  }, {enableHighAccuracy:true, timeout:8000, maximumAge:60000});
+}
+
+/* ---------- In der Nähe (OpenStreetMap / Overpass) ---------- */
+const CAT = {
+  toilets:{q:'["amenity"="toilets"]', t:"Toiletten in der Nähe", n:"Öffentliche Toilette"},
+  pharmacy:{q:'["amenity"="pharmacy"]', t:"Apotheken in der Nähe", n:"Apotheke"},
+  bench:{q:'["amenity"="bench"]', t:"Sitzbänke in der Nähe", n:"Sitzbank"},
+  water:{q:'["amenity"="drinking_water"]', t:"Trinkwasser in der Nähe", n:"Trinkwasser"}
+};
+function dist(la,lo){
+  const R=6371000,r=Math.PI/180;
+  const dLa=(la-STATE.lat)*r, dLo=(lo-STATE.lon)*r;
+  const a=Math.sin(dLa/2)**2+Math.cos(STATE.lat*r)*Math.cos(la*r)*Math.sin(dLo/2)**2;
+  return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
+}
+async function findNear(cat){
+  const c = CAT[cat];
+  go('results');
+  document.getElementById('resTitle').textContent = c.t;
+  document.getElementById('resBody').innerHTML = `<div class="status"><div class="spin"></div>Suche in Ihrer Umgebung…</div>`;
+  const radius = 2000;
+  const ql = `[out:json][timeout:25];(node${c.q}(around:${radius},${STATE.lat},${STATE.lon});way${c.q}(around:${radius},${STATE.lat},${STATE.lon}););out center 40;`;
+  try{
+    const r = await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:'data='+encodeURIComponent(ql)});
+    const d = await r.json();
+    let items = d.elements.map(el=>{
+      const la = el.lat ?? el.center?.lat, lo = el.lon ?? el.center?.lon;
+      if(la==null) return null;
+      return {name:(el.tags && el.tags.name) || c.n, la, lo, m:dist(la,lo)};
+    }).filter(Boolean).sort((a,b)=>a.m-b.m).slice(0,12);
+
+    if(!items.length){
+      document.getElementById('resBody').innerHTML = `<div class="status">Hier in der Nähe ist nichts eingetragen.<br>Versuchen Sie es an einem anderen Ort noch einmal.</div>`;
+      return;
+    }
+    document.getElementById('resBody').innerHTML = `<div class="rows">`+items.map(i=>`
+      <a class="row" href="https://www.google.com/maps/dir/?api=1&destination=${i.la},${i.lo}" target="_blank" rel="noopener">
+        <div class="main"><b>${i.name}</b><small>${i.m<1000? i.m+' m entfernt' : (i.m/1000).toFixed(1)+' km entfernt'}</small></div>
+        <div class="go">Weg zeigen ›</div>
+      </a>`).join('')+`</div>`;
+  }catch(e){
+    document.getElementById('resBody').innerHTML = `<div class="status">Das hat gerade nicht geklappt.<br>Bitte Internet prüfen und erneut versuchen.</div>`;
+  }
+}
+
+/* ---------- Suchen / Öffnungszeiten ---------- */
+function doSearch(){
+  const q = document.getElementById('q').value.trim();
+  if(!q) return;
+  const u = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}&center=${STATE.lat},${STATE.lon}`;
+  window.open(u,'_blank','noopener');
+}
+function quick(t){ document.getElementById('q').value=t; doSearch(); }
+document.addEventListener('keydown',e=>{ if(e.key==='Enter' && document.activeElement && document.activeElement.id==='q') doSearch(); });
+
+/* ---------- Start ---------- */
+paintLand();
+locate();
+
+/* ---------- Als App lauffähig machen (offline + installierbar) ---------- */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
