@@ -1,9 +1,10 @@
-/* Lotse – Service Worker
-   Speichert die eigene App-Hülle, damit Notruf & Erste Hilfe auch ohne
-   Internet öffnen. Fremde Dienste (Karten, OpenStreetMap) gehen weiter
-   immer übers Netz – die brauchen es ohnehin. */
+/* Lotse – Service Worker (v2)
+   Neu gegenüber v1: Die Seite selbst wird zuerst frisch aus dem Netz geholt,
+   damit Updates automatisch erscheinen. Nur ohne Internet greift die
+   gespeicherte Kopie. Symbole & Manifest kommen weiter zuerst aus dem
+   Speicher (schnell). Fremde Dienste (Karten, OpenStreetMap) immer aus dem Netz. */
 
-const CACHE = 'lotse-v1';
+const CACHE = 'lotse-v2';
 const SHELL = [
   './',
   './index.html',
@@ -27,15 +28,31 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  const url = new URL(e.request.url);
-  // Nur eigene Dateien aus dem Speicher bedienen; alles Fremde aus dem Netz.
-  if (e.request.method === 'GET' && url.origin === location.origin) {
+  const req = e.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== location.origin) return; // Karten/OSM o. Ä. nie abfangen
+
+  const istSeite = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
+
+  if (istSeite) {
+    // Seite: zuerst Netz (frischer Stand), bei Offline die Kopie
     e.respondWith(
-      caches.match(e.request).then(hit => hit || fetch(e.request).then(resp => {
+      fetch(req).then(resp => {
         const copy = resp.clone();
-        caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
+        caches.open(CACHE).then(c => c.put('./index.html', copy)).catch(() => {});
         return resp;
-      }).catch(() => caches.match('./index.html')))
+      }).catch(() => caches.match('./index.html'))
     );
+    return;
   }
+
+  // Übrige eigene Dateien (Symbole, Manifest): zuerst Kopie, sonst Netz
+  e.respondWith(
+    caches.match(req).then(hit => hit || fetch(req).then(resp => {
+      const copy = resp.clone();
+      caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+      return resp;
+    }))
+  );
 });
