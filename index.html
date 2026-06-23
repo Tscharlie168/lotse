@@ -94,7 +94,7 @@
   @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   .back{
     display:inline-flex;align-items:center;gap:8px;background:none;border:0;
-    color:var(--sea);font-size:1.05rem;font-weight:700;cursor:pointer;padding:6px 2px;margin-bottom:6px;
+    color:var(--sea);font-size:1.3rem;font-weight:800;cursor:pointer;padding:12px 6px;margin-bottom:6px;
   }
 
   /* --- Listen / Aktionsknöpfe --- */
@@ -267,8 +267,7 @@ const LAENDER = {
       {label:"Giftnotruf (Baden-Württemberg)", num:"0761 19240", soft:true}
     ],
     fahr:[
-      {b:"Bahn & Bus (DB)", s:"Verbindung suchen", url:"https://www.bahn.de"},
-      {b:"bodo – Verkehrsverbund Bodensee", s:"Busse & Fahrpläne der Region", url:"https://www.bodo.de/fahrplanauskunft"}
+      {b:"Bahn & Bus (DB)", s:"Verbindung in ganz Deutschland suchen", url:"https://www.bahn.de"}
     ]
   },
   AT: {
@@ -282,8 +281,7 @@ const LAENDER = {
       {label:"Vergiftungs­zentrale", num:"01 406 43 43", soft:true}
     ],
     fahr:[
-      {b:"ÖBB – Bahn & Bus", s:"Verbindung suchen", url:"https://www.oebb.at"},
-      {b:"VVV – Verkehrsverbund Vorarlberg", s:"Busse & Fahrpläne der Region", url:"https://www.vmobil.at"}
+      {b:"ÖBB – Bahn & Bus", s:"Verbindung in ganz Österreich suchen", url:"https://fahrplan.oebb.at"}
     ]
   }
 };
@@ -308,11 +306,14 @@ function paintLand(){
     <a class="row call ${n.soft?'soft':''}" href="tel:${n.num.replace(/\s/g,'')}">
       <div class="main"><b>${n.label}</b></div><div class="num">${n.num}</div>
     </a>`).join('');
-  // Fahrplan
+  // Fahrplan: landesweiter Planer + ortsbezogene Haltestellensuche
   document.getElementById('fahrRows').innerHTML = L.fahr.map(f=>`
     <a class="row" href="${f.url}" target="_blank" rel="noopener">
       <div class="main"><b>${f.b}</b><small>${f.s}</small></div><div class="go">Öffnen ›</div>
-    </a>`).join('');
+    </a>`).join('') + `
+    <a class="row" href="javascript:void(0)" onclick="nearStops()">
+      <div class="main"><b>Haltestelle in der Nähe</b><small>Bus &amp; Bahn um Sie herum auf der Karte</small></div><div class="go">Zeigen ›</div>
+    </a>`;
 }
 function toggleLand(){
   STATE.land = STATE.land==='DE' ? 'AT' : 'DE';
@@ -342,11 +343,12 @@ function locate(){
 }
 
 /* ---------- In der Nähe (OpenStreetMap / Overpass) ---------- */
+/* steps = Umkreis in Metern; wird erweitert, bis etwas gefunden wird (gut für ländliche Orte) */
 const CAT = {
-  toilets:{q:'["amenity"="toilets"]', t:"Toiletten in der Nähe", n:"Öffentliche Toilette"},
-  pharmacy:{q:'["amenity"="pharmacy"]', t:"Apotheken in der Nähe", n:"Apotheke"},
-  bench:{q:'["amenity"="bench"]', t:"Sitzbänke in der Nähe", n:"Sitzbank"},
-  water:{q:'["amenity"="drinking_water"]', t:"Trinkwasser in der Nähe", n:"Trinkwasser"}
+  toilets:{q:'["amenity"="toilets"]', t:"Toiletten in der Nähe", n:"Öffentliche Toilette", steps:[1500,5000,12000]},
+  pharmacy:{q:'["amenity"="pharmacy"]', t:"Apotheken in der Nähe", n:"Apotheke", steps:[3000,8000,20000]},
+  bench:{q:'["amenity"="bench"]', t:"Sitzbänke in der Nähe", n:"Sitzbank", steps:[1000,3000]},
+  water:{q:'["amenity"="drinking_water"]', t:"Trinkwasser in der Nähe", n:"Trinkwasser", steps:[1500,6000,15000]}
 };
 function dist(la,lo){
   const R=6371000,r=Math.PI/180;
@@ -359,22 +361,28 @@ async function findNear(cat){
   go('results');
   document.getElementById('resTitle').textContent = c.t;
   document.getElementById('resBody').innerHTML = `<div class="status"><div class="spin"></div>Suche in Ihrer Umgebung…</div>`;
-  const radius = 2000;
-  const ql = `[out:json][timeout:25];(node${c.q}(around:${radius},${STATE.lat},${STATE.lon});way${c.q}(around:${radius},${STATE.lat},${STATE.lon}););out center 40;`;
   try{
-    const r = await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:'data='+encodeURIComponent(ql)});
-    const d = await r.json();
-    let items = d.elements.map(el=>{
-      const la = el.lat ?? el.center?.lat, lo = el.lon ?? el.center?.lon;
-      if(la==null) return null;
-      return {name:(el.tags && el.tags.name) || c.n, la, lo, m:dist(la,lo)};
-    }).filter(Boolean).sort((a,b)=>a.m-b.m).slice(0,12);
+    let items = [], used = 0;
+    for(const radius of c.steps){
+      used = radius;
+      const ql = `[out:json][timeout:25];(node${c.q}(around:${radius},${STATE.lat},${STATE.lon});way${c.q}(around:${radius},${STATE.lat},${STATE.lon}););out center 60;`;
+      const r = await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:'data='+encodeURIComponent(ql)});
+      const d = await r.json();
+      items = d.elements.map(el=>{
+        const la = el.lat ?? el.center?.lat, lo = el.lon ?? el.center?.lon;
+        if(la==null) return null;
+        return {name:(el.tags && el.tags.name) || c.n, la, lo, m:dist(la,lo)};
+      }).filter(Boolean).sort((a,b)=>a.m-b.m).slice(0,12);
+      if(items.length) break;   // gefunden – nicht weiter aufdrehen
+    }
 
     if(!items.length){
-      document.getElementById('resBody').innerHTML = `<div class="status">Hier in der Nähe ist nichts eingetragen.<br>Versuchen Sie es an einem anderen Ort noch einmal.</div>`;
+      const km = (used/1000);
+      document.getElementById('resBody').innerHTML = `<div class="status">Im Umkreis von ${km} km ist nichts in der Karte eingetragen.<br>Das heißt nicht, dass es nichts gibt – nur, dass es bei OpenStreetMap noch fehlt.</div>`;
       return;
     }
-    document.getElementById('resBody').innerHTML = `<div class="rows">`+items.map(i=>`
+    const hint = used>=8000 ? `<div class="note">Im näheren Umkreis war nichts eingetragen – das Nächste liegt etwas weiter weg.</div>` : '';
+    document.getElementById('resBody').innerHTML = hint + `<div class="rows">`+items.map(i=>`
       <a class="row" href="https://www.google.com/maps/dir/?api=1&destination=${i.la},${i.lo}" target="_blank" rel="noopener">
         <div class="main"><b>${i.name}</b><small>${i.m<1000? i.m+' m entfernt' : (i.m/1000).toFixed(1)+' km entfernt'}</small></div>
         <div class="go">Weg zeigen ›</div>
@@ -385,13 +393,17 @@ async function findNear(cat){
 }
 
 /* ---------- Suchen / Öffnungszeiten ---------- */
+function mapsAround(query){
+  // Karte direkt um den Standort herum öffnen → Nächstes steht oben
+  return `https://www.google.com/maps/search/${encodeURIComponent(query)}/@${STATE.lat},${STATE.lon},14z`;
+}
 function doSearch(){
   const q = document.getElementById('q').value.trim();
   if(!q) return;
-  const u = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}&center=${STATE.lat},${STATE.lon}`;
-  window.open(u,'_blank','noopener');
+  window.open(mapsAround(q),'_blank','noopener');
 }
 function quick(t){ document.getElementById('q').value=t; doSearch(); }
+function nearStops(){ window.open(mapsAround('Haltestelle'),'_blank','noopener'); }
 document.addEventListener('keydown',e=>{ if(e.key==='Enter' && document.activeElement && document.activeElement.id==='q') doSearch(); });
 
 /* ---------- Start ---------- */
