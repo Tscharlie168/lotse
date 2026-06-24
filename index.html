@@ -185,6 +185,19 @@
   .tip h3{color:#2f6b3a}
   .brain{background:#f0eef8;border:1px solid #d6cfe9}
   .brain h3{color:#4a3c7a}
+  .horo{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 4px 12px rgba(15,38,48,.04)}
+  .horo h3{margin:0 0 10px;font-size:1.12rem}
+  .sign-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .sign{background:#f6f8f9;border:1px solid var(--line);border-radius:12px;padding:10px 4px;cursor:pointer;text-align:center;font-size:.95rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .sign:active{background:var(--tap)}
+  .sign .sym{font-size:1.5rem}
+  .sign small{font-weight:400;color:var(--ink-soft);font-size:.72rem}
+  .horo-card .top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .horo-card .top .sym{font-size:2rem}
+  .horo-card .top b{font-size:1.25rem}
+  .horo-card .top small{display:block;color:var(--ink-soft);font-weight:400;font-size:.85rem}
+  .horo-card p{margin:0;font-size:1.08rem;line-height:1.55;color:var(--ink)}
+  .horo-card .change{background:none;border:0;color:var(--sea);font-weight:700;cursor:pointer;padding:10px 0 0;font-size:.98rem}
   .wx{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 4px 12px rgba(15,38,48,.04);margin-bottom:12px}
   .wx .ort{font-size:1.1rem;font-weight:800;margin:0 0 6px}
   .wx .now{display:flex;align-items:center;gap:12px;margin:6px 0}
@@ -523,6 +536,7 @@
       <button class="back" onclick="go('home')">‹ Zurück</button>
       <h2>Mein Tag</h2>
       <div class="day-head" id="dayHead"></div>
+      <div class="horo" id="horo"></div>
       <div class="card-info quote"><p id="spruch"></p></div>
       <div class="card-info tip"><h3>🌿 Gesundheitstipp des Tages</h3><p id="tip"></p></div>
       <div class="card-info brain"><h3>🧠 Kleine Gehirnjogging-Übung</h3><p id="brain"></p></div>
@@ -798,20 +812,105 @@ function jahreszeit(m){
 }
 const GEHIRN = [
   "Zählen Sie beim Zähneputzen von 100 rückwärts und ziehen Sie immer 7 ab.",
-  "Nennen Sie im Kopf zehn Städte, die mit B beginnen.",
-  "Buchstabieren Sie Ihren Vornamen rückwärts.",
-  "Erinnern Sie sich an Ihr Frühstück von gestern – jede Zutat einzeln.",
-  "Zählen Sie alle roten Dinge im Raum und merken Sie sich die Zahl.",
-  "Nennen Sie sieben Tiere, die mit S beginnen.",
-  "Rechnen Sie im Kopf: 7 × 8, das Ergebnis dann mal 2.",
-  "Sagen Sie die Monate des Jahres rückwärts auf.",
-  "Was haben Sie vor genau einer Woche gegessen?",
-  "Nennen Sie fünf Wörter, die sich auf das Wort Haus reimen.",
-  "Beschreiben Sie im Kopf den Weg vom Bett bis zur Haustür.",
-  "Denken Sie an ein Lied und tippen Sie den Takt mit dem Finger.",
-  "Nennen Sie zehn Gemüsesorten, ohne eine zu wiederholen.",
+  "Rechnen Sie 7 × 8, das Ergebnis dann mal 2.",
   "Zählen Sie rückwärts von 50 in Dreierschritten.",
-  "Rufen Sie drei Telefonnummern aus dem Gedächtnis ab."
+  "Was ergibt 13 + 28 im Kopf?",
+  "Verdoppeln Sie der Reihe nach: 2, 4, 8, 16 … bis über 100.",
+  "Wie viele Minuten hat ein halber Tag?",
+  "Rechnen Sie 100 minus 17, dann noch einmal minus 17.",
+  "Zählen Sie in Viererschritten von 0 bis 40.",
+  "Was kosten ungefähr drei Dinge zu je 1,99 Euro?",
+  "Teilen Sie 144 im Kopf durch 12.",
+  "Rechnen Sie 9 × 6 und addieren Sie 6 dazu.",
+  "Zählen Sie von 33 in Dreierschritten aufwärts bis 60.",
+  "Addieren Sie die Ziffern Ihres Geburtsjahres zusammen.",
+  "Wie viele Tage hat ein Vierteljahr ungefähr?",
+  "Halbieren Sie der Reihe nach: 100, 50, 25 …",
+  "Nennen Sie zehn Städte, die mit B beginnen.",
+  "Nennen Sie sieben Tiere, die mit S beginnen.",
+  "Buchstabieren Sie Ihren Vornamen rückwärts.",
+  "Nennen Sie fünf Wörter, die sich auf das Wort Haus reimen.",
+  "Finden Sie fünf Wörter mit einem Doppel-L.",
+  "Nennen Sie zehn Berufe, ohne einen zu wiederholen.",
+  "Finden Sie für „schön“ drei Wörter mit ähnlicher Bedeutung.",
+  "Nennen Sie zu jedem Buchstaben von A bis E ein Tier.",
+  "Sammeln Sie zehn Wörter zum Thema Garten.",
+  "Bilden Sie einen Satz, in dem jedes Wort mit M beginnt.",
+  "Nennen Sie fünf Blumen, die Sie kennen.",
+  "Finden Sie das Gegenteil von: hell, laut, schwer, schnell, jung.",
+  "Nennen Sie zehn Länder in Europa.",
+  "Finden Sie vier Wörter, die sich auf „Licht“ reimen.",
+  "Nennen Sie sieben Obstsorten.",
+  "Denken Sie sich fünf Wörter mit „Sonnen-“ aus, etwa Sonnenschein.",
+  "Nennen Sie fünf Musikinstrumente.",
+  "Finden Sie zehn Wörter mit genau drei Silben.",
+  "Nennen Sie fünf Flüsse, die Sie kennen.",
+  "Sammeln Sie acht Vornamen, die mit A beginnen.",
+  "Erinnern Sie sich an Ihr Frühstück von gestern – jede Zutat einzeln.",
+  "Was haben Sie vor genau einer Woche gegessen?",
+  "Rufen Sie drei Telefonnummern aus dem Gedächtnis ab.",
+  "Beschreiben Sie im Kopf den Weg vom Bett bis zur Haustür.",
+  "Erinnern Sie sich an die Namen früherer Nachbarn.",
+  "Welche Kleidung trugen Sie gestern?",
+  "Nennen Sie die Vornamen Ihrer Großeltern.",
+  "An welche fünf Geschenke erinnern Sie sich noch?",
+  "Welche Lieder haben Sie als Kind gesungen? Nennen Sie drei.",
+  "Erinnern Sie sich an Ihren ersten Arbeitstag.",
+  "Welche Telefonvorwahl hat Ihr Heimatort?",
+  "Nennen Sie fünf Orte, an denen Sie im Urlaub waren.",
+  "An welche Lehrerin oder welchen Lehrer aus der Schulzeit erinnern Sie sich?",
+  "Welche Autos hatten Sie in Ihrem Leben?",
+  "Beschreiben Sie aus dem Gedächtnis ein Zimmer aus Ihrer Kindheit.",
+  "Zählen Sie alle roten Dinge im Raum und merken Sie sich die Zahl.",
+  "Schließen Sie die Augen und nennen Sie fünf Geräusche, die Sie hören.",
+  "Wie viele Türen hat Ihre Wohnung? Zählen Sie im Kopf.",
+  "Zählen Sie alle Gegenstände aus Holz im Raum.",
+  "Schauen Sie aus dem Fenster, merken Sie sich fünf Dinge und zählen Sie sie dann ohne hinzusehen auf.",
+  "Welche Düfte können Sie gerade wahrnehmen?",
+  "Wie viele Bilder hängen bei Ihnen an den Wänden?",
+  "Fühlen Sie drei Gegenstände und beschreiben Sie deren Oberfläche.",
+  "Schätzen Sie die Uhrzeit, bevor Sie nachsehen.",
+  "Welche Farben hat der Raum, in dem Sie gerade sind?",
+  "Was passt nicht dazu: Apfel, Birne, Karotte, Banane?",
+  "Setzen Sie fort: 2, 4, 6, 8 …",
+  "Setzen Sie fort: 1, 2, 4, 8 …",
+  "Was haben ein Rad und eine Uhr gemeinsam?",
+  "Nennen Sie drei Dinge, die rund sind und rollen können.",
+  "Was kommt nach Frühling, Sommer, Herbst …?",
+  "Ordnen Sie im Kopf: Maus, Pferd, Katze, Elefant – vom kleinsten zum größten.",
+  "Welcher Wochentag ist übermorgen?",
+  "Was ist schwerer: ein Kilo Federn oder ein Kilo Steine?",
+  "Setzen Sie fort: Montag, Mittwoch, Freitag …",
+  "Nennen Sie drei Berufe, bei denen man eine Uniform trägt.",
+  "Was passt nicht dazu: Hammer, Säge, Brot, Schraubenzieher?",
+  "Wie viele Beine haben zusammen drei Hunde und zwei Enten?",
+  "Ordnen Sie die Zahlen 8, 3, 11, 5 der Größe nach.",
+  "Was braucht man zuerst: Mehl oder Brot?",
+  "Tippen Sie mit der rechten Hand einen Takt und sagen Sie dabei das Alphabet.",
+  "Malen Sie mit dem Finger eine Acht in die Luft – erst rechts herum, dann links.",
+  "Klopfen Sie mit einer Hand und streichen Sie mit der anderen – gleichzeitig.",
+  "Zählen Sie bis zwanzig und klatschen Sie bei jeder geraden Zahl.",
+  "Berühren Sie nacheinander den Daumen mit jedem Finger und zählen Sie mit.",
+  "Denken Sie an ein Lied und tippen Sie den Takt mit dem Finger.",
+  "Sagen Sie die Monate des Jahres rückwärts auf.",
+  "Nennen Sie zehn Gemüsesorten, ohne eine zu wiederholen.",
+  "Zählen Sie auf, was alles in Ihre Einkaufstasche von gestern passte.",
+  "Nennen Sie fünf Dinge, die blau sind.",
+  "Welche zehn Tiere leben auf einem Bauernhof?",
+  "Denken Sie sich einen Einkaufszettel mit acht Dingen aus und merken Sie ihn.",
+  "An welche Planeten erinnern Sie sich?",
+  "Zählen Sie rückwärts von 30 und lassen Sie jede fünfte Zahl aus.",
+  "Nennen Sie fünf Werkzeuge aus dem Werkzeugkasten.",
+  "Beschreiben Sie Schritt für Schritt, wie man einen Tee kocht.",
+  "Sammeln Sie acht Feiertage, die Ihnen einfallen.",
+  "Nennen Sie fünf Wörter, die mit „Haus-“ zusammengesetzt sind.",
+  "Erklären Sie in Gedanken einem Kind, was ein Regenbogen ist.",
+  "Nennen Sie zehn Dinge, die man in einer Küche findet.",
+  "Sagen Sie das Alphabet auf und lassen Sie jeden zweiten Buchstaben weg.",
+  "Überlegen Sie fünf Dinge, für die Sie heute dankbar sind.",
+  "Nennen Sie die Farben des Regenbogens in der richtigen Reihenfolge.",
+  "Zählen Sie sieben Dinge auf, die in eine Reisetasche gehören.",
+  "Denken Sie sich einen kleinen Reim auf Ihren Vornamen aus."
 ];
 function moonPhase(d){
   const synodic = 29.530588853;
@@ -840,12 +939,92 @@ function wxText(code){
   };
   return m[code] || ["",""];
 }
+const SIGNS = [
+  {n:"Widder",      sym:"♈", d:"21.3.–20.4.", t:["Heute steckt frischer Schwung in Ihnen.","Ihr Mut bringt heute etwas ins Rollen.","Sie packen heute an, was andere noch überlegen."]},
+  {n:"Stier",       sym:"♉", d:"21.4.–20.5.", t:["Ihre Ruhe ist heute Ihre größte Stärke.","Heute genießen Sie die schönen Dinge mit allen Sinnen.","Beständigkeit zahlt sich heute aus."]},
+  {n:"Zwillinge",   sym:"♊", d:"21.5.–21.6.", t:["Heute sind Sie ein gern gehörter Gesprächspartner.","Ihre Neugier öffnet heute eine schöne Tür.","Ein guter Einfall begleitet Sie durch den Tag."]},
+  {n:"Krebs",       sym:"♋", d:"22.6.–22.7.", t:["Ihr Gespür für andere wird heute geschätzt.","Heute tut Ihnen ein vertrautes Umfeld besonders gut.","Ihre Herzlichkeit wärmt heute auch andere."]},
+  {n:"Löwe",        sym:"♌", d:"23.7.–23.8.", t:["Ihre herzliche Art öffnet heute Türen.","Heute dürfen Sie ruhig im Mittelpunkt stehen.","Ihre gute Laune steckt heute andere an."]},
+  {n:"Jungfrau",    sym:"♍", d:"24.8.–23.9.", t:["Heute gelingt Ihnen, was Sie sorgfältig angehen.","Ihr Blick fürs Wesentliche hilft Ihnen heute.","Eine kleine Ordnung schafft heute große Erleichterung."]},
+  {n:"Waage",       sym:"♎", d:"24.9.–23.10.", t:["Heute finden Sie leicht das rechte Maß.","Ihr Sinn für Harmonie tut heute allen gut.","Ein freundlicher Ausgleich gelingt Ihnen heute mühelos."]},
+  {n:"Skorpion",    sym:"♏", d:"24.10.–22.11.", t:["Ihre innere Kraft trägt Sie heute weit.","Heute vertrauen Sie zu Recht auf Ihr Gespür.","Was Sie heute beginnen, gehen Sie mit ganzem Herzen an."]},
+  {n:"Schütze",     sym:"♐", d:"23.11.–21.12.", t:["Heute lockt die Lust auf etwas Neues.","Ihr Optimismus ist heute ansteckend.","Ein Blick über den Tellerrand bringt heute Freude."]},
+  {n:"Steinbock",   sym:"♑", d:"22.12.–20.1.", t:["Heute kommen Sie mit Geduld gut voran.","Ihre Verlässlichkeit wird heute bemerkt.","Schritt für Schritt erreichen Sie heute Ihr Ziel."]},
+  {n:"Wassermann",  sym:"♒", d:"21.1.–19.2.", t:["Eine gute Idee begleitet Sie heute.","Heute dürfen Sie ruhig eigene Wege gehen.","Ihre Offenheit bringt heute schöne Begegnungen."]},
+  {n:"Fische",      sym:"♓", d:"20.2.–20.3.", t:["Ihr Einfühlungsvermögen ist heute ein Geschenk.","Heute tut Ihnen ein ruhiger Moment besonders gut.","Ihre Fantasie schenkt Ihnen heute schöne Augenblicke."]}
+];
+const HORO_IMPULS = [
+  "Heute liegt etwas Gutes in der Luft – halten Sie die Augen offen.",
+  "Ein Lächeln zur rechten Zeit öffnet heute manche Tür.",
+  "Vertrauen Sie auf Ihr gutes Gespür.",
+  "Kleine Freuden zählen heute doppelt.",
+  "Sie haben mehr Kraft, als Sie gerade glauben.",
+  "Heute ist ein guter Tag, um Danke zu sagen.",
+  "Geduld zahlt sich heute aus.",
+  "Lassen Sie sich von Kleinigkeiten nicht aus der Ruhe bringen.",
+  "Heute darf etwas leichter gehen als gedacht.",
+  "Ihre Gelassenheit ist heute Ihre stille Stärke.",
+  "Ein Anruf oder ein Wiedersehen bringt heute Freude.",
+  "Heute lohnt es sich, neugierig zu bleiben.",
+  "Etwas lange Aufgeschobenes gelingt heute leicht.",
+  "Die Sonne meint es heute gut mit Ihnen – innen wie außen.",
+  "Heute ist ein Tag zum Genießen, nicht zum Hetzen.",
+  "Ein gutes Wort von Ihnen wirkt heute Wunder."
+];
+const HORO_TIPP = [
+  "Gönnen Sie sich ein paar Stunden am See, im Schatten unter einem Baum.",
+  "Ein Spaziergang an der frischen Luft tut heute besonders gut.",
+  "Rufen Sie einen Menschen an, den Sie lange nicht gehört haben.",
+  "Trinken Sie in Ruhe eine Tasse Kaffee oder Tee – und tun Sie nichts dabei.",
+  "Ein gutes Gespräch ist heute mehr wert als jede Eile.",
+  "Schauen Sie nach, was im Garten oder auf dem Markt gerade blüht.",
+  "Lesen Sie ein paar Seiten in einem Buch, das Ihnen Freude macht.",
+  "Bereiten Sie sich etwas zu, das Ihnen wirklich schmeckt.",
+  "Setzen Sie sich kurz in die Sonne und schließen Sie die Augen.",
+  "Erledigen Sie eine kleine Sache, die Sie schon länger vorhaben.",
+  "Hören Sie ein Lied, das Sie gerne mögen.",
+  "Machen Sie heute jemandem ein ehrliches Kompliment.",
+  "Ein kurzer Mittagsschlaf darf heute sein.",
+  "Merken Sie sich am Abend drei Dinge, die heute schön waren.",
+  "Atmen Sie ein paar Mal tief durch, bevor der Tag richtig beginnt.",
+  "Bummeln Sie ohne Ziel durch Ihre Umgebung und schauen Sie sich um."
+];
+function horoText(idx, doy){
+  const s = SIGNS[idx];
+  const trait = s.t[doy % s.t.length];
+  const imp = HORO_IMPULS[(doy*3 + idx) % HORO_IMPULS.length];
+  const tip = HORO_TIPP[(doy*7 + idx*2) % HORO_TIPP.length];
+  return trait + " " + imp + " " + tip;
+}
+let signMem = null;
+function getSign(){ try{ const v=localStorage.getItem('lotse_sign'); if(v!==null) return v; }catch(e){} return signMem; }
+function chooseSign(i){ signMem = String(i); try{ localStorage.setItem('lotse_sign', i); }catch(e){} renderHoro(); }
+function clearSign(){ signMem = null; try{ localStorage.removeItem('lotse_sign'); }catch(e){} renderHoro(); }
+function renderHoro(){
+  const box = document.getElementById('horo');
+  const saved = getSign();
+  if(saved===null || saved==='' || isNaN(saved)){
+    box.innerHTML = `<h3>Tageshoroskop – Ihr Sternzeichen wählen</h3><div class="sign-grid">` +
+      SIGNS.map((s,i)=>`<button class="sign" onclick="chooseSign(${i})"><span class="sym">${s.sym}</span>${s.n}<small>${s.d}</small></button>`).join('') +
+      `</div>`;
+    return;
+  }
+  const i = parseInt(saved,10);
+  const s = SIGNS[i];
+  const doy = tagDesJahres(new Date());
+  box.innerHTML = `<div class="horo-card">
+    <div class="top"><span class="sym">${s.sym}</span><div><b>${s.n}</b><small>${s.d}</small></div></div>
+    <p>${horoText(i, doy)}</p>
+    <button class="change" onclick="clearSign()">Anderes Sternzeichen wählen</button>
+  </div>`;
+}
 function renderHeute(){
   const now = new Date();
   const dat = now.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const mp = moonPhase(now);
   document.getElementById('dayHead').innerHTML =
     `<div class="dat">${dat}</div><div class="moon">${mp.emoji} Mond: ${mp.name}</div>`;
+  renderHoro();
   document.getElementById('spruch').textContent = SPRUECHE[tagDesJahres(now) % SPRUECHE.length];
   const pool = GESUNDHEIT[jahreszeit(now.getMonth())];
   document.getElementById('tip').textContent = pool[tagDesJahres(now) % pool.length];
