@@ -83,9 +83,7 @@
   .tile .ic{width:40px;height:40px}
   .tile .lbl{font-size:1.18rem;font-weight:800;line-height:1.2}
   .tile .sub{font-size:.92rem;color:var(--ink-soft);margin-top:-4px}
-  .tile.alarm{grid-column:1 / -1;background:var(--alarm);border-color:var(--alarm-dark);color:#fff;min-height:auto;flex-direction:row;align-items:center;gap:16px}
-  .tile.alarm .lbl{font-size:1.35rem}
-  .tile.alarm .sub{color:#ffd9d5}
+  .tile.alarm{background:var(--alarm);border-color:var(--alarm-dark);color:#fff}
   .tile.alarm .ic *{stroke:#fff}
 
   /* --- Unterseiten --- */
@@ -175,9 +173,16 @@
   .big-btn:active{transform:translateY(1px)}
 
   /* --- Mein Tag --- */
-  .tile.day{grid-column:1 / -1;flex-direction:row;align-items:center;gap:16px;min-height:auto;background:#eef5f7;border-color:#cfe0e6}
-  .tile.day .lbl{font-size:1.25rem}
-  .tile.day .ic{width:38px;height:38px;flex:0 0 auto}
+  .tile.day{background:#eef5f7;border-color:#cfe0e6}
+  .daybar{display:flex;align-items:center;gap:16px;width:100%;background:#eef5f7;border:1px solid #cfe0e6;border-radius:18px;padding:18px 20px;margin-bottom:14px;cursor:pointer;text-align:left;font:inherit;box-shadow:0 1px 0 rgba(15,38,48,.04),0 6px 16px rgba(15,38,48,.05);transition:transform .05s ease}
+  .daybar:active{transform:translateY(1px)}
+  .daybar .ic{width:40px;height:40px;flex:0 0 auto}
+  .daybar .lbl{font-size:1.35rem;font-weight:800;color:var(--ink)}
+  .foto{border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:14px;box-shadow:0 6px 16px rgba(15,38,48,.06);background:var(--card)}
+  .foto svg{display:block;width:100%;height:auto}
+  .foto .cap{padding:12px 16px}
+  .foto .cap b{display:block;font-size:1.05rem}
+  .foto .cap span{color:var(--ink-soft);font-size:.95rem}
   .day-head{background:#eef5f7;color:var(--ink);border:1px solid #cfe0e6;border-radius:16px;padding:18px 20px;margin-bottom:14px}
   .day-head .dat{font-size:1.3rem;font-weight:800}
   .day-head .moon{margin-top:6px;color:var(--ink-soft);font-size:1.02rem}
@@ -231,17 +236,14 @@
   <main>
     <!-- HEIM -->
     <section class="view active" id="v-home">
+      <div id="fotoTag"></div>
+
+      <button class="daybar" onclick="go('heute')">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></span>
+        <span class="lbl">Mein Tag</span>
+      </button>
+
       <div class="grid">
-        <button class="tile alarm" onclick="go('notruf')">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5c0 8 8 16 16 16l-2-5-4 1-3-3 1-4-5-2z"/></svg></span>
-          <span><span class="lbl">Notruf & Erste Hilfe</span></span>
-        </button>
-
-        <button class="tile day" onclick="go('heute')">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></span>
-          <span><span class="lbl">Mein Tag</span></span>
-        </button>
-
         <button class="tile" onclick="go('nearby')">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
           <span class="lbl">In der Nähe</span>
@@ -265,9 +267,16 @@
           <span class="lbl">Was koche ich heute?</span>
           <span class="sub">Einfache, gute Gerichte</span>
         </button>
-      </div>
-      <div class="foot">
-        <button class="flink" onclick="go('recht')">Rechtliches & Kontakt</button>
+
+        <button class="tile alarm" onclick="go('notruf')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5c0 8 8 16 16 16l-2-5-4 1-3-3 1-4-5-2z"/></svg></span>
+          <span class="lbl">Notruf & Erste Hilfe</span>
+        </button>
+
+        <button class="tile" onclick="go('recht')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h4"/></svg></span>
+          <span class="lbl">Rechtliches & Kontakt</span>
+        </button>
       </div>
     </section>
 
@@ -1162,9 +1171,26 @@ function neuesRezept(){
 }
 neuesRezept();
 
+/* ---------- Foto des Tages (eigene Vektor-Landschaften) ---------- */
+const FOTO = [
+  {cap:"Sonnenaufgang über dem See", tipp:"Gönnen Sie sich heute einen ruhigen Moment.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="a1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe2b0"/><stop offset="1" stop-color="#ffc299"/></linearGradient><linearGradient id="a2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9cdde"/><stop offset="1" stop-color="#7aa9c4"/></linearGradient></defs><rect width="400" height="120" fill="url(#a1)"/><circle cx="200" cy="86" r="30" fill="#fff0b8"/><path d="M0 120 Q90 96 180 108 Q300 122 400 100 L400 120 Z" fill="#b6a98f" opacity="0.55"/><rect y="120" width="400" height="80" fill="url(#a2)"/><ellipse cx="200" cy="138" rx="30" ry="5" fill="#fff0b8" opacity="0.6"/><g stroke="#fff" stroke-opacity="0.45" stroke-width="2"><line x1="50" y1="150" x2="130" y2="150"/><line x1="250" y1="166" x2="350" y2="166"/><line x1="120" y1="178" x2="210" y2="178"/></g></svg>`},
+  {cap:"Lavendel im Sommer", tipp:"Riechen Sie heute bewusst an etwas Schönem.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="b1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe0f2"/><stop offset="1" stop-color="#e8f4fb"/></linearGradient></defs><rect width="400" height="96" fill="url(#b1)"/><circle cx="330" cy="40" r="20" fill="#fff4cf"/><rect y="96" width="400" height="104" fill="#cfe3b0"/><g fill="#7fae6a" opacity="0.45"><rect y="150" width="400" height="6"/><rect y="128" width="400" height="5"/><rect y="112" width="400" height="4"/></g><g fill="#9d83cf"><circle cx="30" cy="150" r="4"/><circle cx="80" cy="150" r="4"/><circle cx="130" cy="150" r="4"/><circle cx="180" cy="150" r="4"/><circle cx="230" cy="150" r="4"/><circle cx="280" cy="150" r="4"/><circle cx="330" cy="150" r="4"/><circle cx="380" cy="150" r="4"/><circle cx="55" cy="128" r="3"/><circle cx="105" cy="128" r="3"/><circle cx="155" cy="128" r="3"/><circle cx="205" cy="128" r="3"/><circle cx="255" cy="128" r="3"/><circle cx="305" cy="128" r="3"/><circle cx="355" cy="128" r="3"/><circle cx="40" cy="112" r="2.5"/><circle cx="120" cy="112" r="2.5"/><circle cx="200" cy="112" r="2.5"/><circle cx="280" cy="112" r="2.5"/><circle cx="360" cy="112" r="2.5"/></g></svg>`},
+  {cap:"Blick auf die Berge", tipp:"Atmen Sie heute einmal tief durch.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="c1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfeaf6"/><stop offset="1" stop-color="#eef7fb"/></linearGradient></defs><rect width="400" height="200" fill="url(#c1)"/><circle cx="320" cy="46" r="18" fill="#fff3c4"/><path d="M0 200 L70 110 L120 160 L150 130 L210 200 Z" fill="#8fb0a6"/><path d="M150 200 L240 90 L300 150 L330 120 L400 200 Z" fill="#6d9489"/><path d="M240 90 L223 116 L257 116 Z" fill="#fff"/><path d="M70 110 L58 130 L82 130 Z" fill="#fff"/><rect y="184" width="400" height="16" fill="#5c8378"/></svg>`},
+  {cap:"Herbst am Wegrand", tipp:"Gehen Sie heute ein paar Schritte an der frischen Luft.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="d1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dceff3"/><stop offset="1" stop-color="#f3f0e4"/></linearGradient></defs><rect width="400" height="160" fill="url(#d1)"/><rect y="160" width="400" height="40" fill="#cdbf8e"/><rect x="190" y="96" width="14" height="74" fill="#8a6a45"/><circle cx="197" cy="80" r="46" fill="#e8923b"/><circle cx="165" cy="92" r="30" fill="#d2772a"/><circle cx="230" cy="92" r="30" fill="#f0b24a"/><g fill="#d2772a"><circle cx="120" cy="172" r="4"/><circle cx="270" cy="176" r="4"/><circle cx="320" cy="168" r="4"/><circle cx="70" cy="178" r="4"/></g></svg>`},
+  {cap:"Stiller Wintertag", tipp:"Wärmen Sie sich heute mit einer Tasse Tee.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="e1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c3d4e2"/><stop offset="1" stop-color="#e8eef4"/></linearGradient></defs><rect width="400" height="200" fill="url(#e1)"/><path d="M0 200 L0 150 Q120 120 220 150 Q320 178 400 145 L400 200 Z" fill="#ffffff"/><rect x="250" y="96" width="9" height="60" fill="#7c6a55"/><g stroke="#7c6a55" stroke-width="4" stroke-linecap="round"><line x1="254" y1="120" x2="234" y2="104"/><line x1="254" y1="118" x2="276" y2="100"/><line x1="254" y1="138" x2="236" y2="126"/><line x1="254" y1="136" x2="274" y2="124"/></g><g fill="#ffffff"><circle cx="60" cy="40" r="3"/><circle cx="120" cy="70" r="2.5"/><circle cx="180" cy="35" r="3"/><circle cx="300" cy="55" r="2.5"/><circle cx="350" cy="30" r="3"/><circle cx="90" cy="100" r="2.5"/></g></svg>`},
+  {cap:"Blumenwiese", tipp:"Freuen Sie sich heute an einer kleinen Farbe.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe6f5"/><stop offset="1" stop-color="#e9f6fb"/></linearGradient></defs><rect width="400" height="110" fill="url(#g1)"/><circle cx="60" cy="42" r="20" fill="#fff3c4"/><rect y="110" width="400" height="90" fill="#bfe0a0"/><g><circle cx="50" cy="150" r="6" fill="#e8657a"/><circle cx="120" cy="165" r="6" fill="#f3c34a"/><circle cx="190" cy="150" r="6" fill="#fff"/><circle cx="260" cy="168" r="6" fill="#e8657a"/><circle cx="330" cy="152" r="6" fill="#f3c34a"/><circle cx="90" cy="182" r="5" fill="#fff"/><circle cx="220" cy="184" r="5" fill="#e8657a"/><circle cx="300" cy="182" r="5" fill="#fff"/><circle cx="160" cy="180" r="5" fill="#f3c34a"/></g><g stroke="#7fae6a" stroke-width="2"><line x1="50" y1="156" x2="50" y2="172"/><line x1="120" y1="171" x2="120" y2="186"/><line x1="190" y1="156" x2="190" y2="172"/><line x1="260" y1="174" x2="260" y2="188"/><line x1="330" y1="158" x2="330" y2="174"/></g></svg>`}
+];
+function renderFoto(){
+  const doy = tagDesJahres(new Date());
+  const f = FOTO[doy % FOTO.length];
+  document.getElementById('fotoTag').innerHTML =
+    `<div class="foto">${f.svg}<div class="cap"><b>${f.cap}</b><span>${f.tipp}</span></div></div>`;
+}
+
 /* ---------- Start ---------- */
 paintLand();
 locate();
+renderFoto();
 
 /* ---------- Als App lauffähig machen (offline + installierbar) ---------- */
 if('serviceWorker' in navigator){
