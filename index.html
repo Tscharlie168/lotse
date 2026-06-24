@@ -176,11 +176,15 @@
   .tile.day{grid-column:1 / -1;flex-direction:row;align-items:center;gap:16px;min-height:auto;background:#eef5f7;border-color:#cfe0e6}
   .tile.day .lbl{font-size:1.25rem}
   .tile.day .ic{width:38px;height:38px;flex:0 0 auto}
-  .day-head{background:var(--ground);color:#eaf2f5;border-radius:16px;padding:18px 20px;margin-bottom:14px}
+  .day-head{background:#eef5f7;color:var(--ink);border:1px solid #cfe0e6;border-radius:16px;padding:18px 20px;margin-bottom:14px}
   .day-head .dat{font-size:1.3rem;font-weight:800}
-  .day-head .moon{margin-top:6px;color:#9fc0cd;font-size:1.02rem}
+  .day-head .moon{margin-top:6px;color:var(--ink-soft);font-size:1.02rem}
   .quote{background:#fff7ec;border:1px solid #f0d9b6}
   .quote p{margin:0;color:#6b4b1e;font-size:1.15rem;font-weight:600;line-height:1.5}
+  .tip{background:#eef7ef;border:1px solid #c9e4cd}
+  .tip h3{color:#2f6b3a}
+  .brain{background:#f0eef8;border:1px solid #d6cfe9}
+  .brain h3{color:#4a3c7a}
   .wx{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 4px 12px rgba(15,38,48,.04);margin-bottom:12px}
   .wx .ort{font-size:1.1rem;font-weight:800;margin:0 0 6px}
   .wx .now{display:flex;align-items:center;gap:12px;margin:6px 0}
@@ -520,6 +524,8 @@
       <h2>Mein Tag</h2>
       <div class="day-head" id="dayHead"></div>
       <div class="card-info quote"><p id="spruch"></p></div>
+      <div class="card-info tip"><h3>🌿 Gesundheitstipp des Tages</h3><p id="tip"></p></div>
+      <div class="card-info brain"><h3>🧠 Kleine Gehirnjogging-Übung</h3><p id="brain"></p></div>
 
       <h2 style="margin-top:22px">Wetter hier</h2>
       <div id="wxHere"></div>
@@ -534,11 +540,11 @@
 
       <h2 style="margin-top:18px">Eine gute Nachricht</h2>
       <div class="rows">
-        <a class="row" href="https://www.zdfheute.de/thema/good-news-konstruktive-nachrichten-100.html" target="_blank" rel="noopener">
-          <div class="main"><b>Good News (ZDF)</b><small>Konstruktive, gute Nachrichten</small></div><div class="go">Öffnen ›</div>
-        </a>
         <a class="row" href="https://goodnews.eu/" target="_blank" rel="noopener">
           <div class="main"><b>goodnews.eu</b><small>Positive Entwicklungen aus aller Welt</small></div><div class="go">Öffnen ›</div>
+        </a>
+        <a class="row" href="https://goodnews-magazin.de/" target="_blank" rel="noopener">
+          <div class="main"><b>Good News Magazin</b><small>Unabhängige Redaktion, Mut machende Geschichten</small></div><div class="go">Öffnen ›</div>
         </a>
       </div>
       <div class="note">Bewusst als Knopf, nicht als Schlagzeile – Sie entscheiden, wann Sie gute Nachrichten lesen möchten.</div>
@@ -749,6 +755,64 @@ function tagDesJahres(d){
   const start = new Date(d.getFullYear(),0,0);
   return Math.floor((d - start) / 86400000);
 }
+const GESUNDHEIT = {
+  winter:[
+    "Lüften Sie morgens kurz durch – frische Luft vertreibt Müdigkeit.",
+    "Auch bei Kälte ans Trinken denken; der Körper braucht weiter Flüssigkeit.",
+    "Eine warme Suppe tut gut und liefert nebenbei Flüssigkeit.",
+    "Tageslicht tanken: ein kurzer Mittagsspaziergang hebt die Stimmung.",
+    "Heizungsluft trocknet die Haut – ruhig öfter eincremen.",
+    "Hände regelmäßig waschen – der einfachste Schutz in der Erkältungszeit.",
+    "Ein paar Schritte im Warmen sind besser als langes Sitzen."
+  ],
+  fruehling:[
+    "Die erste Sonne genießen – aber an den Sonnenschutz denken.",
+    "Frühjahrsmüde? Ein Spaziergang bringt den Kreislauf in Schwung.",
+    "Frisches Gemüse der Saison auf den Teller, etwa Spargel oder Radieschen.",
+    "Pollenzeit: abends die Haare ausspülen, dann schläft es sich besser.",
+    "Eine Wechseldusche am Morgen macht munter.",
+    "Das milde Wetter lädt ein, öfter zu Fuß zu gehen."
+  ],
+  sommer:[
+    "Bei Hitze über den Tag verteilt genug trinken – Wasser oder Tee.",
+    "Die heiße Mittagszeit lieber im Schatten verbringen.",
+    "Leichte Kost an warmen Tagen: Obst, Salate, etwas Gegrilltes.",
+    "Hut und Sonnenschutz beim Spaziergang nicht vergessen.",
+    "Am frühen Morgen oder Abend bewegt es sich am angenehmsten.",
+    "Ein kühles Fußbad erfrischt an heißen Tagen erstaunlich gut."
+  ],
+  herbst:[
+    "Buntes Herbstgemüse genießen – Kürbis, Kohl, Wurzelgemüse.",
+    "Spaziergänge im Laub stärken Abwehr und Stimmung.",
+    "Gute Zeit, die Grippeimpfung mit dem Arzt zu besprechen.",
+    "Morgens kurz ans Fenster – Licht tut bei kürzeren Tagen gut.",
+    "Nach dem Zwiebelprinzip anziehen: mehrere dünne Schichten.",
+    "Ein Ingwertee wärmt an den ersten kühlen Tagen."
+  ]
+};
+function jahreszeit(m){
+  if(m===11 || m<=1) return 'winter';
+  if(m<=4) return 'fruehling';
+  if(m<=7) return 'sommer';
+  return 'herbst';
+}
+const GEHIRN = [
+  "Zählen Sie beim Zähneputzen von 100 rückwärts und ziehen Sie immer 7 ab.",
+  "Nennen Sie im Kopf zehn Städte, die mit B beginnen.",
+  "Buchstabieren Sie Ihren Vornamen rückwärts.",
+  "Erinnern Sie sich an Ihr Frühstück von gestern – jede Zutat einzeln.",
+  "Zählen Sie alle roten Dinge im Raum und merken Sie sich die Zahl.",
+  "Nennen Sie sieben Tiere, die mit S beginnen.",
+  "Rechnen Sie im Kopf: 7 × 8, das Ergebnis dann mal 2.",
+  "Sagen Sie die Monate des Jahres rückwärts auf.",
+  "Was haben Sie vor genau einer Woche gegessen?",
+  "Nennen Sie fünf Wörter, die sich auf das Wort Haus reimen.",
+  "Beschreiben Sie im Kopf den Weg vom Bett bis zur Haustür.",
+  "Denken Sie an ein Lied und tippen Sie den Takt mit dem Finger.",
+  "Nennen Sie zehn Gemüsesorten, ohne eine zu wiederholen.",
+  "Zählen Sie rückwärts von 50 in Dreierschritten.",
+  "Rufen Sie drei Telefonnummern aus dem Gedächtnis ab."
+];
 function moonPhase(d){
   const synodic = 29.530588853;
   const ref = Date.UTC(2000,0,6,18,14) / 86400000;
@@ -783,6 +847,9 @@ function renderHeute(){
   document.getElementById('dayHead').innerHTML =
     `<div class="dat">${dat}</div><div class="moon">${mp.emoji} Mond: ${mp.name}</div>`;
   document.getElementById('spruch').textContent = SPRUECHE[tagDesJahres(now) % SPRUECHE.length];
+  const pool = GESUNDHEIT[jahreszeit(now.getMonth())];
+  document.getElementById('tip').textContent = pool[tagDesJahres(now) % pool.length];
+  document.getElementById('brain').textContent = GEHIRN[tagDesJahres(now) % GEHIRN.length];
   renderWx(document.getElementById('wxHere'), STATE.lat, STATE.lon, STATE.ort && STATE.ort!=="Ihr Standort" ? STATE.ort : "Ihr Standort");
 }
 async function renderWx(box, lat, lon, label){
