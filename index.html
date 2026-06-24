@@ -93,9 +93,11 @@
   .view.active{display:block;animation:in .18s ease}
   @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   .back{
-    display:inline-flex;align-items:center;gap:8px;background:none;border:0;
-    color:var(--sea);font-size:1.3rem;font-weight:800;cursor:pointer;padding:12px 6px;margin-bottom:6px;
+    display:inline-flex;align-items:center;gap:8px;
+    background:#eef5f7;border:1px solid #cfe0e6;border-radius:12px;
+    color:var(--sea);font-size:1.2rem;font-weight:800;cursor:pointer;padding:12px 18px;margin-bottom:14px;
   }
+  .back:active{background:var(--tap)}
 
   /* --- Listen / Aktionsknöpfe --- */
   .rows{display:flex;flex-direction:column;gap:12px}
@@ -180,6 +182,7 @@
   .day-head .dat{font-size:1.3rem;font-weight:800}
   .day-head .moon{margin-top:6px;color:var(--ink-soft);font-size:1.02rem}
   .quote{background:#fff7ec;border:1px solid #f0d9b6}
+  .quote h3{color:#6b4b1e}
   .quote p{margin:0;color:#6b4b1e;font-size:1.15rem;font-weight:600;line-height:1.5}
   .tip{background:#eef7ef;border:1px solid #c9e4cd}
   .tip h3{color:#2f6b3a}
@@ -231,12 +234,12 @@
       <div class="grid">
         <button class="tile alarm" onclick="go('notruf')">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5c0 8 8 16 16 16l-2-5-4 1-3-3 1-4-5-2z"/></svg></span>
-          <span><span class="lbl">Notruf & Erste Hilfe</span><span class="sub">Schnell Hilfe holen</span></span>
+          <span><span class="lbl">Notruf & Erste Hilfe</span></span>
         </button>
 
         <button class="tile day" onclick="go('heute')">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></span>
-          <span><span class="lbl">Mein Tag</span><span class="sub">Datum, Wetter, ein guter Gedanke</span></span>
+          <span><span class="lbl">Mein Tag</span></span>
         </button>
 
         <button class="tile" onclick="go('nearby')">
@@ -537,7 +540,7 @@
       <h2>Mein Tag</h2>
       <div class="day-head" id="dayHead"></div>
       <div class="horo" id="horo"></div>
-      <div class="card-info quote"><p id="spruch"></p></div>
+      <div class="card-info quote"><h3>✨ Spruch des Tages</h3><p id="spruch"></p></div>
       <div class="card-info tip"><h3>🌿 Gesundheitstipp des Tages</h3><p id="tip"></p></div>
       <div class="card-info brain"><h3>🧠 Kleine Gehirnjogging-Übung</h3><p id="brain"></p></div>
 
@@ -552,7 +555,7 @@
       </div>
       <div id="wxThere"></div>
 
-      <h2 style="margin-top:18px">Eine gute Nachricht</h2>
+      <h2 style="margin-top:18px">Gute Nachrichten des Tages</h2>
       <div class="rows">
         <a class="row" href="https://goodnews.eu/" target="_blank" rel="noopener">
           <div class="main"><b>goodnews.eu</b><small>Positive Entwicklungen aus aller Welt</small></div><div class="go">Öffnen ›</div>
