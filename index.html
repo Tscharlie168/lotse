@@ -129,8 +129,8 @@
   .card-info ol{margin:8px 0 0;padding-left:20px;color:var(--ink-soft)}
   .card-info li{margin:4px 0}
 
-  .cats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:6px}
-  .cat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 12px;cursor:pointer;text-align:center;font-weight:700;font-size:1.05rem;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(15,38,48,.04)}
+  .cats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:6px}
+  .cat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 6px;cursor:pointer;text-align:center;font-weight:700;font-size:.92rem;line-height:1.2;display:flex;flex-direction:column;align-items:center;gap:7px;box-shadow:0 4px 12px rgba(15,38,48,.04);overflow-wrap:anywhere;hyphens:auto}
   .cat:active{background:var(--tap)}
 
   .status{text-align:center;color:var(--ink-soft);padding:26px 10px;font-size:1rem}
@@ -179,10 +179,8 @@
   .daybar .ic{width:40px;height:40px;flex:0 0 auto}
   .daybar .lbl{font-size:1.35rem;font-weight:800;color:var(--ink)}
   .foto{border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:14px;box-shadow:0 6px 16px rgba(15,38,48,.06);background:var(--card)}
+  .foto img{display:block;width:100%;aspect-ratio:8 / 5;object-fit:cover}
   .foto svg{display:block;width:100%;height:auto}
-  .foto .cap{padding:12px 16px}
-  .foto .cap b{display:block;font-size:1.05rem}
-  .foto .cap span{color:var(--ink-soft);font-size:.95rem}
   .foto-act{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:-2px 0 14px}
   .foto-act button{background:#eef5f7;border:1px solid #cfe0e6;border-radius:10px;color:var(--sea);font-weight:700;font-size:.98rem;padding:10px 14px;cursor:pointer}
   .foto-act button:active{background:var(--tap)}
@@ -193,6 +191,7 @@
   .foto-manage .thumb img{width:100%;height:100%;object-fit:cover;display:block}
   .foto-manage .addfoto{width:46px;height:46px;border:1px dashed #c4ced2;border-radius:12px;background:#fafbfc;cursor:pointer;display:flex;align-items:center;justify-content:center}
   .foto-manage .addfoto svg{width:24px;height:24px}
+  .foto-manage .addrow{display:flex;gap:12px}
   .day-head{background:#eef5f7;color:var(--ink);border:1px solid #cfe0e6;border-radius:16px;padding:18px 20px;margin-bottom:14px}
   .day-head .dat{font-size:1.3rem;font-weight:800}
   .day-head .moon{margin-top:6px;color:var(--ink-soft);font-size:1.02rem}
@@ -443,6 +442,10 @@
         <button class="cat" onclick="findNear('bench')"><span style="font-size:1.7rem">🪑</span>Sitzbank</button>
         <button class="cat" onclick="findNear('water')"><span style="font-size:1.7rem">🚰</span>Trinkwasser</button>
         <button class="cat" onclick="findNear('sights')"><span style="font-size:1.7rem">🏰</span>Sehenswürdigkeit</button>
+        <button class="cat" onclick="findNear('cafe')"><span style="font-size:1.7rem">☕</span>Café</button>
+        <button class="cat" onclick="findNear('busstop')"><span style="font-size:1.7rem">🚏</span>Bushaltestelle</button>
+        <button class="cat" onclick="findNear('atm')"><span style="font-size:1.7rem">🏧</span>Geldautomat</button>
+        <button class="cat" onclick="findNear('hofverkauf')"><span style="font-size:1.7rem">🧺</span>Hofverkauf</button>
         <button class="cat" onclick="eventsNear()"><span style="font-size:1.7rem">🎉</span>Veranstaltung</button>
       </div>
       <div class="note">„Veranstaltung" öffnet eine Suche nach Terminen in Ihrer Nähe – diese stehen nicht in der Karte, darum führt der Knopf zur passenden Web-Suche.</div>
@@ -473,8 +476,13 @@
       <div class="chips">
         <span class="chip" onclick="quick('Bäckerei')">Bäckerei</span>
         <span class="chip" onclick="quick('Supermarkt')">Supermarkt</span>
+        <span class="chip" onclick="quick('Café')">Café</span>
+        <span class="chip" onclick="quick('Metzgerei')">Metzgerei</span>
+        <span class="chip" onclick="quick('Drogerie')">Drogerie</span>
         <span class="chip" onclick="quick('Arzt')">Arzt</span>
+        <span class="chip" onclick="quick('Krankenhaus')">Krankenhaus</span>
         <span class="chip" onclick="quick('Restaurant')">Restaurant</span>
+        <span class="chip" onclick="quick('Bushaltestelle')">Bushaltestelle</span>
         <span class="chip" onclick="quick('Bank Geldautomat')">Geldautomat</span>
       </div>
       <div class="note">Öffnet die Karte mit Adresse, Öffnungszeiten und Weg.</div>
@@ -691,7 +699,11 @@ const CAT = {
   pharmacy:{q:'["amenity"="pharmacy"]', t:"Apotheken in der Nähe", n:"Apotheke", steps:[3000,8000,20000]},
   bench:{q:'["amenity"="bench"]', t:"Sitzbänke in der Nähe", n:"Sitzbank", steps:[1000,3000]},
   water:{q:'["amenity"="drinking_water"]', t:"Trinkwasser in der Nähe", n:"Trinkwasser", steps:[1500,6000,15000]},
-  sights:{q:'["tourism"~"attraction|viewpoint|museum|gallery|artwork|zoo|theme_park"]', t:"Sehenswürdigkeiten in der Nähe", n:"Sehenswürdigkeit", steps:[3000,10000,25000]}
+  sights:{q:'["tourism"~"attraction|viewpoint|museum|gallery|artwork|zoo|theme_park"]', t:"Sehenswürdigkeiten in der Nähe", n:"Sehenswürdigkeit", steps:[3000,10000,25000]},
+  cafe:{q:'["amenity"="cafe"]', t:"Cafés in der Nähe", n:"Café", steps:[1500,5000,12000]},
+  busstop:{q:'["highway"="bus_stop"]', t:"Bushaltestellen in der Nähe", n:"Bushaltestelle", steps:[600,2000,6000]},
+  atm:{q:'["amenity"="atm"]', t:"Geldautomaten in der Nähe", n:"Geldautomat", steps:[1500,6000,15000]},
+  hofverkauf:{q:['["shop"="farm"]','["amenity"="vending_machine"]["vending"~"eggs|fruit|vegetables|milk|honey|food|cheese|potatoes|farm|wine"]'], t:"Hofläden & Automaten in der Nähe", n:"Hofverkauf", steps:[3000,8000,20000]}
 };
 function dist(la,lo){
   const R=6371000,r=Math.PI/180;
@@ -708,7 +720,9 @@ async function findNear(cat){
     let items = [], used = 0;
     for(const radius of c.steps){
       used = radius;
-      const ql = `[out:json][timeout:25];(node${c.q}(around:${radius},${STATE.lat},${STATE.lon});way${c.q}(around:${radius},${STATE.lat},${STATE.lon}););out center 60;`;
+      const sels = Array.isArray(c.q) ? c.q : [c.q];
+      const body = sels.map(sel => `node${sel}(around:${radius},${STATE.lat},${STATE.lon});way${sel}(around:${radius},${STATE.lat},${STATE.lon});`).join('');
+      const ql = `[out:json][timeout:25];(${body});out center 60;`;
       const r = await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:'data='+encodeURIComponent(ql)});
       const d = await r.json();
       items = d.elements.map(el=>{
@@ -1214,7 +1228,8 @@ function renderFoto(){
     box.innerHTML = `<div class="foto">${img}</div>`;
   });
 }
-function addFoto(){ const i = document.getElementById('fotoInput'); if(i) i.click(); }
+function addFoto(){ const i = document.getElementById('fotoInputGal'); if(i) i.click(); }
+function pick(which){ const i = document.getElementById(which==='cam' ? 'fotoInputCam' : 'fotoInputGal'); if(i) i.click(); }
 function askDelFoto(id){ if(confirm('Dieses Foto entfernen?')) idbDel(id).then(()=>{ renderFoto(); renderFotoManage(); }); }
 function renderFotoManage(){
   const box = document.getElementById('fotoManage');
@@ -1225,8 +1240,13 @@ function renderFotoManage(){
       html += '<div class="thumbs">' + fotos.sort((a,b)=>a.id-b.id).map(f=>
         `<button class="thumb" onclick="askDelFoto(${f.id})" title="Antippen zum Entfernen"><img src="${f.data}" alt=""></button>`).join('') + '</div>';
     }
-    html += `<button class="addfoto" onclick="addFoto()" aria-label="Eigenes Foto hinzufügen"><svg viewBox="0 0 24 24" fill="none" stroke="#9aa9ae" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h3l2-2h6l2 2h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg></button>`;
-    box.innerHTML = html + `<input type="file" accept="image/*" id="fotoInput" style="display:none" onchange="handleFoto(this)">`;
+    html += `<div class="addrow">`
+      + `<button class="addfoto" onclick="pick('cam')" aria-label="Foto aufnehmen"><svg viewBox="0 0 24 24" fill="none" stroke="#9aa9ae" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h3l2-2h6l2 2h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg></button>`
+      + `<button class="addfoto" onclick="pick('gal')" aria-label="Foto aus Galerie"><svg viewBox="0 0 24 24" fill="none" stroke="#9aa9ae" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.8"/><path d="M21 16l-5-5L7 19"/></svg></button>`
+      + `</div>`;
+    box.innerHTML = html
+      + `<input type="file" accept="image/*" capture="environment" id="fotoInputCam" style="display:none" onchange="handleFoto(this)">`
+      + `<input type="file" accept="image/*" id="fotoInputGal" style="display:none" onchange="handleFoto(this)">`;
   });
 }
 function handleFoto(input){
