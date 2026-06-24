@@ -129,8 +129,8 @@
   .card-info ol{margin:8px 0 0;padding-left:20px;color:var(--ink-soft)}
   .card-info li{margin:4px 0}
 
-  .cats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:6px}
-  .cat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 6px;cursor:pointer;text-align:center;font-weight:700;font-size:.92rem;line-height:1.2;display:flex;flex-direction:column;align-items:center;gap:7px;box-shadow:0 4px 12px rgba(15,38,48,.04);overflow-wrap:anywhere;hyphens:auto}
+  .cats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:6px}
+  .cat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 10px;cursor:pointer;text-align:center;font-weight:700;font-size:1rem;line-height:1.2;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(15,38,48,.04);overflow-wrap:anywhere;hyphens:auto}
   .cat:active{background:var(--tap)}
 
   .status{text-align:center;color:var(--ink-soft);padding:26px 10px;font-size:1rem}
@@ -445,8 +445,9 @@
         <button class="cat" onclick="findNear('cafe')"><span style="font-size:1.7rem">☕</span>Café</button>
         <button class="cat" onclick="findNear('busstop')"><span style="font-size:1.7rem">🚏</span>Bushaltestelle</button>
         <button class="cat" onclick="findNear('atm')"><span style="font-size:1.7rem">🏧</span>Geldautomat</button>
-        <button class="cat" onclick="findNear('hofverkauf')"><span style="font-size:1.7rem">🧺</span>Hofverkauf</button>
-        <button class="cat" onclick="eventsNear()"><span style="font-size:1.7rem">🎉</span>Veranstaltung</button>
+        <button class="cat" onclick="findNear('hofladen')"><span style="font-size:1.7rem">🏡</span>Hofladen</button>
+        <button class="cat" onclick="findNear('automat')"><span style="font-size:1.7rem">🧺</span>Verkaufsautomat</button>
+        <button class="cat" onclick="eventsNear()" style="grid-column:1 / -1"><span style="font-size:1.7rem">🎉</span>Veranstaltung</button>
       </div>
       <div class="note">„Veranstaltung" öffnet eine Suche nach Terminen in Ihrer Nähe – diese stehen nicht in der Karte, darum führt der Knopf zur passenden Web-Suche.</div>
     </section>
@@ -703,7 +704,8 @@ const CAT = {
   cafe:{q:'["amenity"="cafe"]', t:"Cafés in der Nähe", n:"Café", steps:[1500,5000,12000]},
   busstop:{q:'["highway"="bus_stop"]', t:"Bushaltestellen in der Nähe", n:"Bushaltestelle", steps:[600,2000,6000]},
   atm:{q:'["amenity"="atm"]', t:"Geldautomaten in der Nähe", n:"Geldautomat", steps:[1500,6000,15000]},
-  hofverkauf:{q:['["shop"="farm"]','["amenity"="vending_machine"]["vending"~"eggs|fruit|vegetables|milk|honey|food|cheese|potatoes|farm|wine"]'], t:"Hofläden & Automaten in der Nähe", n:"Hofverkauf", steps:[3000,8000,20000]}
+  hofladen:{q:'["shop"="farm"]', t:"Hofläden in der Nähe", n:"Hofladen", steps:[3000,10000,25000]},
+  automat:{q:'["amenity"="vending_machine"]["vending"~"eggs|fruit|vegetables|milk|honey|food|cheese|potatoes|farm|wine"]', t:"Verkaufsautomaten in der Nähe", n:"Verkaufsautomat", steps:[2000,6000,15000]}
 };
 function dist(la,lo){
   const R=6371000,r=Math.PI/180;
