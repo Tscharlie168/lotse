@@ -111,6 +111,8 @@
   .row .main b{display:block;font-size:1.1rem;font-weight:700}
   .row .main small{color:var(--ink-soft);font-size:.92rem}
   .row .go{color:var(--sea);font-weight:800;font-size:.95rem;white-space:nowrap}
+  .row .ic-right{flex:0 0 auto;width:34px;height:26px;margin-left:10px;display:flex;align-items:center;justify-content:center}
+  .row .ic-right svg{width:100%;height:100%}
 
   .call{background:var(--alarm);border-color:var(--alarm-dark);color:#fff}
   .call:active{background:var(--alarm-dark)}
@@ -170,6 +172,27 @@
   .big-btn{width:100%;background:var(--sea);color:#fff;border:0;border-radius:14px;padding:18px;font-size:1.15rem;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(29,110,140,.25)}
   .big-btn:active{transform:translateY(1px)}
 
+  /* --- Mein Tag --- */
+  .tile.day{grid-column:1 / -1;flex-direction:row;align-items:center;gap:16px;min-height:auto;background:#eef5f7;border-color:#cfe0e6}
+  .tile.day .lbl{font-size:1.25rem}
+  .tile.day .ic{width:38px;height:38px;flex:0 0 auto}
+  .day-head{background:var(--ground);color:#eaf2f5;border-radius:16px;padding:18px 20px;margin-bottom:14px}
+  .day-head .dat{font-size:1.3rem;font-weight:800}
+  .day-head .moon{margin-top:6px;color:#9fc0cd;font-size:1.02rem}
+  .quote{background:#fff7ec;border:1px solid #f0d9b6}
+  .quote p{margin:0;color:#6b4b1e;font-size:1.15rem;font-weight:600;line-height:1.5}
+  .wx{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 4px 12px rgba(15,38,48,.04);margin-bottom:12px}
+  .wx .ort{font-size:1.1rem;font-weight:800;margin:0 0 6px}
+  .wx .now{display:flex;align-items:center;gap:12px;margin:6px 0}
+  .wx .now .t{font-size:2rem;font-weight:800}
+  .wx .now .e{font-size:2rem}
+  .wx .meta{color:var(--ink-soft);font-size:1rem;margin:4px 0}
+  .wx .days{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .wx .d{flex:1;min-width:84px;background:#f4f8f9;border-radius:12px;padding:10px;text-align:center}
+  .wx .d b{display:block;font-size:.92rem}
+  .wx .d .de{font-size:1.5rem;margin:2px 0}
+  .wx .d small{color:var(--ink-soft)}
+
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   button:focus-visible,.row:focus-visible,.tile:focus-visible{outline:3px solid var(--buoy);outline-offset:2px}
 </style>
@@ -192,6 +215,11 @@
         <button class="tile alarm" onclick="go('notruf')">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5c0 8 8 16 16 16l-2-5-4 1-3-3 1-4-5-2z"/></svg></span>
           <span><span class="lbl">Notruf & Erste Hilfe</span><span class="sub">Schnell Hilfe holen</span></span>
+        </button>
+
+        <button class="tile day" onclick="go('heute')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></span>
+          <span><span class="lbl">Mein Tag</span><span class="sub">Datum, Wetter, ein guter Gedanke</span></span>
         </button>
 
         <button class="tile" onclick="go('nearby')">
@@ -481,9 +509,39 @@
         <div class="fa-body">
           <p>© 2026 Udo Maier. Die eigenen Texte und Gestaltung dieser App sind urheberrechtlich geschützt.</p>
           <p>Kartendaten: © OpenStreetMap-Mitwirkende, verfügbar unter der Open Database License (ODbL).</p>
+          <p>Wetterdaten: © Open-Meteo.com, verfügbar unter der Lizenz CC BY 4.0.</p>
           <p>Verlinkte Rezepte und fremde Inhalte gehören den jeweiligen Urhebern.</p>
         </div>
       </details>
+    </section>
+    <!-- MEIN TAG -->
+    <section class="view" id="v-heute">
+      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <h2>Mein Tag</h2>
+      <div class="day-head" id="dayHead"></div>
+      <div class="card-info quote"><p id="spruch"></p></div>
+
+      <h2 style="margin-top:22px">Wetter hier</h2>
+      <div id="wxHere"></div>
+
+      <h2 style="margin-top:18px">Wetter am Zielort</h2>
+      <p style="color:var(--ink-soft);margin:0 0 10px">Planen Sie einen Ausflug? Ort eintippen.</p>
+      <div class="search-box">
+        <input id="wxQ" type="text" placeholder="z. B. Bregenz, Lindau, München" enterkeyhint="search">
+        <button onclick="wxTarget()">Zeigen</button>
+      </div>
+      <div id="wxThere"></div>
+
+      <h2 style="margin-top:18px">Eine gute Nachricht</h2>
+      <div class="rows">
+        <a class="row" href="https://www.zdfheute.de/thema/good-news-konstruktive-nachrichten-100.html" target="_blank" rel="noopener">
+          <div class="main"><b>Good News (ZDF)</b><small>Konstruktive, gute Nachrichten</small></div><div class="go">Öffnen ›</div>
+        </a>
+        <a class="row" href="https://goodnews.eu/" target="_blank" rel="noopener">
+          <div class="main"><b>goodnews.eu</b><small>Positive Entwicklungen aus aller Welt</small></div><div class="go">Öffnen ›</div>
+        </a>
+      </div>
+      <div class="note">Bewusst als Knopf, nicht als Schlagzeile – Sie entscheiden, wann Sie gute Nachrichten lesen möchten.</div>
     </section>
   </main>
 </div>
@@ -525,6 +583,7 @@ let STATE = { lat:47.5996, lon:9.5566, ort:"Langenargen", land:"DE", located:fal
 function go(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('v-'+name).classList.add('active');
+  if(name==='heute') renderHeute();
   window.scrollTo(0,0);
 }
 
@@ -542,15 +601,16 @@ function paintLand(){
   // Fahrplan: Verbindung von hier aus (mit Abfahrtszeiten) + landesweiter Planer
   document.getElementById('fahrRows').innerHTML = `
     <a class="row" href="javascript:void(0)" onclick="planRoute()">
-      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14" r="6"/><path d="M14 10l6-6M16 4h4M20 4v4"/></svg></span>
-      <div class="main"><b>Verbindung von hier aus</b><small>Ziel eingeben – zeigt die nächsten Abfahrten mit Bus &amp; Bahn</small></div><div class="go">Suchen ›</div>
+      <div class="main"><b>Verbindung von hier aus</b><small>Ziel eingeben – zeigt die nächsten Abfahrten mit Bus &amp; Bahn</small></div>
+      <span class="ic-right"><svg viewBox="0 0 32 24" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="12" r="4.5" fill="#1d6e8c"/><rect x="10" y="10.5" width="9" height="3" rx="1" fill="#1d6e8c"/><polygon points="18,6 28,12 18,18" fill="#1d6e8c"/></svg></span>
     </a>
     <a class="row" href="javascript:void(0)" onclick="nearStops()">
-      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="13" rx="2"/><path d="M4 11h16"/><circle cx="8" cy="20" r="1.2"/><circle cx="16" cy="20" r="1.2"/></svg></span>
-      <div class="main"><b>Abfahrten an Haltestelle</b><small>Nächste Station antippen – dann erscheinen die Abfahrtszeiten</small></div><div class="go">Zeigen ›</div>
+      <div class="main"><b>Abfahrten an Haltestelle</b><small>Nächste Station antippen – dann erscheinen die Abfahrtszeiten</small></div>
+      <span class="ic-right"><svg viewBox="0 0 28 24" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="20" height="15" rx="3" fill="#1d6e8c"/><rect x="6.5" y="6" width="15" height="5" rx="1" fill="#ffffff"/><circle cx="9" cy="20" r="2" fill="#1d6e8c"/><circle cx="19" cy="20" r="2" fill="#1d6e8c"/></svg></span>
     </a>` + L.fahr.map(f=>`
     <a class="row" href="${f.url}" target="_blank" rel="noopener">
-      <div class="main"><b>${f.b}</b><small>${f.s} &amp; Tickets</small></div><div class="go">Öffnen ›</div>
+      <div class="main"><b>${f.b}</b><small>${f.s} &amp; Tickets</small></div>
+      <span class="ic-right"><svg viewBox="0 0 28 24" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="3" width="16" height="14" rx="4" fill="#1d6e8c"/><rect x="8.5" y="6" width="11" height="4.5" rx="1" fill="#ffffff"/><circle cx="11" cy="13.5" r="1.4" fill="#ffffff"/><circle cx="17" cy="13.5" r="1.4" fill="#ffffff"/><path d="M9.5 18l-2 4M18.5 18l2 4" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round"/></svg></span>
     </a>`).join('');
 }
 function toggleLand(){
@@ -651,11 +711,138 @@ function sendFeedback(){
   const t = document.getElementById('fb').value.trim();
   window.location.href = 'mailto:info@udo-maier.de?subject=' + encodeURIComponent('Lotse – Verbesserungsidee') + '&body=' + encodeURIComponent(t);
 }
+
+/* ---------- Mein Tag ---------- */
+const SPRUECHE = [
+  "Jeder Tag ist ein neuer Anfang.",
+  "Auch der längste Weg beginnt mit einem einzigen Schritt.",
+  "Morgenstund hat Gold im Mund.",
+  "Kleine Schritte sind auch Schritte.",
+  "Heute ist ein guter Tag, um freundlich zu sein – zu anderen und zu sich selbst.",
+  "Was du heute pflanzt, blüht morgen.",
+  "Es ist nie zu spät für einen schönen Augenblick.",
+  "Ein gutes Wort kostet nichts und wirkt Wunder.",
+  "Geteilte Freude ist doppelte Freude.",
+  "Das Glück wohnt oft in den kleinen Dingen.",
+  "Jeder Sonnenaufgang ist eine zweite Chance.",
+  "Zufriedenheit ist der größte Reichtum.",
+  "Wer dankbar ist, hat schon halb gewonnen.",
+  "Lass den heutigen Tag dein bestes Werk sein.",
+  "Ein freundliches Gesicht öffnet jede Tür.",
+  "Bewegung ist Medizin – jeder Schritt zählt.",
+  "Manchmal ist Innehalten der mutigste Schritt.",
+  "Gutes tun macht zweimal froh: den anderen und dich.",
+  "Die beste Zeit für etwas Neues ist jetzt.",
+  "Wer fragt, bleibt jung.",
+  "Ruhe ist kein Stillstand, sondern Kraft tanken.",
+  "Heute ein kleines Ziel – morgen ein gutes Gefühl.",
+  "Lachen ist gesund – gönn dir heute eins.",
+  "Was gut gemeint ist, kommt meist gut an.",
+  "Ein Lächeln kostet nichts und schenkt viel.",
+  "Wer rastet, der rostet – ein kleiner Spaziergang tut gut.",
+  "Sorgen sind wie Wolken: Sie ziehen vorüber.",
+  "Du musst nicht alles schaffen – nur das Nächste.",
+  "Ein wenig Sonne im Herzen wärmt den ganzen Tag.",
+  "Heute zählt, was du tust – nicht, was du gestern versäumt hast."
+];
+function tagDesJahres(d){
+  const start = new Date(d.getFullYear(),0,0);
+  return Math.floor((d - start) / 86400000);
+}
+function moonPhase(d){
+  const synodic = 29.530588853;
+  const ref = Date.UTC(2000,0,6,18,14) / 86400000;
+  const now = d.getTime() / 86400000;
+  let age = (((now - ref) % synodic) + synodic) % synodic;
+  const ph = [
+    [1.85,"Neumond","🌑"],[5.54,"zunehmende Sichel","🌒"],[9.23,"zunehmender Halbmond","🌓"],
+    [12.92,"zunehmender Mond","🌔"],[16.61,"Vollmond","🌕"],[20.30,"abnehmender Mond","🌖"],
+    [23.99,"abnehmender Halbmond","🌗"],[27.68,"abnehmende Sichel","🌘"]
+  ];
+  for(const [lim,name,emo] of ph){ if(age < lim) return {name,emoji:emo}; }
+  return {name:"Neumond",emoji:"🌑"};
+}
+function wxText(code){
+  const m = {
+    0:["klar","☀️"],1:["überwiegend klar","🌤️"],2:["teils bewölkt","⛅"],3:["bedeckt","☁️"],
+    45:["Nebel","🌫️"],48:["Reifnebel","🌫️"],
+    51:["leichter Niesel","🌦️"],53:["Niesel","🌦️"],55:["dichter Niesel","🌦️"],
+    61:["leichter Regen","🌧️"],63:["Regen","🌧️"],65:["starker Regen","🌧️"],
+    66:["gefrierender Regen","🌧️"],67:["gefrierender Regen","🌧️"],
+    71:["leichter Schnee","🌨️"],73:["Schnee","🌨️"],75:["starker Schnee","❄️"],77:["Schneegriesel","❄️"],
+    80:["Regenschauer","🌦️"],81:["Regenschauer","🌦️"],82:["heftige Schauer","🌧️"],
+    85:["Schneeschauer","🌨️"],86:["Schneeschauer","🌨️"],
+    95:["Gewitter","⛈️"],96:["Gewitter mit Hagel","⛈️"],99:["Gewitter mit Hagel","⛈️"]
+  };
+  return m[code] || ["",""];
+}
+function renderHeute(){
+  const now = new Date();
+  const dat = now.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const mp = moonPhase(now);
+  document.getElementById('dayHead').innerHTML =
+    `<div class="dat">${dat}</div><div class="moon">${mp.emoji} Mond: ${mp.name}</div>`;
+  document.getElementById('spruch').textContent = SPRUECHE[tagDesJahres(now) % SPRUECHE.length];
+  renderWx(document.getElementById('wxHere'), STATE.lat, STATE.lon, STATE.ort && STATE.ort!=="Ihr Standort" ? STATE.ort : "Ihr Standort");
+}
+async function renderWx(box, lat, lon, label){
+  box.innerHTML = `<div class="status"><div class="spin"></div>Wetter wird geladen…</div>`;
+  try{
+    const u = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
+      + `&current=temperature_2m,weather_code`
+      + `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset`
+      + `&timezone=auto&forecast_days=3`;
+    const r = await fetch(u); const d = await r.json();
+    const cur = d.current, dl = d.daily;
+    const [ct,ce] = wxText(cur.weather_code);
+    const sr = dl.sunrise[0].slice(11,16), ss = dl.sunset[0].slice(11,16);
+    const tage = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+    let daysHtml = '';
+    for(let i=0;i<dl.time.length;i++){
+      const wd = i===0 ? 'Heute' : tage[new Date(dl.time[i]).getDay()];
+      const [,e] = wxText(dl.weather_code[i]);
+      daysHtml += `<div class="d"><b>${wd}</b><div class="de">${e}</div><small>${Math.round(dl.temperature_2m_min[i])}° / ${Math.round(dl.temperature_2m_max[i])}°</small></div>`;
+    }
+    box.innerHTML = `<div class="wx">
+      <p class="ort">${label}</p>
+      <div class="now"><span class="e">${ce}</span><span class="t">${Math.round(cur.temperature_2m)}°</span><span style="color:var(--ink-soft)">${ct}</span></div>
+      <p class="meta">Regenwahrscheinlichkeit heute: ${dl.precipitation_probability_max[0] ?? 0}%</p>
+      <p class="meta">☀️ Aufgang ${sr} Uhr &nbsp;·&nbsp; 🌙 Untergang ${ss} Uhr</p>
+      <div class="days">${daysHtml}</div>
+    </div>`;
+  }catch(e){
+    box.innerHTML = `<div class="status">Das Wetter ließ sich gerade nicht laden.<br>Bitte Internet prüfen und erneut versuchen.</div>`;
+  }
+}
+async function wxTarget(){
+  const q = document.getElementById('wxQ').value.trim();
+  if(!q) return;
+  const box = document.getElementById('wxThere');
+  box.innerHTML = `<div class="status"><div class="spin"></div>Ort wird gesucht…</div>`;
+  try{
+    const g = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&language=de&format=json`);
+    const gd = await g.json();
+    if(!gd.results || !gd.results.length){
+      box.innerHTML = `<div class="status">Diesen Ort habe ich nicht gefunden.<br>Bitte anders schreiben und erneut versuchen.</div>`;
+      return;
+    }
+    const o = gd.results[0];
+    const name = o.name + (o.admin1 ? ', '+o.admin1 : '');
+    renderWx(box, o.latitude, o.longitude, name);
+  }catch(e){
+    box.innerHTML = `<div class="status">Die Suche hat gerade nicht geklappt.<br>Bitte erneut versuchen.</div>`;
+  }
+}
 function planRoute(){
   // Verbindungssuche im Öffi-Modus, Start = aktueller Standort; Ziel tippt der Nutzer ein
   window.open(`https://www.google.com/maps/dir/?api=1&origin=${STATE.lat},${STATE.lon}&travelmode=transit`,'_blank','noopener');
 }
-document.addEventListener('keydown',e=>{ if(e.key==='Enter' && document.activeElement && document.activeElement.id==='q') doSearch(); });
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter') return;
+  const id = document.activeElement && document.activeElement.id;
+  if(id==='q') doSearch();
+  if(id==='wxQ') wxTarget();
+});
 
 /* ---------- Was koche ich heute? (einfach, ausgewogen, offline) ---------- */
 const REZEPTE = [
