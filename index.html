@@ -142,6 +142,10 @@
   .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 15px;font-size:.98rem;cursor:pointer}
   .chip:active{background:var(--tap)}
 
+  .foot{text-align:center;margin-top:26px;padding-top:10px;border-top:1px solid var(--line)}
+  .flink{background:none;border:0;color:var(--ink-soft);font-size:1rem;text-decoration:underline;cursor:pointer;padding:10px}
+  textarea{width:100%;font-size:1.05rem;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-family:inherit;box-sizing:border-box;margin-top:8px}
+
   /* --- Aufklappbare Erste-Hilfe-Karten --- */
   .fa{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;box-shadow:0 4px 12px rgba(15,38,48,.04);overflow:hidden}
   .fa summary{list-style:none;cursor:pointer;padding:18px 16px;font-size:1.15rem;font-weight:800;color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -213,6 +217,9 @@
           <span class="lbl">Was koche ich heute?</span>
           <span class="sub">Einfache, gute Gerichte</span>
         </button>
+      </div>
+      <div class="foot">
+        <button class="flink" onclick="go('recht')">Rechtliches & Kontakt</button>
       </div>
     </section>
 
@@ -411,8 +418,72 @@
       <h2>Was koche ich heute?</h2>
       <div id="rezept"></div>
       <button class="big-btn" onclick="neuesRezept()">Anderer Vorschlag</button>
+
+      <h2 style="margin-top:24px">Mehr gesunde Rezepte</h2>
+      <div class="rows">
+        <a class="row" href="https://eatsmarter.de/experten/dr-med-matthias-riedl" target="_blank" rel="noopener">
+          <div class="main"><b>Dr. Matthias Riedl (Ernährungs-Docs)</b><small>Ausführliche, gesunde Rezepte zum Nachkochen</small></div><div class="go">Öffnen ›</div>
+        </a>
+        <a class="row" href="https://ernaehrungsdoc-matthias-riedl.com/" target="_blank" rel="noopener">
+          <div class="main"><b>Dr. Riedl – offizielle Seite</b><small>Tipps & Wissen rund um gesunde Ernährung</small></div><div class="go">Öffnen ›</div>
+        </a>
+      </div>
       <div class="note" style="margin-top:16px"><b>Ans Trinken denken.</b> Über den Tag verteilt etwa 1,5 Liter – Wasser, ungesüßter Tee oder Schorle. Ein gefülltes Glas in Sichtweite erinnert von selbst.</div>
       <div class="note">Die Vorschläge sind allgemeine Anregungen, kein Diät- oder Krankenkostplan. Bei Allergien, Unverträglichkeiten oder einer ärztlichen Diät bitte anpassen oder im Zweifel den Arzt fragen.</div>
+    </section>
+
+    <!-- RECHTLICHES & KONTAKT -->
+    <section class="view" id="v-recht">
+      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <h2>Rechtliches & Kontakt</h2>
+
+      <div class="card-info">
+        <h3>Verbesserung vorschlagen</h3>
+        <p>Was fehlt, was stört, was würde helfen? Schreiben Sie es hier hinein – mit „Senden" öffnet sich Ihr E-Mail-Programm mit dem fertigen Text an Udo Maier.</p>
+        <textarea id="fb" rows="5" placeholder="Ihre Idee oder Rückmeldung …"></textarea>
+        <button class="big-btn" style="margin-top:10px" onclick="sendFeedback()">Per E-Mail senden</button>
+      </div>
+
+      <details class="fa">
+        <summary>Impressum</summary>
+        <div class="fa-body">
+          <p>Angaben gemäß § 5 DDG</p>
+          <p>Udo Maier<br>Alfred-Weiß-Str. 2<br>88085 Langenargen<br>Deutschland</p>
+          <p><b>Kontakt:</b><br>E-Mail: info@udo-maier.de</p>
+          <p>Verantwortlich für den Inhalt: Udo Maier (Anschrift wie oben).</p>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>Datenschutzerklärung</summary>
+        <div class="fa-body">
+          <p><b>Verantwortlicher:</b> Udo Maier, Alfred-Weiß-Str. 2, 88085 Langenargen, info@udo-maier.de</p>
+          <p><b>Kurz gesagt:</b> Der Lotse hat keine Benutzerkonten, setzt keine Cookies, zeigt keine Werbung und verfolgt Ihr Verhalten nicht.</p>
+          <p><b>Standort:</b> Wenn Sie es erlauben, ermittelt die App Ihren Standort, um Orte in der Nähe (z. B. Toiletten, Apotheken) zu finden und das richtige Land einzustellen. Der Standort wird dafür an die Kartendienste OpenStreetMap (Nominatim, Overpass) übertragen. Er wird nicht dauerhaft gespeichert. Erteilen Sie keine Erlaubnis, nutzt die App einen ungefähren Standardort.</p>
+          <p><b>Verlinkte Dienste:</b> Knöpfe wie „Weg zeigen", „Verbindung", „Suchen" oder die Rezept-Links öffnen fremde Angebote (z. B. Google Maps, Google Suche, Deutsche Bahn, ÖBB, EAT SMARTER). Sobald Sie dort sind, gelten die Datenschutzbestimmungen des jeweiligen Anbieters.</p>
+          <p><b>Hosting:</b> Die App liegt auf GitHub Pages (GitHub Inc.). Beim Abruf können technisch notwendige Daten wie die IP-Adresse in Server-Protokollen anfallen.</p>
+          <p><b>Ihre Rechte:</b> Sie haben nach DSGVO das Recht auf Auskunft, Berichtigung und Löschung. Wenden Sie sich dazu an die oben genannte E-Mail-Adresse.</p>
+          <p style="font-size:.9rem">Hinweis: Dies ist eine in einfacher Sprache gehaltene Fassung. Für volle rechtliche Sicherheit empfiehlt sich eine anwaltlich geprüfte Datenschutzerklärung.</p>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>Haftungsausschluss</summary>
+        <div class="fa-body">
+          <p><b>Gesundheits- und Ernährungshinweise:</b> Die Inhalte zu Erster Hilfe und Ernährung sind allgemeine Informationen. Sie ersetzen weder eine ärztliche Beratung noch einen Erste-Hilfe-Kurs. Im Notfall wählen Sie den Notruf 112. Für Richtigkeit, Vollständigkeit und Aktualität wird keine Gewähr übernommen; die Nutzung erfolgt auf eigene Verantwortung.</p>
+          <p><b>Orts- und Kartendaten</b> stammen aus OpenStreetMap und können unvollständig oder veraltet sein – ohne Gewähr.</p>
+          <p><b>Externe Links:</b> Für die Inhalte verlinkter fremder Seiten sind deren Betreiber verantwortlich. Trotz sorgfältiger Auswahl wird für diese Inhalte keine Haftung übernommen.</p>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>Urheberrecht & Kartendaten</summary>
+        <div class="fa-body">
+          <p>© 2026 Udo Maier. Die eigenen Texte und Gestaltung dieser App sind urheberrechtlich geschützt.</p>
+          <p>Kartendaten: © OpenStreetMap-Mitwirkende, verfügbar unter der Open Database License (ODbL).</p>
+          <p>Verlinkte Rezepte und fremde Inhalte gehören den jeweiligen Urhebern.</p>
+        </div>
+      </details>
     </section>
   </main>
 </div>
@@ -471,9 +542,11 @@ function paintLand(){
   // Fahrplan: Verbindung von hier aus (mit Abfahrtszeiten) + landesweiter Planer
   document.getElementById('fahrRows').innerHTML = `
     <a class="row" href="javascript:void(0)" onclick="planRoute()">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14" r="6"/><path d="M14 10l6-6M16 4h4M20 4v4"/></svg></span>
       <div class="main"><b>Verbindung von hier aus</b><small>Ziel eingeben – zeigt die nächsten Abfahrten mit Bus &amp; Bahn</small></div><div class="go">Suchen ›</div>
     </a>
     <a class="row" href="javascript:void(0)" onclick="nearStops()">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="13" rx="2"/><path d="M4 11h16"/><circle cx="8" cy="20" r="1.2"/><circle cx="16" cy="20" r="1.2"/></svg></span>
       <div class="main"><b>Abfahrten an Haltestelle</b><small>Nächste Station antippen – dann erscheinen die Abfahrtszeiten</small></div><div class="go">Zeigen ›</div>
     </a>` + L.fahr.map(f=>`
     <a class="row" href="${f.url}" target="_blank" rel="noopener">
@@ -550,7 +623,7 @@ async function findNear(cat){
     const hint = used>=8000 ? `<div class="note">Im näheren Umkreis war nichts eingetragen – das Nächste liegt etwas weiter weg.</div>` : '';
     document.getElementById('resBody').innerHTML = hint + `<div class="rows">`+items.map(i=>`
       <a class="row" href="https://www.google.com/maps/dir/?api=1&destination=${i.la},${i.lo}" target="_blank" rel="noopener">
-        <div class="main"><b>${i.name}</b><small>${i.m<1000? i.m+' m entfernt' : (i.m/1000).toFixed(1)+' km entfernt'}</small></div>
+        <div class="main"><b>${i.name}</b><small>${i.m<1000 ? i.m+' m entfernt' : (i.m<10000 ? (i.m/1000).toFixed(1).replace('.',',')+' km entfernt' : 'ca. '+Math.round(i.m/1000)+' km entfernt')}</small></div>
         <div class="go">Weg zeigen ›</div>
       </a>`).join('')+`</div>`;
   }catch(e){
@@ -574,6 +647,10 @@ function eventsNear(){
   const ort = (STATE.ort && STATE.ort!=="Ihr Standort") ? STATE.ort : "in der Nähe";
   window.open(`https://www.google.com/search?q=${encodeURIComponent('Veranstaltungen heute '+ort)}`,'_blank','noopener');
 }
+function sendFeedback(){
+  const t = document.getElementById('fb').value.trim();
+  window.location.href = 'mailto:info@udo-maier.de?subject=' + encodeURIComponent('Lotse – Verbesserungsidee') + '&body=' + encodeURIComponent(t);
+}
 function planRoute(){
   // Verbindungssuche im Öffi-Modus, Start = aktueller Standort; Ziel tippt der Nutzer ein
   window.open(`https://www.google.com/maps/dir/?api=1&origin=${STATE.lat},${STATE.lon}&travelmode=transit`,'_blank','noopener');
@@ -582,52 +659,52 @@ document.addEventListener('keydown',e=>{ if(e.key==='Enter' && document.activeEl
 
 /* ---------- Was koche ich heute? (einfach, ausgewogen, offline) ---------- */
 const REZEPTE = [
-  {n:"Pellkartoffeln mit Kräuterquark", warum:"Sättigend, eiweißreich, leicht verdaulich",
+  {n:"Pellkartoffeln mit Kräuterquark", pers:2, warum:"Sättigend, eiweißreich, leicht verdaulich",
    zut:["4 mittelgroße Kartoffeln","250 g Magerquark","2 EL Milch","1 Bund Schnittlauch oder Petersilie","1 TL Leinöl","Salz, Pfeffer"],
    s:"Kartoffeln in der Schale weich kochen (ca. 20 Min.). Quark mit Milch, gehackten Kräutern, Leinöl, Salz und Pfeffer verrühren. Kartoffeln pellen und mit dem Quark servieren."},
-  {n:"Haferbrei mit Apfel und Walnuss", warum:"Guter Start in den Tag, gut für die Verdauung",
+  {n:"Haferbrei mit Apfel und Walnuss", pers:1, warum:"Guter Start in den Tag, gut für die Verdauung",
    zut:["50 g Haferflocken","250 ml Milch","1 Apfel","1 EL gehackte Walnüsse","1 Prise Zimt","etwas Honig"],
    s:"Haferflocken mit Milch aufkochen, 3–4 Min. quellen lassen. Apfel reiben oder klein schneiden, unterrühren. Mit Walnüssen, Zimt und etwas Honig bestreuen."},
-  {n:"Rührei mit Tomaten", warum:"Schnell, eiweißreich, mit Vollkornbrot ein vollwertiges Essen",
-   zut:["3 Eier","2 Tomaten","1 Scheibe Vollkornbrot","etwas Butter","Salz, Pfeffer, Schnittlauch"],
+  {n:"Rührei mit Tomaten", pers:2, warum:"Schnell, eiweißreich, mit Vollkornbrot ein vollwertiges Essen",
+   zut:["4 Eier","3 Tomaten","2 Scheiben Vollkornbrot","etwas Butter","Salz, Pfeffer, Schnittlauch"],
    s:"Tomaten würfeln. Eier verquirlen, salzen. Butter erhitzen, Tomaten kurz anbraten, Eier dazugeben und stocken lassen. Mit Vollkornbrot servieren."},
-  {n:"Gemüsesuppe mit Kartoffeln", warum:"Wärmend, viel Gemüse, lässt sich gut aufwärmen",
+  {n:"Gemüsesuppe mit Kartoffeln", pers:4, warum:"Wärmend, viel Gemüse, lässt sich gut aufwärmen",
    zut:["2 Karotten","2 Kartoffeln","1 Stange Lauch","1 Liter Gemüsebrühe","Salz, Pfeffer, Petersilie"],
    s:"Gemüse klein schneiden. In der Brühe ca. 20 Min. weich kochen. Abschmecken, mit Petersilie bestreuen. Schmeckt am nächsten Tag noch besser."},
-  {n:"Linseneintopf", warum:"Pflanzliches Eiweiß, viele Ballaststoffe, hält lange satt",
+  {n:"Linseneintopf", pers:3, warum:"Pflanzliches Eiweiß, viele Ballaststoffe, hält lange satt",
    zut:["200 g rote Linsen","2 Karotten","1 Kartoffel","1 Zwiebel","800 ml Brühe","1 Schuss Essig"],
    s:"Zwiebel anschwitzen, Gemüse würfeln und mitbraten. Linsen und Brühe zugeben, ca. 20 Min. köcheln. Mit etwas Essig, Salz und Pfeffer abschmecken."},
-  {n:"Ofengemüse mit Feta", warum:"Bunt, vitaminreich, fast von allein gekocht",
+  {n:"Ofengemüse mit Feta", pers:2, warum:"Bunt, vitaminreich, fast von allein gekocht",
    zut:["1 Zucchini","1 Paprika","1 Süßkartoffel oder 2 Kartoffeln","100 g Feta","2 EL Olivenöl","Kräuter der Provence"],
    s:"Gemüse in Stücke schneiden, mit Öl und Kräutern mischen, auf ein Blech geben. Bei 200 °C ca. 25 Min. backen. Feta darüberbröseln und noch 5 Min. backen."},
-  {n:"Lachs mit Kartoffeln und Brokkoli", warum:"Gute Fette fürs Herz, eiweißreich",
-   zut:["1 Lachsfilet","3 Kartoffeln","1 kleiner Brokkoli","1 Zitrone","etwas Butter, Salz"],
+  {n:"Lachs mit Kartoffeln und Brokkoli", pers:2, warum:"Gute Fette fürs Herz, eiweißreich",
+   zut:["2 Lachsfilets","6 Kartoffeln","1 Brokkoli","1 Zitrone","etwas Butter, Salz"],
    s:"Kartoffeln kochen. Brokkoli 8 Min. dämpfen. Lachs in der Pfanne in etwas Butter je Seite 3–4 Min. braten, mit Zitrone beträufeln. Zusammen anrichten."},
-  {n:"Vollkornnudeln mit Tomatensauce", warum:"Einfach, sättigend, mit Gemüse aufgewertet",
-   zut:["120 g Vollkornnudeln","1 Dose stückige Tomaten","1 Zwiebel","1 Karotte","1 EL Olivenöl","Basilikum, Parmesan"],
+  {n:"Vollkornnudeln mit Tomatensauce", pers:2, warum:"Einfach, sättigend, mit Gemüse aufgewertet",
+   zut:["250 g Vollkornnudeln","1 Dose stückige Tomaten","1 Zwiebel","1 Karotte","1 EL Olivenöl","Basilikum, Parmesan"],
    s:"Nudeln kochen. Zwiebel und geriebene Karotte in Öl anschwitzen, Tomaten zugeben, 10 Min. köcheln, würzen. Über die Nudeln geben, mit Parmesan bestreuen."},
-  {n:"Quark mit Beeren und Haferflocken", warum:"Leichtes Abendessen, eiweißreich, schnell",
+  {n:"Quark mit Beeren und Haferflocken", pers:2, warum:"Leichtes Abendessen, eiweißreich, schnell",
    zut:["250 g Quark","1 Handvoll Beeren (auch tiefgekühlt)","2 EL Haferflocken","1 TL Honig"],
    s:"Quark mit etwas Wasser oder Milch cremig rühren. Beeren und Haferflocken untermischen, mit Honig süßen."},
-  {n:"Hühnersuppe", warum:"Bekömmlich, wärmend, gut bei Erkältung",
+  {n:"Hühnersuppe", pers:4, warum:"Bekömmlich, wärmend, gut bei Erkältung",
    zut:["1 Hühnerbrust","2 Karotten","1 Stück Sellerie","1 Stange Lauch","1,2 l Wasser","Suppennudeln, Salz"],
    s:"Hühnerbrust mit Gemüse und Wasser ca. 30 Min. köcheln. Fleisch herausnehmen, klein schneiden, zurückgeben. Suppennudeln zugeben, weich kochen, salzen."},
-  {n:"Kartoffel-Gemüse-Pfanne", warum:"Resteverwertung, sättigend, anpassbar",
+  {n:"Kartoffel-Gemüse-Pfanne", pers:2, warum:"Resteverwertung, sättigend, anpassbar",
    zut:["4 gekochte Kartoffeln vom Vortag","1 Zwiebel","1 Paprika","2 Eier","1 EL Öl","Salz, Paprikapulver"],
    s:"Kartoffeln in Scheiben, Zwiebel und Paprika klein schneiden. Alles in Öl goldbraun braten. Zum Schluss die verquirlten Eier darüber stocken lassen."},
-  {n:"Milchreis mit Zimt", warum:"Sanftes warmes Essen, gut bei wenig Appetit",
+  {n:"Milchreis mit Zimt", pers:2, warum:"Sanftes warmes Essen, gut bei wenig Appetit",
    zut:["100 g Milchreis","500 ml Milch","1 EL Zucker","Zimt","nach Wunsch Apfelmus"],
    s:"Milchreis in der Milch unter Rühren aufkochen, dann bei kleiner Hitze ca. 30 Min. quellen lassen. Mit Zucker und Zimt, nach Wunsch mit Apfelmus servieren."},
-  {n:"Gemüseomelett", warum:"Eiweißreich, viel Gemüse, in 15 Minuten fertig",
-   zut:["3 Eier","1 kleine Zucchini oder Pilze","1 Tomate","etwas Käse","Öl, Salz, Pfeffer"],
+  {n:"Gemüseomelett", pers:2, warum:"Eiweißreich, viel Gemüse, in 15 Minuten fertig",
+   zut:["4 Eier","1 Zucchini oder Pilze","2 Tomaten","etwas Käse","Öl, Salz, Pfeffer"],
    s:"Gemüse klein schneiden und in Öl andünsten. Eier verquirlen, würzen, darübergeben. Bei mittlerer Hitze stocken lassen, Käse darüber, zusammenklappen."},
-  {n:"Brotzeit mit Käse und Gemüse", warum:"Kein Kochen nötig, ausgewogen, leicht",
-   zut:["2 Scheiben Vollkornbrot","Käse oder magerer Aufschnitt","Radieschen","Gurke","Tomate","etwas Butter"],
+  {n:"Brotzeit mit Käse und Gemüse", pers:2, warum:"Kein Kochen nötig, ausgewogen, leicht",
+   zut:["4 Scheiben Vollkornbrot","Käse oder magerer Aufschnitt","Radieschen","Gurke","Tomate","etwas Butter"],
    s:"Brote bestreichen und belegen. Rohkost in Scheiben dazu. Ein vollwertiges, leichtes Abendessen ohne Aufwand."},
-  {n:"Joghurt mit Obst und Müsli", warum:"Frisch, schnell, gut für den Darm",
+  {n:"Joghurt mit Obst und Müsli", pers:2, warum:"Frisch, schnell, gut für den Darm",
    zut:["250 g Naturjoghurt","1 Banane oder Saisonobst","3 EL Müsli","1 TL Honig","ein paar Nüsse"],
    s:"Obst klein schneiden, mit Joghurt und Müsli schichten. Mit Honig und Nüssen toppen."},
-  {n:"Kürbis- oder Karottensuppe", warum:"Cremig, vitaminreich, leicht zu löffeln",
+  {n:"Kürbis- oder Karottensuppe", pers:3, warum:"Cremig, vitaminreich, leicht zu löffeln",
    zut:["500 g Kürbis oder Karotten","1 Kartoffel","1 Zwiebel","700 ml Brühe","1 Schuss Sahne","Salz, Muskat"],
    s:"Zwiebel anschwitzen, Gemüse würfeln, mit Brühe ca. 20 Min. weich kochen. Pürieren, mit Sahne, Salz und Muskat abschmecken."}
 ];
@@ -641,7 +718,7 @@ function neuesRezept(){
     <div class="rezept-card">
       <h3>${r.n}</h3>
       <p class="warum">${r.warum}</p>
-      <h4>Das brauchen Sie</h4>
+      <h4>Zutaten für ${r.pers} ${r.pers===1?'Person':'Personen'}</h4>
       <ul>${r.zut.map(z=>`<li>${z}</li>`).join('')}</ul>
       <h4>So geht's</h4>
       <p class="schritte">${r.s}</p>
