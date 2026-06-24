@@ -142,6 +142,30 @@
   .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 15px;font-size:.98rem;cursor:pointer}
   .chip:active{background:var(--tap)}
 
+  /* --- Aufklappbare Erste-Hilfe-Karten --- */
+  .fa{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;box-shadow:0 4px 12px rgba(15,38,48,.04);overflow:hidden}
+  .fa summary{list-style:none;cursor:pointer;padding:18px 16px;font-size:1.15rem;font-weight:800;color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .fa summary::-webkit-details-marker{display:none}
+  .fa summary::after{content:"+";color:var(--sea);font-size:1.6rem;font-weight:800;line-height:1;flex:0 0 auto}
+  .fa[open] summary::after{content:"–"}
+  .fa[open] summary{border-bottom:1px solid var(--line)}
+  .fa-body{padding:14px 16px 18px}
+  .fa-body p{margin:0 0 10px;color:var(--ink-soft);font-size:1rem}
+  .fa-body ol{margin:0 0 10px;padding-left:22px}
+  .fa-body li{margin:7px 0;font-size:1rem}
+  .fa-body .fa-key{background:#fdeceb;border-left:4px solid var(--alarm);border-radius:8px;padding:12px 14px;color:#5e1f1a;margin:12px 0}
+
+  /* --- Rezept / Was koche ich heute --- */
+  .rezept-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 6px 16px rgba(15,38,48,.06);margin-bottom:16px}
+  .rezept-card h3{margin:0 0 4px;font-size:1.4rem}
+  .rezept-card .warum{color:var(--sea);font-weight:700;font-size:.98rem;margin:0 0 14px}
+  .rezept-card h4{margin:14px 0 6px;font-size:1.05rem}
+  .rezept-card ul{margin:0;padding-left:20px;color:var(--ink-soft)}
+  .rezept-card li{margin:5px 0;font-size:1.02rem}
+  .rezept-card .schritte{color:var(--ink-soft);font-size:1.02rem;margin:6px 0 0;line-height:1.5}
+  .big-btn{width:100%;background:var(--sea);color:#fff;border:0;border-radius:14px;padding:18px;font-size:1.15rem;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(29,110,140,.25)}
+  .big-btn:active{transform:translateY(1px)}
+
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   button:focus-visible,.row:focus-visible,.tile:focus-visible{outline:3px solid var(--buoy);outline-offset:2px}
 </style>
@@ -183,6 +207,12 @@
           <span class="lbl">Suchen</span>
           <span class="sub">Geschäft & Öffnungszeiten</span>
         </button>
+
+        <button class="tile" onclick="go('kochen')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v7M8 3v7M11 3v7M8 10v11"/><path d="M16 3c-1.5 0-3 1.5-3 5s1.5 4 3 4M16 3c1.5 0 3 1.5 3 5s-1.5 4-3 4M16 12v9"/></svg></span>
+          <span class="lbl">Was koche ich heute?</span>
+          <span class="sub">Einfache, gute Gerichte</span>
+        </button>
       </div>
     </section>
 
@@ -191,22 +221,141 @@
       <button class="back" onclick="go('home')">‹ Zurück</button>
       <h2>Notruf & Erste Hilfe</h2>
       <div class="rows" id="notrufNums"></div>
-      <div class="note">Im Zweifel immer den <b>Notruf 112</b> wählen. Lieber einmal zu viel anrufen als zu wenig.</div>
+      <div class="note">Im Zweifel immer den <b>Notruf 112</b> wählen. Lieber einmal zu viel anrufen als zu wenig – und die Person nie allein lassen.</div>
 
-      <h2 style="margin-top:22px">Im Ernstfall</h2>
-      <div class="card-info">
-        <h3>Notruf absetzen</h3>
-        <p>Ruhig bleiben und sagen:</p>
-        <ol><li><b>Wo</b> ist es passiert?</li><li><b>Was</b> ist passiert?</li><li><b>Wie viele</b> sind betroffen?</li><li><b>Warten</b> – auflegen erst, wenn die Leitstelle es sagt.</li></ol>
-      </div>
-      <div class="card-info">
-        <h3>Schlaganfall erkennen – Test</h3>
-        <p><b>Gesicht:</b> Lächeln – hängt eine Seite?<br><b>Arme:</b> Beide heben – sinkt einer ab?<br><b>Sprache:</b> Satz nachsprechen – klingt sie verwaschen?<br><b>Zeit:</b> Bei einem „Ja" sofort 112 anrufen.</p>
-      </div>
-      <div class="card-info">
-        <h3>Wiederbelebung</h3>
-        <p>Keine Atmung? Fest und schnell in die Mitte des Brustkorbs drücken – etwa zweimal pro Sekunde, ohne Pause, bis Hilfe kommt.</p>
-      </div>
+      <h2 style="margin-top:24px">Erste Hilfe – Schritt für Schritt</h2>
+      <p style="color:var(--ink-soft);margin:0 0 14px">Tippen Sie auf ein Thema, dann klappt die Anleitung auf.</p>
+
+      <details class="fa" open>
+        <summary>① Zuerst prüfen: Atmet die Person?</summary>
+        <div class="fa-body">
+          <p>Diese Frage entscheidet alles Weitere.</p>
+          <ol>
+            <li><b>Ansprechen</b> und laut fragen: „Hören Sie mich?"</li>
+            <li>Keine Reaktion? <b>Sanft an den Schultern rütteln.</b></li>
+            <li><b>Atmung prüfen (10 Sekunden):</b> Kopf vorsichtig nach hinten neigen, Ohr über Mund und Nase halten – hebt sich der Brustkorb? Hören und fühlen Sie Atem?</li>
+          </ol>
+          <p class="fa-key">Atmet normal → <b>stabile Seitenlage</b> und 112.<br>
+          Atmet nicht oder nur einzelne, ringende Schnappgeräusche → <b>sofort 112 und Herzdruckmassage.</b></p>
+          <p>Schnappatmung ist <b>keine</b> normale Atmung. Im Zweifel handeln wie „atmet nicht".</p>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>② Notruf richtig absetzen</summary>
+        <div class="fa-body">
+          <p>Ruhig bleiben und der Reihe nach sagen:</p>
+          <ol>
+            <li><b>Wo</b> ist es passiert? (Ort, Straße, Besonderheit)</li>
+            <li><b>Was</b> ist passiert?</li>
+            <li><b>Wie viele</b> Personen sind betroffen?</li>
+            <li><b>Warten</b> – nicht auflegen, bis die Leitstelle es sagt. Sie stellt noch Fragen.</li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>③ Stabile Seitenlage</summary>
+        <div class="fa-body">
+          <p>Für Bewusstlose, die <b>normal atmen</b>. So bleibt der Mund nach unten und die Atemwege frei.</p>
+          <ol>
+            <li>Neben der Person knien, beide Beine strecken.</li>
+            <li>Nahen Arm angewinkelt nach oben legen (Handfläche nach oben).</li>
+            <li>Fernen Arm über die Brust führen, Handrücken an die nahe Wange.</li>
+            <li>Fernes Bein am Knie anwinkeln und die Person zu sich herüberziehen.</li>
+            <li>Kopf leicht überstrecken, Mund nach unten.</li>
+          </ol>
+          <p class="fa-key">Bei älteren Menschen: <b>langsam und vorsichtig</b> drehen (brüchige Knochen), <b>zudecken</b> gegen Auskühlen und die <b>Atmung weiter beobachten</b>.</p>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>④ Wiederbelebung (Herzdruckmassage)</summary>
+        <div class="fa-body">
+          <p>Wenn die Person <b>nicht normal atmet</b>: erst 112, dann sofort drücken.</p>
+          <ol>
+            <li>Person flach auf den Rücken, auf festen Boden.</li>
+            <li>Beide Hände übereinander auf die <b>Mitte des Brustkorbs</b>.</li>
+            <li><b>Fest und schnell</b> drücken – etwa zweimal pro Sekunde, gut 5 cm tief.</li>
+            <li><b>Nicht aufhören</b>, bis der Rettungsdienst übernimmt. Wird es zu anstrengend, abwechseln lassen.</li>
+          </ol>
+          <p>Ein Defibrillator (AED) in der Nähe? Einschalten – das Gerät erklärt sich selbst per Sprache.</p>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>⑤ Schlaganfall erkennen – der FAST-Test</summary>
+        <div class="fa-body">
+          <ol>
+            <li><b>Gesicht:</b> Lächeln lassen – hängt eine Seite herab?</li>
+            <li><b>Arme:</b> Beide Arme heben lassen – sinkt einer ab?</li>
+            <li><b>Sprache:</b> Einen einfachen Satz nachsprechen lassen – klingt sie verwaschen?</li>
+            <li><b>Zeit:</b> Bei <b>einem</b> „Ja" zählt jede Minute – sofort 112.</li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>⑥ Herzinfarkt</summary>
+        <div class="fa-body">
+          <p>Anzeichen: Druck oder Enge in der Brust, oft ausstrahlend in Arm, Kiefer oder Rücken, Luftnot, kalter Schweiß, Angst.</p>
+          <p class="fa-key">Bei älteren Menschen und Diabetikern oft <b>untypisch</b> – nur Schwäche, Übelkeit oder Atemnot ohne klaren Brustschmerz. Im Zweifel ernst nehmen.</p>
+          <ol>
+            <li>Sofort 112.</li>
+            <li>Person <b>aufrecht hinsetzen</b>, Oberkörper hoch.</li>
+            <li>Beengende Kleidung öffnen, beruhigen, nicht allein lassen.</li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>⑦ Schwindel & Kreislaufschwäche</summary>
+        <div class="fa-body">
+          <p>Häufig bei niedrigem Blutdruck, Hitze, zu wenig Trinken oder nach dem Aufstehen. Anzeichen: blass, kaltschweißig, „schwarz vor Augen", Übelkeit.</p>
+          <p>Solange die Person <b>bei Bewusstsein</b> ist:</p>
+          <ol>
+            <li>Hinlegen, <b>Beine hochlagern</b> (etwa 30 cm).</li>
+            <li>Enge Kleidung öffnen, frische Luft, beruhigen.</li>
+            <li>Etwas zu trinken, wenn sie wach und klar ist.</li>
+          </ol>
+          <p class="fa-key">Erholt sie sich nicht rasch oder wird bewusstlos → 112.</p>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>⑧ Unterzuckerung (bei Diabetes)</summary>
+        <div class="fa-body">
+          <p>Anzeichen: Zittern, Schwitzen, Verwirrtheit, plötzlich gereizt oder fahrig.</p>
+          <ol>
+            <li><b>Wach und kann schlucken?</b> Etwas Süßes geben – Saft, Traubenzucker, Limonade (keine „Light"-Variante).</li>
+            <li><b>Bewusstlos?</b> Nichts einflößen (Erstickungsgefahr) – stabile Seitenlage und 112.</li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>⑨ Sturz</summary>
+        <div class="fa-body">
+          <ol>
+            <li>Ruhe bewahren, die Person nicht hastig aufrichten.</li>
+            <li>Bei starken Schmerzen, einer Fehlstellung (z. B. an der Hüfte) oder einem Kopfaufprall: <b>liegen lassen</b>, warm halten, 112.</li>
+            <li>Kann sie sich selbst und ohne große Schmerzen bewegen, langsam und in Etappen aufhelfen.</li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>⑩ Starke Blutung</summary>
+        <div class="fa-body">
+          <ol>
+            <li><b>Fest auf die Wunde drücken</b> – mit einem sauberen Tuch, notfalls mit der bloßen Hand.</li>
+            <li>Die betroffene Stelle <b>hochhalten</b>.</li>
+            <li>Druck halten und 112 rufen. Tuch nicht wegnehmen – bei Durchbluten ein zweites darüberlegen.</li>
+          </ol>
+        </div>
+      </details>
+
+      <div class="note" style="margin-top:18px">Diese Anleitungen ersetzen keinen Erste-Hilfe-Kurs. Lassen Sie sie von einer ausgebildeten Person prüfen (z. B. beim Roten Kreuz) und frischen Sie Ihr Wissen ab und zu auf.</div>
     </section>
 
     <!-- IN DER NÄHE -->
@@ -218,7 +367,10 @@
         <button class="cat" onclick="findNear('pharmacy')"><span style="font-size:1.7rem">💊</span>Apotheke</button>
         <button class="cat" onclick="findNear('bench')"><span style="font-size:1.7rem">🪑</span>Sitzbank</button>
         <button class="cat" onclick="findNear('water')"><span style="font-size:1.7rem">🚰</span>Trinkwasser</button>
+        <button class="cat" onclick="findNear('sights')"><span style="font-size:1.7rem">🏰</span>Sehenswürdigkeit</button>
+        <button class="cat" onclick="eventsNear()"><span style="font-size:1.7rem">🎉</span>Veranstaltung</button>
       </div>
+      <div class="note">„Veranstaltung" öffnet eine Suche nach Terminen in Ihrer Nähe – diese stehen nicht in der Karte, darum führt der Knopf zur passenden Web-Suche.</div>
     </section>
 
     <!-- ERGEBNISSE -->
@@ -251,6 +403,16 @@
         <span class="chip" onclick="quick('Bank Geldautomat')">Geldautomat</span>
       </div>
       <div class="note">Öffnet die Karte mit Adresse, Öffnungszeiten und Weg.</div>
+    </section>
+
+    <!-- WAS KOCHE ICH HEUTE -->
+    <section class="view" id="v-kochen">
+      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <h2>Was koche ich heute?</h2>
+      <div id="rezept"></div>
+      <button class="big-btn" onclick="neuesRezept()">Anderer Vorschlag</button>
+      <div class="note" style="margin-top:16px"><b>Ans Trinken denken.</b> Über den Tag verteilt etwa 1,5 Liter – Wasser, ungesüßter Tee oder Schorle. Ein gefülltes Glas in Sichtweite erinnert von selbst.</div>
+      <div class="note">Die Vorschläge sind allgemeine Anregungen, kein Diät- oder Krankenkostplan. Bei Allergien, Unverträglichkeiten oder einer ärztlichen Diät bitte anpassen oder im Zweifel den Arzt fragen.</div>
     </section>
   </main>
 </div>
@@ -351,7 +513,8 @@ const CAT = {
   toilets:{q:'["amenity"="toilets"]', t:"Toiletten in der Nähe", n:"Öffentliche Toilette", steps:[1500,5000,12000]},
   pharmacy:{q:'["amenity"="pharmacy"]', t:"Apotheken in der Nähe", n:"Apotheke", steps:[3000,8000,20000]},
   bench:{q:'["amenity"="bench"]', t:"Sitzbänke in der Nähe", n:"Sitzbank", steps:[1000,3000]},
-  water:{q:'["amenity"="drinking_water"]', t:"Trinkwasser in der Nähe", n:"Trinkwasser", steps:[1500,6000,15000]}
+  water:{q:'["amenity"="drinking_water"]', t:"Trinkwasser in der Nähe", n:"Trinkwasser", steps:[1500,6000,15000]},
+  sights:{q:'["tourism"~"attraction|viewpoint|museum|gallery|artwork|zoo|theme_park"]', t:"Sehenswürdigkeiten in der Nähe", n:"Sehenswürdigkeit", steps:[3000,10000,25000]}
 };
 function dist(la,lo){
   const R=6371000,r=Math.PI/180;
@@ -407,11 +570,84 @@ function doSearch(){
 }
 function quick(t){ document.getElementById('q').value=t; doSearch(); }
 function nearStops(){ window.open(mapsAround('Haltestelle'),'_blank','noopener'); }
+function eventsNear(){
+  const ort = (STATE.ort && STATE.ort!=="Ihr Standort") ? STATE.ort : "in der Nähe";
+  window.open(`https://www.google.com/search?q=${encodeURIComponent('Veranstaltungen heute '+ort)}`,'_blank','noopener');
+}
 function planRoute(){
   // Verbindungssuche im Öffi-Modus, Start = aktueller Standort; Ziel tippt der Nutzer ein
   window.open(`https://www.google.com/maps/dir/?api=1&origin=${STATE.lat},${STATE.lon}&travelmode=transit`,'_blank','noopener');
 }
 document.addEventListener('keydown',e=>{ if(e.key==='Enter' && document.activeElement && document.activeElement.id==='q') doSearch(); });
+
+/* ---------- Was koche ich heute? (einfach, ausgewogen, offline) ---------- */
+const REZEPTE = [
+  {n:"Pellkartoffeln mit Kräuterquark", warum:"Sättigend, eiweißreich, leicht verdaulich",
+   zut:["4 mittelgroße Kartoffeln","250 g Magerquark","2 EL Milch","1 Bund Schnittlauch oder Petersilie","1 TL Leinöl","Salz, Pfeffer"],
+   s:"Kartoffeln in der Schale weich kochen (ca. 20 Min.). Quark mit Milch, gehackten Kräutern, Leinöl, Salz und Pfeffer verrühren. Kartoffeln pellen und mit dem Quark servieren."},
+  {n:"Haferbrei mit Apfel und Walnuss", warum:"Guter Start in den Tag, gut für die Verdauung",
+   zut:["50 g Haferflocken","250 ml Milch","1 Apfel","1 EL gehackte Walnüsse","1 Prise Zimt","etwas Honig"],
+   s:"Haferflocken mit Milch aufkochen, 3–4 Min. quellen lassen. Apfel reiben oder klein schneiden, unterrühren. Mit Walnüssen, Zimt und etwas Honig bestreuen."},
+  {n:"Rührei mit Tomaten", warum:"Schnell, eiweißreich, mit Vollkornbrot ein vollwertiges Essen",
+   zut:["3 Eier","2 Tomaten","1 Scheibe Vollkornbrot","etwas Butter","Salz, Pfeffer, Schnittlauch"],
+   s:"Tomaten würfeln. Eier verquirlen, salzen. Butter erhitzen, Tomaten kurz anbraten, Eier dazugeben und stocken lassen. Mit Vollkornbrot servieren."},
+  {n:"Gemüsesuppe mit Kartoffeln", warum:"Wärmend, viel Gemüse, lässt sich gut aufwärmen",
+   zut:["2 Karotten","2 Kartoffeln","1 Stange Lauch","1 Liter Gemüsebrühe","Salz, Pfeffer, Petersilie"],
+   s:"Gemüse klein schneiden. In der Brühe ca. 20 Min. weich kochen. Abschmecken, mit Petersilie bestreuen. Schmeckt am nächsten Tag noch besser."},
+  {n:"Linseneintopf", warum:"Pflanzliches Eiweiß, viele Ballaststoffe, hält lange satt",
+   zut:["200 g rote Linsen","2 Karotten","1 Kartoffel","1 Zwiebel","800 ml Brühe","1 Schuss Essig"],
+   s:"Zwiebel anschwitzen, Gemüse würfeln und mitbraten. Linsen und Brühe zugeben, ca. 20 Min. köcheln. Mit etwas Essig, Salz und Pfeffer abschmecken."},
+  {n:"Ofengemüse mit Feta", warum:"Bunt, vitaminreich, fast von allein gekocht",
+   zut:["1 Zucchini","1 Paprika","1 Süßkartoffel oder 2 Kartoffeln","100 g Feta","2 EL Olivenöl","Kräuter der Provence"],
+   s:"Gemüse in Stücke schneiden, mit Öl und Kräutern mischen, auf ein Blech geben. Bei 200 °C ca. 25 Min. backen. Feta darüberbröseln und noch 5 Min. backen."},
+  {n:"Lachs mit Kartoffeln und Brokkoli", warum:"Gute Fette fürs Herz, eiweißreich",
+   zut:["1 Lachsfilet","3 Kartoffeln","1 kleiner Brokkoli","1 Zitrone","etwas Butter, Salz"],
+   s:"Kartoffeln kochen. Brokkoli 8 Min. dämpfen. Lachs in der Pfanne in etwas Butter je Seite 3–4 Min. braten, mit Zitrone beträufeln. Zusammen anrichten."},
+  {n:"Vollkornnudeln mit Tomatensauce", warum:"Einfach, sättigend, mit Gemüse aufgewertet",
+   zut:["120 g Vollkornnudeln","1 Dose stückige Tomaten","1 Zwiebel","1 Karotte","1 EL Olivenöl","Basilikum, Parmesan"],
+   s:"Nudeln kochen. Zwiebel und geriebene Karotte in Öl anschwitzen, Tomaten zugeben, 10 Min. köcheln, würzen. Über die Nudeln geben, mit Parmesan bestreuen."},
+  {n:"Quark mit Beeren und Haferflocken", warum:"Leichtes Abendessen, eiweißreich, schnell",
+   zut:["250 g Quark","1 Handvoll Beeren (auch tiefgekühlt)","2 EL Haferflocken","1 TL Honig"],
+   s:"Quark mit etwas Wasser oder Milch cremig rühren. Beeren und Haferflocken untermischen, mit Honig süßen."},
+  {n:"Hühnersuppe", warum:"Bekömmlich, wärmend, gut bei Erkältung",
+   zut:["1 Hühnerbrust","2 Karotten","1 Stück Sellerie","1 Stange Lauch","1,2 l Wasser","Suppennudeln, Salz"],
+   s:"Hühnerbrust mit Gemüse und Wasser ca. 30 Min. köcheln. Fleisch herausnehmen, klein schneiden, zurückgeben. Suppennudeln zugeben, weich kochen, salzen."},
+  {n:"Kartoffel-Gemüse-Pfanne", warum:"Resteverwertung, sättigend, anpassbar",
+   zut:["4 gekochte Kartoffeln vom Vortag","1 Zwiebel","1 Paprika","2 Eier","1 EL Öl","Salz, Paprikapulver"],
+   s:"Kartoffeln in Scheiben, Zwiebel und Paprika klein schneiden. Alles in Öl goldbraun braten. Zum Schluss die verquirlten Eier darüber stocken lassen."},
+  {n:"Milchreis mit Zimt", warum:"Sanftes warmes Essen, gut bei wenig Appetit",
+   zut:["100 g Milchreis","500 ml Milch","1 EL Zucker","Zimt","nach Wunsch Apfelmus"],
+   s:"Milchreis in der Milch unter Rühren aufkochen, dann bei kleiner Hitze ca. 30 Min. quellen lassen. Mit Zucker und Zimt, nach Wunsch mit Apfelmus servieren."},
+  {n:"Gemüseomelett", warum:"Eiweißreich, viel Gemüse, in 15 Minuten fertig",
+   zut:["3 Eier","1 kleine Zucchini oder Pilze","1 Tomate","etwas Käse","Öl, Salz, Pfeffer"],
+   s:"Gemüse klein schneiden und in Öl andünsten. Eier verquirlen, würzen, darübergeben. Bei mittlerer Hitze stocken lassen, Käse darüber, zusammenklappen."},
+  {n:"Brotzeit mit Käse und Gemüse", warum:"Kein Kochen nötig, ausgewogen, leicht",
+   zut:["2 Scheiben Vollkornbrot","Käse oder magerer Aufschnitt","Radieschen","Gurke","Tomate","etwas Butter"],
+   s:"Brote bestreichen und belegen. Rohkost in Scheiben dazu. Ein vollwertiges, leichtes Abendessen ohne Aufwand."},
+  {n:"Joghurt mit Obst und Müsli", warum:"Frisch, schnell, gut für den Darm",
+   zut:["250 g Naturjoghurt","1 Banane oder Saisonobst","3 EL Müsli","1 TL Honig","ein paar Nüsse"],
+   s:"Obst klein schneiden, mit Joghurt und Müsli schichten. Mit Honig und Nüssen toppen."},
+  {n:"Kürbis- oder Karottensuppe", warum:"Cremig, vitaminreich, leicht zu löffeln",
+   zut:["500 g Kürbis oder Karotten","1 Kartoffel","1 Zwiebel","700 ml Brühe","1 Schuss Sahne","Salz, Muskat"],
+   s:"Zwiebel anschwitzen, Gemüse würfeln, mit Brühe ca. 20 Min. weich kochen. Pürieren, mit Sahne, Salz und Muskat abschmecken."}
+];
+let letztesRezept = -1;
+function neuesRezept(){
+  let i;
+  do { i = Math.floor(Math.random()*REZEPTE.length); } while(i===letztesRezept && REZEPTE.length>1);
+  letztesRezept = i;
+  const r = REZEPTE[i];
+  document.getElementById('rezept').innerHTML = `
+    <div class="rezept-card">
+      <h3>${r.n}</h3>
+      <p class="warum">${r.warum}</p>
+      <h4>Das brauchen Sie</h4>
+      <ul>${r.zut.map(z=>`<li>${z}</li>`).join('')}</ul>
+      <h4>So geht's</h4>
+      <p class="schritte">${r.s}</p>
+    </div>`;
+}
+neuesRezept();
 
 /* ---------- Start ---------- */
 paintLand();
