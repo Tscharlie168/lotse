@@ -246,6 +246,12 @@
   .rechner-grid .rfn{background:#f1f4f5;color:var(--ink-soft)}
   .rechner-grid .rgleich{background:var(--sea);color:#fff;border-color:var(--sea)}
   .rechner-grid .r0{grid-column:span 2}
+  /* --- Countdown --- */
+  .cd-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .cd-row button{flex:1;min-width:84px;background:#eef5f7;border:1px solid #cfe0e6;color:var(--sea);border-radius:12px;padding:13px 8px;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit}
+  .cd-row button:active{background:var(--tap)}
+  @keyframes cdblink{50%{color:var(--alarm)}}
+  .cd-blink{animation:cdblink 1s steps(1,end) infinite}
 </style>
 </head>
 <body>
@@ -273,7 +279,7 @@
       <div class="grid">
         <button class="tile" onclick="go('werkzeuge')">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
-          <span class="lbl">Werkzeuge</span>
+          <span class="lbl">Kleine Helfer</span>
           <span class="sub">Lupe, Stoppuhr, Rechner u. a.</span>
         </button>
 
@@ -315,7 +321,7 @@
     <!-- WERKZEUGE -->
     <section class="view" id="v-werkzeuge">
       <button class="back" onclick="go('home')">&lsaquo; Zur&uuml;ck</button>
-      <h2>Werkzeuge</h2>
+      <h2>Kleine Helfer</h2>
       <div class="cats">
         <button class="cat" onclick="go('lupe')">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg>
@@ -324,6 +330,10 @@
         <button class="cat" onclick="go('stoppuhr')">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6"/><path d="M12 5v0"/><circle cx="12" cy="13" r="8"/><path d="M12 13V9"/><path d="m17.5 7.5 1.5-1.5"/></svg>
           <span>Stoppuhr</span>
+        </button>
+        <button class="cat" onclick="go('countdown')">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14M5 2h14M17 22v-4.17a2 2 0 0 0-.59-1.41L12 12l-4.41 4.42A2 2 0 0 0 7 17.83V22M7 2v4.17a2 2 0 0 0 .59 1.41L12 12l4.41-4.42A2 2 0 0 0 17 6.17V2"/></svg>
+          <span>Countdown</span>
         </button>
         <button class="cat" onclick="go('rechner')">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg>
@@ -334,7 +344,7 @@
           <span>Mit Google-KI suchen</span>
         </button>
       </div>
-      <div class="note">Diese vier Werkzeuge zuerst zum Ausprobieren &ndash; weitere folgen.</div>
+      <div class="note">Praktische kleine Helfer zum Ausprobieren &ndash; weitere folgen.</div>
     </section>
 
     <!-- LUPE -->
@@ -365,6 +375,30 @@
         <button id="uhrResetBtn" onclick="uhrReset()">Zur&uuml;cksetzen</button>
       </div>
       <div class="note">L&auml;uft korrekt weiter, auch wenn der Bildschirm zwischendurch aus war.</div>
+    </section>
+
+    <!-- COUNTDOWN -->
+    <section class="view" id="v-countdown">
+      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <h2>Countdown</h2>
+      <div class="uhr-zeit" id="cdZeit">00:00</div>
+      <div class="cd-row">
+        <button onclick="cdPreset(60)">1 Min</button>
+        <button onclick="cdPreset(180)">3 Min</button>
+        <button onclick="cdPreset(300)">5 Min</button>
+        <button onclick="cdPreset(600)">10 Min</button>
+        <button onclick="cdPreset(900)">15 Min</button>
+      </div>
+      <div class="cd-row">
+        <button onclick="cdAdd(60)">+1 Min</button>
+        <button onclick="cdAdd(600)">+10 Min</button>
+        <button onclick="cdAdd(30)">+30 Sek</button>
+      </div>
+      <div class="btn-reihe">
+        <button id="cdStartBtn" onclick="cdToggle()" disabled>Start</button>
+        <button onclick="cdReset()">Zur&uuml;cksetzen</button>
+      </div>
+      <div class="note">Zeit w&auml;hlen und auf Start tippen. Ist die Zeit abgelaufen, ert&ouml;nt ein Signal &ndash; solange die App ge&ouml;ffnet ist.</div>
     </section>
 
     <!-- RECHNER -->
@@ -1531,6 +1565,87 @@ function kiSuche(){
   var q=(document.getElementById('kiQ').value||'').trim();
   if(!q) return;
   window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank','noopener');
+}
+
+/* --- Countdown / Timer --- */
+var cdRest=0, cdEnde=0, cdLauft=false, cdTimer=null, cdAudio=null;
+function cdFmtMMSS(ms){
+  var z=Math.max(0,Math.ceil(ms/1000));
+  var m=Math.floor(z/60), s=z%60;
+  return (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+}
+function cdShow(){
+  var ms = cdLauft ? Math.max(0, cdEnde-Date.now()) : cdRest;
+  document.getElementById('cdZeit').textContent = cdFmtMMSS(ms);
+}
+function cdBtnState(){
+  var b=document.getElementById('cdStartBtn');
+  b.textContent = cdLauft ? 'Pause' : 'Start';
+  b.disabled = (!cdLauft && cdRest<=0);
+  b.classList.toggle('an', cdLauft);
+}
+function cdClearAlarm(){ document.getElementById('cdZeit').classList.remove('cd-blink'); }
+function cdPreset(sek){
+  if(cdLauft){ cdLauft=false; clearInterval(cdTimer); cdTimer=null; }
+  cdClearAlarm();
+  cdRest=sek*1000; cdShow(); cdBtnState();
+}
+function cdAdd(sek){
+  if(cdLauft) return;
+  cdClearAlarm();
+  cdRest=Math.min(cdRest+sek*1000, 99*60000);
+  cdShow(); cdBtnState();
+}
+function cdEnsureAudio(){
+  try{
+    if(!cdAudio){ cdAudio=new (window.AudioContext||window.webkitAudioContext)(); }
+    if(cdAudio.state==='suspended'){ cdAudio.resume(); }
+  }catch(e){}
+}
+function cdToggle(){
+  if(cdLauft){
+    cdRest=Math.max(0, cdEnde-Date.now()); cdLauft=false;
+    clearInterval(cdTimer); cdTimer=null;
+    cdShow(); cdBtnState();
+  } else {
+    if(cdRest<=0) return;
+    cdEnsureAudio(); cdClearAlarm();
+    cdEnde=Date.now()+cdRest; cdLauft=true;
+    cdTimer=setInterval(cdTick,200);
+    cdBtnState();
+  }
+}
+function cdTick(){
+  var ms=cdEnde-Date.now();
+  if(ms<=0){
+    cdLauft=false; clearInterval(cdTimer); cdTimer=null; cdRest=0;
+    var z=document.getElementById('cdZeit');
+    z.textContent='00:00'; z.classList.add('cd-blink');
+    cdBtnState(); cdBeep();
+    return;
+  }
+  cdShow();
+}
+function cdReset(){
+  cdLauft=false; clearInterval(cdTimer); cdTimer=null;
+  cdRest=0; cdClearAlarm(); cdShow(); cdBtnState();
+}
+function cdBeep(){
+  try{
+    cdEnsureAudio();
+    if(!cdAudio) return;
+    var ctx=cdAudio, t=ctx.currentTime, i, o, g, s;
+    for(i=0;i<3;i++){
+      o=ctx.createOscillator(); g=ctx.createGain();
+      o.type='sine'; o.frequency.value=880;
+      o.connect(g); g.connect(ctx.destination);
+      s=t+i*0.55;
+      g.gain.setValueAtTime(0.0001,s);
+      g.gain.exponentialRampToValueAtTime(0.4,s+0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001,s+0.45);
+      o.start(s); o.stop(s+0.5);
+    }
+  }catch(e){}
 }
 </script>
 </body>
