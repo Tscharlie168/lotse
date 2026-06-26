@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e5a6b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lotse Upload">
+<title>Lotse · Foto-Upload</title>
+<style>
+  /* ---- Lotse-Stil: ruhige Bodensee-/Kompass-Optik ----------------------- */
+  :root{
+    --see:        #0e5a6b;   /* tiefes Seeblau (Primär) */
+    --see-dunkel: #0a3f4a;
+    --sand:       #d8a14a;   /* warmer Sandakzent */
+    --sand-hell:  #f3e6cd;
+    --papier:     #f6f3ec;   /* Hintergrund */
+    --karte:      #ffffff;
+    --tinte:      #1d2b30;   /* Text */
+    --grau:       #5f6f73;
+    --linie:      #d7dcd9;
+    --gut:        #1f7a4d;
+    --gut-hell:   #e3f1e8;
+    --warn:       #b23b2e;
+    --warn-hell:  #f6e3e0;
+    --radius:     16px;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; }
+  body{
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--papier);
+    color: var(--tinte);
+    line-height: 1.5;
+    font-size: 18px;
+    padding: 0 0 env(safe-area-inset-bottom);
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap{ max-width: 600px; margin: 0 auto; padding: 16px; }
+
+  header{
+    background: var(--see);
+    color: #fff;
+    padding: 22px 16px calc(22px + env(safe-area-inset-top));
+    padding-top: calc(22px + env(safe-area-inset-top));
+    text-align: center;
+  }
+  header .brand{
+    font-size: 13px; letter-spacing: .28em; text-transform: uppercase;
+    color: var(--sand-hell); margin: 0 0 4px; font-weight: 600;
+  }
+  header h1{ margin: 0; font-size: 28px; font-weight: 800; letter-spacing: .01em; }
+  header p{ margin: 6px 0 0; color: #cfe3e7; font-size: 15px; }
+
+  .karte{
+    background: var(--karte);
+    border: 1px solid var(--linie);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin: 16px 0;
+  }
+  .schritt{ display:flex; align-items:center; gap:10px; margin: 0 0 12px; }
+  .nummer{
+    flex: 0 0 32px; width:32px; height:32px; border-radius:50%;
+    background: var(--see); color:#fff; font-weight:800;
+    display:flex; align-items:center; justify-content:center; font-size:17px;
+  }
+  .schritt h2{ margin:0; font-size:19px; font-weight:700; }
+
+  label.feld{ display:block; font-weight:600; margin: 14px 0 6px; font-size:16px; }
+  input[type=text], input[type=password]{
+    width:100%; padding: 14px; font-size:17px;
+    border:2px solid var(--linie); border-radius:12px; background:#fff; color:var(--tinte);
+  }
+  input:focus{ outline:none; border-color: var(--see); }
+  .hinweis{ color: var(--grau); font-size:14px; margin:6px 0 0; }
+  .hinweis a{ color: var(--see); }
+
+  button{
+    font-family: inherit; font-size: 18px; font-weight: 700;
+    border: none; border-radius: 12px; padding: 15px 18px;
+    cursor: pointer; width: 100%;
+  }
+  button:focus-visible{ outline: 3px solid var(--sand); outline-offset: 2px; }
+  .btn-primaer{ background: var(--see); color:#fff; }
+  .btn-primaer:active{ background: var(--see-dunkel); }
+  .btn-zweit{ background: var(--sand-hell); color: var(--see-dunkel); border:2px solid var(--sand); }
+  .btn-schlicht{ background: #eef1ef; color: var(--tinte); border:2px solid var(--linie); }
+  button:disabled{ opacity:.5; cursor: not-allowed; }
+  .btn-reihe{ display:flex; gap:10px; }
+  .btn-reihe button{ flex:1; }
+
+  /* ---- Zuschneiderahmen (Signatur: 8:5 mit Fadenkreuz) ------------------- */
+  .rahmen-feld{ position: relative; width: 100%; aspect-ratio: 8 / 5;
+    background:#0a3f4a; border-radius:12px; overflow:hidden; touch-action:none; }
+  .rahmen-feld canvas{ display:block; width:100%; height:100%; }
+  .rahmen-feld.leer{ display:flex; align-items:center; justify-content:center;
+    color:#9fc0c7; font-size:15px; text-align:center; padding:20px; }
+  /* Fadenkreuz-Overlay – wird NICHT mit exportiert */
+  .fadenkreuz{ position:absolute; inset:0; pointer-events:none; }
+  .fadenkreuz::before, .fadenkreuz::after{
+    content:""; position:absolute; background: rgba(255,255,255,.55);
+  }
+  .fadenkreuz::before{ left:50%; top:0; bottom:0; width:1px; transform:translateX(-.5px); }
+  .fadenkreuz::after{ top:50%; left:0; right:0; height:1px; transform:translateY(-.5px); }
+  .fadenkreuz .punkt{ position:absolute; left:50%; top:50%; width:18px; height:18px;
+    margin:-9px 0 0 -9px; border:2px solid rgba(255,255,255,.8); border-radius:50%; }
+  /* Drittel-Hilfslinien dezent */
+  .drittel{ position:absolute; inset:0; pointer-events:none; opacity:.25; }
+  .drittel span{ position:absolute; background:#fff; }
+  .drittel .v1{ left:33.33%; top:0; bottom:0; width:1px; }
+  .drittel .v2{ left:66.66%; top:0; bottom:0; width:1px; }
+  .drittel .h1{ top:33.33%; left:0; right:0; height:1px; }
+  .drittel .h2{ top:66.66%; left:0; right:0; height:1px; }
+
+  .zoom-zeile{ display:flex; align-items:center; gap:12px; margin-top:14px; }
+  .zoom-zeile span{ font-size:22px; color:var(--grau); }
+  input[type=range]{ flex:1; accent-color: var(--see); height: 28px; }
+
+  .status{ border-radius:12px; padding:12px 14px; margin-top:12px; font-size:16px; display:none; }
+  .status.zeig{ display:block; }
+  .status.info{ background:#e7f0f2; color:var(--see-dunkel); }
+  .status.gut{ background:var(--gut-hell); color:var(--gut); }
+  .status.warn{ background:var(--warn-hell); color:var(--warn); }
+
+  .groesse-info{ font-size:14px; color:var(--grau); margin-top:8px; }
+  details summary{ cursor:pointer; font-weight:700; color:var(--see-dunkel); }
+  .liste{ margin:10px 0 0; padding:0; list-style:none; }
+  .liste li{ padding:8px 0; border-bottom:1px solid var(--linie); font-size:15px; word-break:break-all; }
+  .liste li:last-child{ border-bottom:none; }
+  .token-status{ font-size:14px; margin-top:6px; }
+  .token-status.ok{ color:var(--gut); font-weight:600; }
+  .token-status.fehlt{ color:var(--warn); font-weight:600; }
+  footer{ text-align:center; color:var(--grau); font-size:13px; padding: 8px 0 28px; }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="brand">Lotse</p>
+  <h1>Foto-Upload</h1>
+  <p>Bild verkleinern und direkt nach GitHub laden</p>
+</header>
+
+<div class="wrap">
+
+  <!-- Schritt 1: Zugang -->
+  <section class="karte">
+    <div class="schritt"><div class="nummer">1</div><h2>Zugang einrichten</h2></div>
+    <details id="tokenBox">
+      <summary>GitHub-Token (einmalig speichern)</summary>
+      <label class="feld" for="token">Persönlicher Zugriffs-Token</label>
+      <input type="password" id="token" placeholder="github_pat_…" autocomplete="off" spellcheck="false">
+      <p class="hinweis">
+        Fein abgestufter Token, nur für das Repository <strong>lotse</strong>,
+        Berechtigung <em>Contents: Read and write</em>. Wird nur auf diesem Gerät
+        gespeichert (localStorage), nie im Code.
+        <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener">Token erstellen ↗</a>
+      </p>
+      <div class="btn-reihe" style="margin-top:12px">
+        <button class="btn-primaer" id="tokenSpeichern">Speichern</button>
+        <button class="btn-schlicht" id="tokenLoeschen">Löschen</button>
+      </div>
+    </details>
+    <p class="token-status" id="tokenStatus"></p>
+  </section>
+
+  <!-- Schritt 2: Foto wählen -->
+  <section class="karte">
+    <div class="schritt"><div class="nummer">2</div><h2>Foto wählen</h2></div>
+    <input type="file" id="datei" accept="image/*" hidden>
+    <button class="btn-zweit" id="dateiButton">Foto auswählen</button>
+    <p class="hinweis">Vom Handy: Galerie oder Kamera.</p>
+  </section>
+
+  <!-- Schritt 3: Ausschnitt -->
+  <section class="karte">
+    <div class="schritt"><div class="nummer">3</div><h2>Ausschnitt wählen</h2></div>
+    <div class="rahmen-feld leer" id="rahmen">
+      <span id="rahmenLeer">Noch kein Foto gewählt</span>
+      <canvas id="leinwand" hidden></canvas>
+      <div class="drittel" hidden id="drittel">
+        <span class="v1"></span><span class="v2"></span><span class="h1"></span><span class="h2"></span>
+      </div>
+      <div class="fadenkreuz" hidden id="kreuz"><span class="punkt"></span></div>
+    </div>
+    <div class="zoom-zeile">
+      <span>−</span>
+      <input type="range" id="zoom" min="0" max="100" value="0" disabled aria-label="Zoom">
+      <span>+</span>
+    </div>
+    <p class="hinweis">Bild mit dem Finger verschieben, mit dem Regler vergrößern. Das Motiv soll mittig im Kreuz liegen.</p>
+    <p class="groesse-info" id="quellInfo"></p>
+  </section>
+
+  <!-- Schritt 4: Name & Upload -->
+  <section class="karte">
+    <div class="schritt"><div class="nummer">4</div><h2>Speichern in GitHub</h2></div>
+    <label class="feld" for="name">Dateiname</label>
+    <input type="text" id="name" placeholder="z. B. bodensee-sonnenaufgang" autocomplete="off" spellcheck="false">
+    <p class="hinweis">Endet automatisch auf <strong>.jpg</strong> und landet im Ordner <strong>fotos/</strong>.
+      Vorschau: <strong id="namePreview">fotos/….jpg</strong></p>
+    <button class="btn-primaer" id="hochladen" disabled style="margin-top:14px">Hochladen</button>
+    <div class="status" id="status"></div>
+  </section>
+
+  <!-- Vorhandene Fotos -->
+  <section class="karte">
+    <details>
+      <summary>Vorhandene Fotos anzeigen</summary>
+      <button class="btn-schlicht" id="listeLaden" style="margin-top:12px">Liste laden</button>
+      <ul class="liste" id="fotoListe"></ul>
+    </details>
+  </section>
+
+  <footer>Lotse · Foto-Upload — läuft komplett im Browser.</footer>
+</div>
+
+<script>
+/* ====================================================================== *
+ *  Konstanten – bei Bedarf hier anpassen                                  *
+ * ====================================================================== */
+const OWNER  = "tscharlie168";
+const REPO   = "lotse";
+const FOLDER = "fotos";
+const EXPORT_W = 1600, EXPORT_H = 1000;      // 8:5
+const MAX_BYTES = 400 * 1024;                 // Obergrenze ~400 KB
+const LS_TOKEN  = "lotse_gh_token";
+const LS_BRANCH = "lotse_gh_branch";
+
+/* ====================================================================== *
+ *  Hilfen                                                                 *
+ * ====================================================================== */
+const $ = id => document.getElementById(id);
+function token(){ return localStorage.getItem(LS_TOKEN) || ""; }
+
+function zeigStatus(text, art){
+  const s = $("status");
+  s.textContent = text;
+  s.className = "status zeig " + (art || "info");
+}
+
+function entferneSonderzeichen(name){
+  return (name || "")
+    .toLowerCase()
+    .replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss")
+    .replace(/[^a-z0-9-_]+/g,"-")
+    .replace(/-+/g,"-")
+    .replace(/^-|-$/g,"");
+}
+
+function aktualisierePreview(){
+  const sauber = entferneSonderzeichen($("name").value) || "…";
+  $("namePreview").textContent = `${FOLDER}/${sauber}.jpg`;
+}
+
+function blobNachBase64(blob){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = () => res(r.result.split(",")[1]);
+    r.onerror = () => rej(new Error("Foto konnte nicht gelesen werden."));
+    r.readAsDataURL(blob);
+  });
+}
+
+/* ====================================================================== *
+ *  Token-Verwaltung                                                       *
+ * ====================================================================== */
+function tokenStatusZeigen(){
+  const el = $("tokenStatus");
+  if(token()){
+    el.textContent = "Token gespeichert ✓";
+    el.className = "token-status ok";
+    $("tokenBox").open = false;
+  } else {
+    el.textContent = "Noch kein Token gespeichert.";
+    el.className = "token-status fehlt";
+    $("tokenBox").open = true;
+  }
+  pruefeBereit();
+}
+$("tokenSpeichern").onclick = () => {
+  const t = $("token").value.trim();
+  if(!t){ alert("Bitte erst einen Token eingeben."); return; }
+  localStorage.setItem(LS_TOKEN, t);
+  localStorage.removeItem(LS_BRANCH);   // Branch bei neuem Token neu ermitteln
+  $("token").value = "";
+  tokenStatusZeigen();
+};
+$("tokenLoeschen").onclick = () => {
+  localStorage.removeItem(LS_TOKEN);
+  localStorage.removeItem(LS_BRANCH);
+  tokenStatusZeigen();
+};
+
+/* ====================================================================== *
+ *  Bild laden & Zuschneiden (Pan + Zoom, Cover-Logik)                     *
+ * ====================================================================== */
+let bmp = null;                       // ImageBitmap des Quellfotos
+const view = { scale:1, x:0, y:0, min:1, max:1 };
+const cv = $("leinwand");
+const ctx = cv.getContext("2d");
+let FRAME_W = 0, FRAME_H = 0;          // Anzeigegröße in CSS-Pixeln
+
+function setzeLeinwandGroesse(){
+  const rect = $("rahmen").getBoundingClientRect();
+  FRAME_W = rect.width;
+  FRAME_H = rect.height;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width  = Math.round(FRAME_W * dpr);
+  cv.height = Math.round(FRAME_H * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function begrenze(){
+  // Cover: Bild muss den Rahmen immer voll ausfüllen
+  view.min = Math.max(FRAME_W / bmp.width, FRAME_H / bmp.height);
+  view.max = view.min * 4;
+  view.scale = Math.min(Math.max(view.scale, view.min), view.max);
+  const bw = bmp.width * view.scale, bh = bmp.height * view.scale;
+  view.x = Math.min(0, Math.max(FRAME_W - bw, view.x));
+  view.y = Math.min(0, Math.max(FRAME_H - bh, view.y));
+}
+
+function zeichne(){
+  if(!bmp) return;
+  begrenze();
+  ctx.clearRect(0, 0, FRAME_W, FRAME_H);
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(bmp, view.x, view.y, bmp.width * view.scale, bmp.height * view.scale);
+  // Zoom-Regler spiegeln
+  const t = (view.max > view.min) ? (view.scale - view.min) / (view.max - view.min) : 0;
+  $("zoom").value = Math.round(t * 100);
+}
+
+async function ladeFoto(file){
+  try{
+    // createImageBitmap respektiert die EXIF-Ausrichtung
+    bmp = await createImageBitmap(file, { imageOrientation: "from-image" });
+  }catch(e){
+    // Fallback ohne Orientierungs-Option
+    bmp = await createImageBitmap(file);
+  }
+  $("rahmen").classList.remove("leer");
+  $("rahmenLeer").hidden = true;
+  cv.hidden = false; $("drittel").hidden = false; $("kreuz").hidden = false;
+  $("zoom").disabled = false;
+
+  setzeLeinwandGroesse();
+  view.scale = Math.max(FRAME_W / bmp.width, FRAME_H / bmp.height); // Cover
+  view.x = (FRAME_W - bmp.width  * view.scale) / 2;                 // mittig
+  view.y = (FRAME_H - bmp.height * view.scale) / 2;
+  zeichne();
+
+  $("quellInfo").textContent =
+    `Quelle: ${bmp.width}×${bmp.height} px` +
+    (bmp.width < EXPORT_W || bmp.height < EXPORT_H
+      ? " — kleiner als 1600×1000, wird hochgerechnet (etwas weicher)." : "");
+  pruefeBereit();
+}
+
+$("dateiButton").onclick = () => $("datei").click();
+$("datei").onchange = e => { if(e.target.files[0]) ladeFoto(e.target.files[0]); };
+
+/* Zoom-Regler – um die Rahmenmitte zoomen */
+$("zoom").oninput = e => {
+  if(!bmp) return;
+  const t = e.target.value / 100;
+  const neu = view.min + t * (view.max - view.min);
+  const cxp = FRAME_W/2, cyp = FRAME_H/2;
+  const k = neu / view.scale;
+  view.x = cxp - (cxp - view.x) * k;
+  view.y = cyp - (cyp - view.y) * k;
+  view.scale = neu;
+  zeichne();
+};
+
+/* Verschieben & Pinch */
+let zeiger = new Map(), letzteMitte = null, letzterAbstand = 0;
+const rahmen = $("rahmen");
+rahmen.addEventListener("pointerdown", e => {
+  if(!bmp) return;
+  rahmen.setPointerCapture(e.pointerId);
+  zeiger.set(e.pointerId, { x:e.clientX, y:e.clientY });
+});
+rahmen.addEventListener("pointermove", e => {
+  if(!bmp || !zeiger.has(e.pointerId)) return;
+  const alt = zeiger.get(e.pointerId);
+  zeiger.set(e.pointerId, { x:e.clientX, y:e.clientY });
+
+  if(zeiger.size === 1){
+    view.x += e.clientX - alt.x;
+    view.y += e.clientY - alt.y;
+    zeichne();
+  } else if(zeiger.size === 2){
+    const p = [...zeiger.values()];
+    const mitte = { x:(p[0].x+p[1].x)/2, y:(p[0].y+p[1].y)/2 };
+    const abst  = Math.hypot(p[0].x-p[1].x, p[0].y-p[1].y);
+    if(letzterAbstand){
+      const k = abst / letzterAbstand;
+      const r = rahmen.getBoundingClientRect();
+      const mx = mitte.x - r.left, my = mitte.y - r.top;
+      view.scale *= k;
+      view.x = mx - (mx - view.x) * k;
+      view.y = my - (my - view.y) * k;
+      zeichne();
+    }
+    letzterAbstand = abst; letzteMitte = mitte;
+  }
+});
+function zeigerWeg(e){
+  zeiger.delete(e.pointerId);
+  if(zeiger.size < 2){ letzterAbstand = 0; }
+}
+rahmen.addEventListener("pointerup", zeigerWeg);
+rahmen.addEventListener("pointercancel", zeigerWeg);
+
+window.addEventListener("resize", () => {
+  if(!bmp) return;
+  const altW = FRAME_W;
+  setzeLeinwandGroesse();
+  if(altW){ const f = FRAME_W/altW; view.scale*=f; view.x*=f; view.y*=f; }
+  zeichne();
+});
+
+/* ====================================================================== *
+ *  Export: 1600×1000 JPEG, Qualität auf ~400 KB einregeln                 *
+ * ====================================================================== */
+async function macheBlob(){
+  const c = document.createElement("canvas");
+  c.width = EXPORT_W; c.height = EXPORT_H;
+  const cx = c.getContext("2d");
+  cx.imageSmoothingQuality = "high";
+  const r = EXPORT_W / FRAME_W;   // gleicher Ausschnitt, nur hochskaliert
+  cx.drawImage(bmp, view.x*r, view.y*r, bmp.width*view.scale*r, bmp.height*view.scale*r);
+
+  const stufen = [0.92,0.86,0.80,0.74,0.68,0.62,0.56,0.50,0.44];
+  let gewaehlt = null;
+  for(const q of stufen){
+    const blob = await new Promise(res => c.toBlob(res, "image/jpeg", q));
+    gewaehlt = { blob, q };
+    if(blob.size <= MAX_BYTES) break;
+  }
+  return gewaehlt;
+}
+
+/* ====================================================================== *
+ *  GitHub-API                                                            *
+ * ====================================================================== */
+function kopf(){
+  return { Authorization:`Bearer ${token()}`, Accept:"application/vnd.github+json" };
+}
+async function ermittleBranch(){
+  let b = localStorage.getItem(LS_BRANCH);
+  if(b) return b;
+  const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, { headers: kopf() });
+  if(res.status === 401) throw new Error("Token ungültig oder abgelaufen (401).");
+  if(!res.ok) throw new Error(`Repository nicht erreichbar (${res.status}).`);
+  const j = await res.json();
+  b = j.default_branch || "main";
+  localStorage.setItem(LS_BRANCH, b);
+  return b;
+}
+async function holeSha(pfad){
+  const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${pfad}`, { headers: kopf() });
+  if(res.status === 200){ return (await res.json()).sha; }
+  if(res.status === 404){ return null; }
+  if(res.status === 401){ throw new Error("Token ungültig oder abgelaufen (401)."); }
+  throw new Error(`Prüfung fehlgeschlagen (${res.status}).`);
+}
+
+$("hochladen").onclick = async () => {
+  if(!bmp){ alert("Bitte zuerst ein Foto wählen."); return; }
+  if(!token()){ alert("Bitte zuerst den Token speichern (Schritt 1)."); $("tokenBox").open=true; return; }
+  const sauber = entferneSonderzeichen($("name").value);
+  if(!sauber){ alert("Bitte einen Dateinamen eingeben."); $("name").focus(); return; }
+
+  const pfad = `${FOLDER}/${sauber}.jpg`;
+  $("hochladen").disabled = true;
+
+  try{
+    zeigStatus("Bild wird verkleinert …", "info");
+    const { blob, q } = await macheBlob();
+    const kb = Math.round(blob.size/1024);
+
+    zeigStatus("Zweig wird ermittelt …", "info");
+    const branch = await ermittleBranch();
+
+    zeigStatus("Wird vorbereitet …", "info");
+    const sha = await holeSha(pfad);
+    if(sha && !confirm(`„${pfad}" gibt es schon. Überschreiben?`)){
+      zeigStatus("Abgebrochen – nichts geändert.", "warn");
+      $("hochladen").disabled = false; return;
+    }
+
+    zeigStatus(`Wird hochgeladen … (${kb} KB)`, "info");
+    const base64 = await blobNachBase64(blob);
+    const koerper = {
+      message: `${sha ? "Foto aktualisiert" : "Foto hinzugefügt"}: ${pfad}`,
+      content: base64,
+      branch
+    };
+    if(sha) koerper.sha = sha;
+
+    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${pfad}`, {
+      method:"PUT",
+      headers:{ ...kopf(), "Content-Type":"application/json" },
+      body: JSON.stringify(koerper)
+    });
+
+    if(res.ok){
+      zeigStatus(`Fertig! „${pfad}" gespeichert (${kb} KB, Qualität ${Math.round(q*100)} %). Die Seite ist nach ein paar Minuten aktualisiert.`, "gut");
+      $("name").value = ""; aktualisierePreview();
+    } else if(res.status === 401){
+      zeigStatus("Token ungültig oder abgelaufen (401). Bitte in Schritt 1 erneuern.", "warn");
+    } else if(res.status === 403){
+      zeigStatus("Keine Berechtigung (403). Token braucht die Berechtigung Contents: Read and write.", "warn");
+    } else if(res.status === 422){
+      zeigStatus("Konflikt (422). Vermutlich gleichzeitig geändert – bitte erneut versuchen.", "warn");
+    } else {
+      const t = await res.text();
+      zeigStatus(`Fehler ${res.status}. ${t.slice(0,140)}`, "warn");
+    }
+  }catch(err){
+    zeigStatus(err.message || "Unbekannter Fehler – Internetverbindung prüfen.", "warn");
+  }finally{
+    $("hochladen").disabled = false;
+  }
+};
+
+/* ====================================================================== *
+ *  Vorhandene Fotos auflisten                                            *
+ * ====================================================================== */
+$("listeLaden").onclick = async () => {
+  const ul = $("fotoListe");
+  ul.innerHTML = "<li>Lädt …</li>";
+  try{
+    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FOLDER}`,
+      { headers: token() ? kopf() : { Accept:"application/vnd.github+json" } });
+    if(!res.ok){ ul.innerHTML = `<li>Konnte nicht laden (${res.status}).</li>`; return; }
+    const arr = (await res.json())
+      .filter(f => f.type === "file" && /\.(jpe?g|png|webp)$/i.test(f.name))
+      .map(f => f.name).sort();
+    ul.innerHTML = arr.length
+      ? arr.map(n => `<li>${n}</li>`).join("")
+      : "<li>Noch keine Fotos im Ordner.</li>";
+  }catch(e){
+    ul.innerHTML = "<li>Fehler beim Laden – Internet prüfen.</li>";
+  }
+};
+
+/* ====================================================================== *
+ *  Start                                                                  *
+ * ====================================================================== */
+function pruefeBereit(){
+  $("hochladen").disabled = !(bmp && token());
+}
+$("name").addEventListener("input", aktualisierePreview);
+aktualisierePreview();
+tokenStatusZeigen();
+</script>
+</body>
+</html>
