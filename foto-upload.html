@@ -169,9 +169,13 @@
   <!-- Schritt 2: Foto wählen -->
   <section class="karte">
     <div class="schritt"><div class="nummer">2</div><h2>Foto wählen</h2></div>
-    <input type="file" id="datei" accept="image/*" hidden>
-    <button class="btn-zweit" id="dateiButton">Foto auswählen</button>
-    <p class="hinweis">Vom Handy: Galerie oder Kamera.</p>
+    <input type="file" id="dateiKamera"  accept="image/*" capture="environment" hidden>
+    <input type="file" id="dateiGalerie" accept="image/*" hidden>
+    <div class="btn-reihe">
+      <button class="btn-zweit" id="kameraButton">Kamera</button>
+      <button class="btn-zweit" id="galerieButton">Galerie</button>
+    </div>
+    <p class="hinweis">„Kamera" öffnet direkt den Fotoapparat, „Galerie" die gespeicherten Bilder.</p>
   </section>
 
   <!-- Schritt 3: Ausschnitt -->
@@ -360,8 +364,10 @@ async function ladeFoto(file){
   pruefeBereit();
 }
 
-$("dateiButton").onclick = () => $("datei").click();
-$("datei").onchange = e => { if(e.target.files[0]) ladeFoto(e.target.files[0]); };
+$("kameraButton").onclick  = () => $("dateiKamera").click();
+$("galerieButton").onclick = () => $("dateiGalerie").click();
+$("dateiKamera").onchange  = e => { if(e.target.files[0]) ladeFoto(e.target.files[0]); };
+$("dateiGalerie").onchange = e => { if(e.target.files[0]) ladeFoto(e.target.files[0]); };
 
 /* Zoom-Regler – um die Rahmenmitte zoomen */
 $("zoom").oninput = e => {
