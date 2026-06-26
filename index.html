@@ -222,6 +222,30 @@
 
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   button:focus-visible,.row:focus-visible,.tile:focus-visible{outline:3px solid var(--buoy);outline-offset:2px}
+
+  /* --- Werkzeuge --- */
+  .btn-reihe{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .btn-reihe button{flex:1;min-width:130px;background:#eef5f7;border:1px solid #cfe0e6;color:var(--sea);border-radius:12px;padding:15px;font-size:1.05rem;font-weight:800;cursor:pointer;font-family:inherit}
+  .btn-reihe button:active{background:var(--tap)}
+  .btn-reihe button.an{background:var(--sea);color:#fff;border-color:var(--sea)}
+  .range{width:100%;accent-color:var(--sea);height:34px;margin:0 0 4px}
+  /* Lupe */
+  .lupe-stage{position:relative;width:100%;aspect-ratio:3/4;max-height:56vh;background:#000;border-radius:16px;overflow:hidden}
+  .lupe-stage video,.lupe-stage canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:center center;transition:transform .08s linear}
+  .lupe-stage.invert video,.lupe-stage.invert canvas{filter:invert(1) grayscale(.2) contrast(1.15)}
+  .lupe-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#cfe0e6;font-size:1rem;text-align:center;padding:24px}
+  .lupe-label{display:block;font-weight:700;margin:16px 2px 6px}
+  /* Stoppuhr */
+  .uhr-zeit{font-size:3.4rem;font-weight:800;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:1px;margin:30px 0;color:var(--ink)}
+  /* Rechner */
+  .rechner-anzeige{background:var(--ground);color:#fff;border-radius:14px;padding:18px 16px;text-align:right;font-size:2.4rem;font-weight:700;font-variant-numeric:tabular-nums;min-height:64px;word-break:break-all;overflow:hidden}
+  .rechner-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+  .rechner-grid button{padding:22px 0;font-size:1.5rem;font-weight:800;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);cursor:pointer;font-family:inherit}
+  .rechner-grid button:active{background:var(--tap)}
+  .rechner-grid .rop{background:#eef5f7;color:var(--sea);border-color:#cfe0e6}
+  .rechner-grid .rfn{background:#f1f4f5;color:var(--ink-soft)}
+  .rechner-grid .rgleich{background:var(--sea);color:#fff;border-color:var(--sea)}
+  .rechner-grid .r0{grid-column:span 2}
 </style>
 </head>
 <body>
@@ -247,22 +271,10 @@
       </button>
 
       <div class="grid">
-        <button class="tile" onclick="go('nearby')">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
-          <span class="lbl">In der Nähe</span>
-          <span class="sub">Toilette, Apotheke, Bank, Wasser</span>
-        </button>
-
-        <button class="tile" onclick="go('fahrplan')">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 9h14"/><circle cx="8.5" cy="13" r="1.2"/><circle cx="15.5" cy="13" r="1.2"/><path d="M8 17l-2 4M16 17l2 4"/></svg></span>
-          <span class="lbl">Fahrplan & Bus</span>
-          <span class="sub">Bahn und Bus in der Region</span>
-        </button>
-
-        <button class="tile" onclick="go('suchen')">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
-          <span class="lbl">Suchen</span>
-          <span class="sub">Geschäft & Öffnungszeiten</span>
+        <button class="tile" onclick="go('werkzeuge')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
+          <span class="lbl">Werkzeuge</span>
+          <span class="sub">Lupe, Stoppuhr, Rechner u. a.</span>
         </button>
 
         <button class="tile" onclick="go('kochen')">
@@ -271,16 +283,127 @@
           <span class="sub">Einfache, gute Gerichte</span>
         </button>
 
-        <button class="tile alarm" onclick="go('notruf')">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5c0 8 8 16 16 16l-2-5-4 1-3-3 1-4-5-2z"/></svg></span>
-          <span class="lbl">Notruf & Erste Hilfe</span>
+        <button class="tile" onclick="go('nearby')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+          <span class="lbl">In der Nähe</span>
+          <span class="sub">Toilette, Apotheke, Bank, Wasser</span>
         </button>
 
-        <button class="tile" onclick="go('recht')">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h4"/></svg></span>
-          <span class="lbl">Rechtliches & Kontakt</span>
+        <button class="tile" onclick="go('suchen')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+          <span class="lbl">Suchen</span>
+          <span class="sub">Geschäft &amp; Öffnungszeiten</span>
+        </button>
+
+        <button class="tile" onclick="go('fahrplan')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 9h14"/><circle cx="8.5" cy="13" r="1.2"/><circle cx="15.5" cy="13" r="1.2"/><path d="M8 17l-2 4M16 17l2 4"/></svg></span>
+          <span class="lbl">Fahrplan &amp; Bus</span>
+          <span class="sub">Bahn und Bus in der Region</span>
+        </button>
+
+        <button class="tile alarm" onclick="go('notruf')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5c0 8 8 16 16 16l-2-5-4 1-3-3 1-4-5-2z"/></svg></span>
+          <span class="lbl">Notruf &amp; Erste Hilfe</span>
         </button>
       </div>
+
+      <div class="foot">
+        <button class="flink" onclick="go('recht')">Rechtliches &amp; Kontakt</button>
+      </div>
+    </section>
+
+    <!-- WERKZEUGE -->
+    <section class="view" id="v-werkzeuge">
+      <button class="back" onclick="go('home')">&lsaquo; Zur&uuml;ck</button>
+      <h2>Werkzeuge</h2>
+      <div class="cats">
+        <button class="cat" onclick="go('lupe')">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg>
+          <span>Lupe</span>
+        </button>
+        <button class="cat" onclick="go('stoppuhr')">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6"/><path d="M12 5v0"/><circle cx="12" cy="13" r="8"/><path d="M12 13V9"/><path d="m17.5 7.5 1.5-1.5"/></svg>
+          <span>Stoppuhr</span>
+        </button>
+        <button class="cat" onclick="go('rechner')">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg>
+          <span>Rechner</span>
+        </button>
+        <button class="cat" onclick="go('kisuche')">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6z"/><path d="M18 14l.7 1.9L20.6 16.6 18.7 17.3 18 19.2 17.3 17.3 15.4 16.6 17.3 15.9z"/></svg>
+          <span>Mit Google-KI suchen</span>
+        </button>
+      </div>
+      <div class="note">Diese vier Werkzeuge zuerst zum Ausprobieren &ndash; weitere folgen.</div>
+    </section>
+
+    <!-- LUPE -->
+    <section class="view" id="v-lupe">
+      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <h2>Lupe</h2>
+      <div class="lupe-stage" id="lupeStage">
+        <video id="lupeVideo" playsinline autoplay muted></video>
+        <canvas id="lupeCanvas" hidden></canvas>
+        <div class="lupe-hint" id="lupeHint">Kamera wird gestartet &hellip;</div>
+      </div>
+      <label class="lupe-label" for="lupeZoom">Vergr&ouml;&szlig;ern</label>
+      <input class="range" type="range" id="lupeZoom" min="100" max="400" value="100" oninput="setLupeZoom(this.value)" aria-label="Vergr&ouml;&szlig;ern">
+      <div class="btn-reihe">
+        <button id="lupeFreeze" onclick="lupeFreeze()">Einfrieren</button>
+        <button id="lupeInvert" onclick="lupeInvert()">Heller Text</button>
+      </div>
+      <div class="note">Handy &uuml;ber den Text halten. &bdquo;Einfrieren&ldquo; macht ein Standbild zum ruhigen Betrachten, &bdquo;Heller Text&ldquo; kehrt die Farben um.</div>
+    </section>
+
+    <!-- STOPPUHR -->
+    <section class="view" id="v-stoppuhr">
+      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <h2>Stoppuhr</h2>
+      <div class="uhr-zeit" id="uhrZeit">00:00,0</div>
+      <div class="btn-reihe">
+        <button id="uhrStartBtn" onclick="uhrToggle()">Start</button>
+        <button id="uhrResetBtn" onclick="uhrReset()">Zur&uuml;cksetzen</button>
+      </div>
+      <div class="note">L&auml;uft korrekt weiter, auch wenn der Bildschirm zwischendurch aus war.</div>
+    </section>
+
+    <!-- RECHNER -->
+    <section class="view" id="v-rechner">
+      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <h2>Rechner</h2>
+      <div class="rechner-anzeige" id="rechnerAnzeige">0</div>
+      <div class="rechner-grid">
+        <button class="rfn" onclick="rechC()">C</button>
+        <button class="rfn" onclick="rechDel()">&larr;</button>
+        <button class="rfn" onclick="rechProzent()">%</button>
+        <button class="rop" onclick="rechOp('/')">&divide;</button>
+        <button onclick="rechZ('7')">7</button>
+        <button onclick="rechZ('8')">8</button>
+        <button onclick="rechZ('9')">9</button>
+        <button class="rop" onclick="rechOp('*')">&times;</button>
+        <button onclick="rechZ('4')">4</button>
+        <button onclick="rechZ('5')">5</button>
+        <button onclick="rechZ('6')">6</button>
+        <button class="rop" onclick="rechOp('-')">&minus;</button>
+        <button onclick="rechZ('1')">1</button>
+        <button onclick="rechZ('2')">2</button>
+        <button onclick="rechZ('3')">3</button>
+        <button class="rop" onclick="rechOp('+')">+</button>
+        <button class="r0" onclick="rechZ('0')">0</button>
+        <button onclick="rechKomma()">,</button>
+        <button class="rgleich" onclick="rechGleich()">=</button>
+      </div>
+    </section>
+
+    <!-- MIT GOOGLE-KI SUCHEN -->
+    <section class="view" id="v-kisuche">
+      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <h2>Mit Google-KI suchen</h2>
+      <div class="search-box">
+        <input id="kiQ" type="text" placeholder="Frage eingeben &hellip;" enterkeyhint="search" onkeydown="if(event.key==='Enter')kiSuche()">
+        <button onclick="kiSuche()">Suchen</button>
+      </div>
+      <div class="note">&Ouml;ffnet Google mit Ihrer Frage. Oben erscheint dort meist eine KI-Antwort, darunter die gewohnten Web-Ergebnisse.</div>
     </section>
 
     <!-- NOTRUF -->
@@ -617,7 +740,9 @@ let STATE = { lat:47.5996, lon:9.5566, ort:"Langenargen", land:"DE", located:fal
 function go(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('v-'+name).classList.add('active');
+  if(typeof stopLupe==='function') stopLupe();
   if(name==='heute') renderHeute();
+  if(name==='lupe') startLupe();
   window.scrollTo(0,0);
 }
 
@@ -1254,6 +1379,158 @@ renderFoto();
 /* ---------- Als App lauffähig machen (offline + installierbar) ---------- */
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+
+/* ====================== Werkzeuge ====================== */
+
+/* --- Lupe (Kamera) --- */
+var lupeStream=null, lupeFrozen=false;
+async function startLupe(){
+  var stage=document.getElementById('lupeStage');
+  var v=document.getElementById('lupeVideo');
+  var c=document.getElementById('lupeCanvas');
+  var hint=document.getElementById('lupeHint');
+  lupeFrozen=false; c.hidden=true; v.hidden=false; stage.classList.remove('invert');
+  var z=document.getElementById('lupeZoom'); z.value=100; setLupeZoom(100);
+  var bf=document.getElementById('lupeFreeze'); bf.textContent='Einfrieren'; bf.classList.remove('an');
+  document.getElementById('lupeInvert').classList.remove('an');
+  hint.textContent='Kamera wird gestartet \u2026'; hint.style.display='flex';
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    hint.textContent='Kamera wird von diesem Browser nicht unterst\u00fctzt.'; return;
+  }
+  try{
+    lupeStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    v.srcObject=lupeStream;
+    try{ await v.play(); }catch(e){}
+    hint.style.display='none';
+  }catch(e){
+    hint.textContent='Kamera nicht verf\u00fcgbar. Bitte den Kamera-Zugriff erlauben und es erneut versuchen.';
+  }
+}
+function stopLupe(){
+  if(lupeStream){ lupeStream.getTracks().forEach(function(t){t.stop();}); lupeStream=null; }
+  var v=document.getElementById('lupeVideo'); if(v) v.srcObject=null;
+}
+function setLupeZoom(p){
+  var t='scale('+(p/100)+')';
+  var v=document.getElementById('lupeVideo'); if(v) v.style.transform=t;
+  var c=document.getElementById('lupeCanvas'); if(c) c.style.transform=t;
+}
+function lupeFreeze(){
+  var v=document.getElementById('lupeVideo');
+  var c=document.getElementById('lupeCanvas');
+  var b=document.getElementById('lupeFreeze');
+  if(!lupeFrozen){
+    if(!lupeStream) return;
+    var w=v.videoWidth||1280, h=v.videoHeight||960;
+    c.width=w; c.height=h;
+    c.getContext('2d').drawImage(v,0,0,w,h);
+    c.hidden=false; v.hidden=true;
+    lupeFrozen=true; b.textContent='Weiter (live)'; b.classList.add('an');
+  } else {
+    c.hidden=true; v.hidden=false;
+    lupeFrozen=false; b.textContent='Einfrieren'; b.classList.remove('an');
+  }
+}
+function lupeInvert(){
+  var stage=document.getElementById('lupeStage');
+  var b=document.getElementById('lupeInvert');
+  stage.classList.toggle('invert');
+  b.classList.toggle('an', stage.classList.contains('invert'));
+}
+
+/* --- Stoppuhr --- */
+var uhrLauft=false, uhrStart=0, uhrAkk=0, uhrTimer=null;
+function uhrFmt(ms){
+  var z=Math.max(0,ms);
+  var min=Math.floor(z/60000);
+  var sek=Math.floor((z%60000)/1000);
+  var zs=Math.floor((z%1000)/100);
+  function p2(n){return (n<10?'0':'')+n;}
+  return p2(min)+':'+p2(sek)+','+zs;
+}
+function uhrShow(){
+  var ms=uhrAkk + (uhrLauft ? (Date.now()-uhrStart) : 0);
+  document.getElementById('uhrZeit').textContent=uhrFmt(ms);
+}
+function uhrToggle(){
+  var b=document.getElementById('uhrStartBtn');
+  if(uhrLauft){
+    uhrAkk+=Date.now()-uhrStart; uhrLauft=false;
+    clearInterval(uhrTimer); uhrTimer=null;
+    b.textContent='Weiter'; b.classList.remove('an');
+    uhrShow();
+  } else {
+    uhrStart=Date.now(); uhrLauft=true;
+    uhrTimer=setInterval(uhrShow,100);
+    b.textContent='Stopp'; b.classList.add('an');
+  }
+}
+function uhrReset(){
+  uhrLauft=false; uhrAkk=0;
+  clearInterval(uhrTimer); uhrTimer=null;
+  var b=document.getElementById('uhrStartBtn');
+  b.textContent='Start'; b.classList.remove('an');
+  uhrShow();
+}
+
+/* --- Rechner --- */
+var rA=null, rOp=null, rEingabe='0', rNeu=false;
+function rechZeig(){ document.getElementById('rechnerAnzeige').textContent=rEingabe; }
+function rechZ(d){
+  if(rNeu){ rEingabe=d; rNeu=false; }
+  else { rEingabe=(rEingabe==='0')?d:rEingabe+d; }
+  var ziffern=rEingabe.replace(/[^0-9]/g,'').length;
+  if(ziffern>12){ rEingabe=rEingabe.slice(0,-1); }
+  rechZeig();
+}
+function rechKomma(){
+  if(rNeu){ rEingabe='0,'; rNeu=false; }
+  else if(rEingabe.indexOf(',')<0){ rEingabe+=','; }
+  rechZeig();
+}
+function rechZahl(){ return parseFloat(rEingabe.replace(',','.')); }
+function rechFmt(n){
+  if(!isFinite(n)) return 'Fehler';
+  var s=(Math.round(n*1e8)/1e8).toString();
+  return s.replace('.',',');
+}
+function rechRechne(){
+  var b=rechZahl(), r=b;
+  if(rOp==='+') r=rA+b;
+  else if(rOp==='-') r=rA-b;
+  else if(rOp==='*') r=rA*b;
+  else if(rOp==='/') r=(b===0)?NaN:rA/b;
+  return r;
+}
+function rechOp(op){
+  if(rOp!==null && !rNeu){
+    var r=rechRechne(); rA=r; rEingabe=rechFmt(r); rechZeig();
+  } else {
+    rA=rechZahl();
+  }
+  rOp=op; rNeu=true;
+}
+function rechGleich(){
+  if(rOp===null) return;
+  var r=rechRechne();
+  rEingabe=rechFmt(r); rA=null; rOp=null; rNeu=true; rechZeig();
+}
+function rechProzent(){
+  rEingabe=rechFmt(rechZahl()/100); rNeu=true; rechZeig();
+}
+function rechDel(){
+  if(rNeu) return;
+  rEingabe=(rEingabe.length>1)?rEingabe.slice(0,-1):'0';
+  rechZeig();
+}
+function rechC(){ rA=null; rOp=null; rEingabe='0'; rNeu=false; rechZeig(); }
+
+/* --- Mit Google-KI suchen --- */
+function kiSuche(){
+  var q=(document.getElementById('kiQ').value||'').trim();
+  if(!q) return;
+  window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank','noopener');
 }
 </script>
 </body>
