@@ -289,6 +289,24 @@
   .betrug-merk{margin-top:12px;background:#fdeaea;border:1px solid #f0b8b8;border-radius:12px;padding:14px;font-weight:700;color:#8a2b2b;line-height:1.45}
   .vertraut-set{display:flex;flex-direction:column;gap:10px}
   .vertraut-set input{border:1px solid var(--line);border-radius:12px;padding:14px;font-size:1.1rem;font-family:inherit;box-sizing:border-box}
+  /* --- Weitergeben & Installation --- */
+  .install-banner{display:flex;align-items:center;gap:10px;background:#eef5f7;border:1px solid #cfe0e6;border-radius:14px;padding:12px 14px;margin-bottom:14px}
+  .install-banner .ib-text{flex:1;font-weight:700;color:var(--sea)}
+  .install-banner .ib-btn{background:var(--sea);color:#fff;border:0;border-radius:10px;padding:9px 16px;font-weight:800;font-family:inherit;cursor:pointer}
+  .install-banner .ib-x{background:none;border:0;color:var(--ink-soft);font-size:1.5rem;line-height:1;cursor:pointer;padding:0 4px}
+  .wg-intro{font-size:1.05rem;line-height:1.5;color:var(--ink);margin:0 2px 16px}
+  .wg-qr{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;justify-content:center;margin-bottom:12px}
+  .wg-qr svg{width:100%;max-width:260px;height:auto}
+  .wg-url{text-align:center;font-size:1.05rem;color:var(--ink-soft);word-break:break-all;margin-bottom:6px}
+  .wg-steps p{font-size:1.05rem;margin:0 0 12px}
+  .wg-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;font-size:1.05rem;line-height:1.45}
+  .wg-step .wg-n{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--sea);color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center}
+  /* --- Warnzeichen / Tipps --- */
+  .betrug-h3.warn{color:var(--alarm);font-size:1.25rem;display:flex;align-items:center;gap:8px}
+  .betrug-tipps{margin-top:12px;background:#eaf6ee;border:1px solid #b7e0c4;border-radius:12px;padding:16px;color:#1f5d34;line-height:1.5}
+  .betrug-tipps b{display:block;margin-bottom:8px;font-size:1.05rem}
+  .betrug-tipps ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+  .betrug-tipps li{font-size:1.02rem}
 </style>
 </head>
 <body>
@@ -305,6 +323,11 @@
   <main>
     <!-- HEIM -->
     <section class="view active" id="v-home">
+      <div class="install-banner" id="installBanner" style="display:none">
+        <span class="ib-text">Lotse fest aufs Handy legen?</span>
+        <button class="ib-btn" onclick="bannerAction()">Zeigen</button>
+        <button class="ib-x" onclick="bannerDismiss()" aria-label="Schließen">×</button>
+      </div>
       <h2 class="foto-h">Foto des Tages</h2>
       <div id="fotoTag"></div>
 
@@ -357,6 +380,7 @@
       </div>
 
       <div class="foot">
+        <button class="flink" onclick="go('weitergeben')">Lotse weitergeben</button>
         <button class="flink" onclick="go('recht')">Rechtliches &amp; Kontakt</button>
       </div>
     </section>
@@ -566,7 +590,7 @@
       <h2>Ist das echt?</h2>
       <div class="betrug-regel">F&uuml;r einen echten Gewinn zahlt man <u>nie</u> etwas.<br>Kein Geld, keine Daten, kein Anruf unter Druck.</div>
 
-      <h3 class="betrug-h3">Warnzeichen</h3>
+      <h3 class="betrug-h3 warn"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9.5 16.5H2.5z"/><path d="M12 10v4"/><path d="M12 17.5h.01"/></svg>Das sind Warnzeichen</h3>
       <ul class="betrug-liste">
         <li>Sie haben angeblich gewonnen &ndash; obwohl Sie nie mitgemacht haben.</li>
         <li>Sie sollen zahlen, anrufen (teure 0900-Nummer) oder Daten angeben, um den &bdquo;Gewinn&ldquo; zu erhalten.</li>
@@ -575,6 +599,14 @@
         <li>Es werden Bank-, Ausweis- oder Kontodaten verlangt.</li>
       </ul>
       <div class="betrug-merk">Trifft auch nur eines zu? Dann mit hoher Wahrscheinlichkeit Betrug. Nichts zahlen, nicht anrufen, nichts unterschreiben.</div>
+      <div class="betrug-tipps">
+        <b>So sch&uuml;tzen Sie sich:</b>
+        <ul>
+          <li>Geben Sie nie Bank-, Ausweis- oder Kontodaten weiter.</li>
+          <li>Rufen Sie die angegebene Nummer nicht an.</li>
+          <li>Geben Sie am Telefon keine Ausk&uuml;nfte.</li>
+        </ul>
+      </div>
 
       <h3 class="betrug-h3">Im Zweifel: nicht allein entscheiden</h3>
       <div id="vertrautBox"></div>
@@ -587,6 +619,21 @@
 
       <h3 class="betrug-h3">Seri&ouml;se Pr&uuml;fstellen</h3>
       <div id="betrugStellen" class="rows"></div>
+    </section>
+
+    <!-- LOTSE WEITERGEBEN -->
+    <section class="view" id="v-weitergeben">
+      <button class="back" onclick="go('home')">&lsaquo; Zur&uuml;ck</button>
+      <h2>Lotse weitergeben</h2>
+      <p class="wg-intro">Halten Sie diesen Code vor die Kamera des anderen Handys &ndash; dann &ouml;ffnet sich Lotse dort von selbst.</p>
+      <div class="wg-qr"><svg viewBox="0 0 37 37" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-label="QR-Code zu Lotse"><rect width="37" height="37" fill="#fff"/><path d="M4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM12 4h1v1h-1zM15 4h1v1h-1zM18 4h1v1h-1zM19 4h1v1h-1zM21 4h1v1h-1zM22 4h1v1h-1zM26 4h1v1h-1zM27 4h1v1h-1zM28 4h1v1h-1zM29 4h1v1h-1zM30 4h1v1h-1zM31 4h1v1h-1zM32 4h1v1h-1zM4 5h1v1h-1zM10 5h1v1h-1zM16 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM23 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM4 6h1v1h-1zM6 6h1v1h-1zM7 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM13 6h1v1h-1zM18 6h1v1h-1zM19 6h1v1h-1zM21 6h1v1h-1zM22 6h1v1h-1zM23 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM29 6h1v1h-1zM30 6h1v1h-1zM32 6h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM13 7h1v1h-1zM14 7h1v1h-1zM19 7h1v1h-1zM20 7h1v1h-1zM22 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM29 7h1v1h-1zM30 7h1v1h-1zM32 7h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM13 8h1v1h-1zM14 8h1v1h-1zM18 8h1v1h-1zM19 8h1v1h-1zM20 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM29 8h1v1h-1zM30 8h1v1h-1zM32 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM12 9h1v1h-1zM15 9h1v1h-1zM20 9h1v1h-1zM23 9h1v1h-1zM24 9h1v1h-1zM26 9h1v1h-1zM32 9h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM24 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM28 10h1v1h-1zM29 10h1v1h-1zM30 10h1v1h-1zM31 10h1v1h-1zM32 10h1v1h-1zM12 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM17 11h1v1h-1zM20 11h1v1h-1zM21 11h1v1h-1zM23 11h1v1h-1zM24 11h1v1h-1zM4 12h1v1h-1zM8 12h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM12 12h1v1h-1zM14 12h1v1h-1zM15 12h1v1h-1zM17 12h1v1h-1zM20 12h1v1h-1zM21 12h1v1h-1zM24 12h1v1h-1zM25 12h1v1h-1zM26 12h1v1h-1zM27 12h1v1h-1zM28 12h1v1h-1zM29 12h1v1h-1zM32 12h1v1h-1zM4 13h1v1h-1zM5 13h1v1h-1zM6 13h1v1h-1zM7 13h1v1h-1zM9 13h1v1h-1zM12 13h1v1h-1zM13 13h1v1h-1zM17 13h1v1h-1zM18 13h1v1h-1zM19 13h1v1h-1zM20 13h1v1h-1zM21 13h1v1h-1zM22 13h1v1h-1zM24 13h1v1h-1zM26 13h1v1h-1zM27 13h1v1h-1zM28 13h1v1h-1zM29 13h1v1h-1zM30 13h1v1h-1zM31 13h1v1h-1zM32 13h1v1h-1zM4 14h1v1h-1zM8 14h1v1h-1zM10 14h1v1h-1zM12 14h1v1h-1zM15 14h1v1h-1zM19 14h1v1h-1zM20 14h1v1h-1zM21 14h1v1h-1zM25 14h1v1h-1zM26 14h1v1h-1zM27 14h1v1h-1zM32 14h1v1h-1zM4 15h1v1h-1zM9 15h1v1h-1zM12 15h1v1h-1zM15 15h1v1h-1zM16 15h1v1h-1zM18 15h1v1h-1zM19 15h1v1h-1zM21 15h1v1h-1zM26 15h1v1h-1zM27 15h1v1h-1zM28 15h1v1h-1zM29 15h1v1h-1zM31 15h1v1h-1zM32 15h1v1h-1zM5 16h1v1h-1zM6 16h1v1h-1zM7 16h1v1h-1zM8 16h1v1h-1zM9 16h1v1h-1zM10 16h1v1h-1zM13 16h1v1h-1zM15 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1zM18 16h1v1h-1zM20 16h1v1h-1zM21 16h1v1h-1zM25 16h1v1h-1zM31 16h1v1h-1zM15 17h1v1h-1zM16 17h1v1h-1zM19 17h1v1h-1zM20 17h1v1h-1zM24 17h1v1h-1zM25 17h1v1h-1zM26 17h1v1h-1zM27 17h1v1h-1zM28 17h1v1h-1zM29 17h1v1h-1zM30 17h1v1h-1zM31 17h1v1h-1zM32 17h1v1h-1zM4 18h1v1h-1zM6 18h1v1h-1zM9 18h1v1h-1zM10 18h1v1h-1zM14 18h1v1h-1zM17 18h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1zM21 18h1v1h-1zM22 18h1v1h-1zM25 18h1v1h-1zM26 18h1v1h-1zM28 18h1v1h-1zM29 18h1v1h-1zM30 18h1v1h-1zM32 18h1v1h-1zM6 19h1v1h-1zM7 19h1v1h-1zM8 19h1v1h-1zM11 19h1v1h-1zM12 19h1v1h-1zM13 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM21 19h1v1h-1zM22 19h1v1h-1zM23 19h1v1h-1zM24 19h1v1h-1zM25 19h1v1h-1zM27 19h1v1h-1zM31 19h1v1h-1zM32 19h1v1h-1zM5 20h1v1h-1zM6 20h1v1h-1zM7 20h1v1h-1zM8 20h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM15 20h1v1h-1zM17 20h1v1h-1zM19 20h1v1h-1zM21 20h1v1h-1zM23 20h1v1h-1zM25 20h1v1h-1zM31 20h1v1h-1zM4 21h1v1h-1zM6 21h1v1h-1zM9 21h1v1h-1zM11 21h1v1h-1zM13 21h1v1h-1zM17 21h1v1h-1zM18 21h1v1h-1zM19 21h1v1h-1zM20 21h1v1h-1zM22 21h1v1h-1zM24 21h1v1h-1zM26 21h1v1h-1zM27 21h1v1h-1zM28 21h1v1h-1zM29 21h1v1h-1zM31 21h1v1h-1zM32 21h1v1h-1zM7 22h1v1h-1zM8 22h1v1h-1zM9 22h1v1h-1zM10 22h1v1h-1zM12 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM24 22h1v1h-1zM28 22h1v1h-1zM30 22h1v1h-1zM32 22h1v1h-1zM7 23h1v1h-1zM9 23h1v1h-1zM11 23h1v1h-1zM12 23h1v1h-1zM15 23h1v1h-1zM18 23h1v1h-1zM19 23h1v1h-1zM21 23h1v1h-1zM25 23h1v1h-1zM26 23h1v1h-1zM27 23h1v1h-1zM31 23h1v1h-1zM32 23h1v1h-1zM4 24h1v1h-1zM5 24h1v1h-1zM7 24h1v1h-1zM8 24h1v1h-1zM9 24h1v1h-1zM10 24h1v1h-1zM12 24h1v1h-1zM13 24h1v1h-1zM14 24h1v1h-1zM15 24h1v1h-1zM16 24h1v1h-1zM17 24h1v1h-1zM18 24h1v1h-1zM19 24h1v1h-1zM21 24h1v1h-1zM22 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM25 24h1v1h-1zM26 24h1v1h-1zM27 24h1v1h-1zM28 24h1v1h-1zM29 24h1v1h-1zM32 24h1v1h-1zM12 25h1v1h-1zM14 25h1v1h-1zM15 25h1v1h-1zM16 25h1v1h-1zM19 25h1v1h-1zM20 25h1v1h-1zM21 25h1v1h-1zM22 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM32 25h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM9 26h1v1h-1zM10 26h1v1h-1zM12 26h1v1h-1zM15 26h1v1h-1zM17 26h1v1h-1zM18 26h1v1h-1zM19 26h1v1h-1zM22 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h1v1h-1zM29 26h1v1h-1zM30 26h1v1h-1zM32 26h1v1h-1zM4 27h1v1h-1zM10 27h1v1h-1zM13 27h1v1h-1zM14 27h1v1h-1zM16 27h1v1h-1zM17 27h1v1h-1zM21 27h1v1h-1zM24 27h1v1h-1zM28 27h1v1h-1zM32 27h1v1h-1zM4 28h1v1h-1zM6 28h1v1h-1zM7 28h1v1h-1zM8 28h1v1h-1zM10 28h1v1h-1zM12 28h1v1h-1zM14 28h1v1h-1zM16 28h1v1h-1zM17 28h1v1h-1zM19 28h1v1h-1zM21 28h1v1h-1zM23 28h1v1h-1zM24 28h1v1h-1zM25 28h1v1h-1zM26 28h1v1h-1zM27 28h1v1h-1zM28 28h1v1h-1zM29 28h1v1h-1zM31 28h1v1h-1zM4 29h1v1h-1zM6 29h1v1h-1zM7 29h1v1h-1zM8 29h1v1h-1zM10 29h1v1h-1zM13 29h1v1h-1zM17 29h1v1h-1zM18 29h1v1h-1zM19 29h1v1h-1zM21 29h1v1h-1zM22 29h1v1h-1zM24 29h1v1h-1zM25 29h1v1h-1zM27 29h1v1h-1zM32 29h1v1h-1zM4 30h1v1h-1zM6 30h1v1h-1zM7 30h1v1h-1zM8 30h1v1h-1zM10 30h1v1h-1zM14 30h1v1h-1zM15 30h1v1h-1zM19 30h1v1h-1zM21 30h1v1h-1zM23 30h1v1h-1zM25 30h1v1h-1zM29 30h1v1h-1zM30 30h1v1h-1zM31 30h1v1h-1zM32 30h1v1h-1zM4 31h1v1h-1zM10 31h1v1h-1zM13 31h1v1h-1zM18 31h1v1h-1zM21 31h1v1h-1zM22 31h1v1h-1zM24 31h1v1h-1zM25 31h1v1h-1zM27 31h1v1h-1zM29 31h1v1h-1zM31 31h1v1h-1zM32 31h1v1h-1zM4 32h1v1h-1zM5 32h1v1h-1zM6 32h1v1h-1zM7 32h1v1h-1zM8 32h1v1h-1zM9 32h1v1h-1zM10 32h1v1h-1zM12 32h1v1h-1zM14 32h1v1h-1zM15 32h1v1h-1zM16 32h1v1h-1zM19 32h1v1h-1zM21 32h1v1h-1zM24 32h1v1h-1zM25 32h1v1h-1zM27 32h1v1h-1zM28 32h1v1h-1zM31 32h1v1h-1z" fill="#0d2f3f"/></svg></div>
+      <div class="wg-url">tscharlie168.github.io/lotse</div>
+      <div class="btn-reihe">
+        <button onclick="wgTeilen()">Link teilen</button>
+        <button onclick="wgKopieren()">Link kopieren</button>
+      </div>
+      <h3 class="betrug-h3">Lotse dauerhaft aufs Handy legen</h3>
+      <div id="wgInstall"></div>
     </section>
 
     <!-- NOTRUF -->
@@ -941,6 +988,7 @@ function go(name){
   if(name==='taschenlampe') renderLamp();
   if(name==='hilfe') renderHilfe();
   if(name==='betrug') paintBetrug();
+  if(name==='weitergeben') renderInstall();
   window.scrollTo(0,0);
 }
 
@@ -1975,6 +2023,55 @@ function paintBetrug(){
     return '<a class="row" href="'+s.url+'" target="_blank" rel="noopener"><div class="main"><b>'+s.b+'</b><small>'+s.s+'</small></div>'+arrow+'</a>';
   }).join('')+'<div class="note" style="margin-top:10px">Angezeigt f\u00fcr '+(L?L.name:'')+'. \u00dcber den Knopf \u201eLand\u201c oben auf der Startseite umstellbar.</div>';
 }
+
+/* ====================== Lotse weitergeben / Installation ====================== */
+var deferredPrompt=null;
+window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredPrompt=e; updateInstallUI(); });
+window.addEventListener('appinstalled', function(){ deferredPrompt=null; bannerDismiss(); });
+function isStandalone(){ try{ return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true; }catch(e){ return false; } }
+function bannerInit(){
+  var b=document.getElementById('installBanner'); if(!b) return;
+  var dismissed=false; try{ dismissed=localStorage.getItem('lotse_install_dismiss')==='1'; }catch(e){}
+  b.style.display=(isStandalone()||dismissed)?'none':'flex';
+}
+function bannerDismiss(){ try{ localStorage.setItem('lotse_install_dismiss','1'); }catch(e){} var b=document.getElementById('installBanner'); if(b) b.style.display='none'; }
+function bannerAction(){ if(deferredPrompt){ installNow(); } else { go('weitergeben'); } }
+async function installNow(){
+  if(!deferredPrompt){ go('weitergeben'); return; }
+  deferredPrompt.prompt();
+  try{ await deferredPrompt.userChoice; }catch(e){}
+  deferredPrompt=null; bannerDismiss(); updateInstallUI();
+}
+function renderInstall(){
+  var box=document.getElementById('wgInstall'); if(!box) return;
+  if(isStandalone()){ box.innerHTML='<div class="note">Lotse ist bereits auf dem Startbildschirm. Sehr gut!</div>'; return; }
+  if(deferredPrompt){
+    box.innerHTML='<button class="big-btn" onclick="installNow()">Jetzt aufs Handy legen</button><div class="note">Ein Tipp gen\u00fcgt \u2013 Lotse erscheint als Symbol auf dem Startbildschirm.</div>';
+    return;
+  }
+  if(istIOS()){
+    box.innerHTML='<div class="wg-steps"><p>So legen Sie Lotse auf den Startbildschirm:</p>'+
+      '<div class="wg-step"><span class="wg-n">1</span><div>Unten auf das <b>Teilen-Symbol</b> tippen (Viereck mit Pfeil nach oben).</div></div>'+
+      '<div class="wg-step"><span class="wg-n">2</span><div>Etwas nach unten wischen, auf <b>\u201eZum Home-Bildschirm\u201c</b> tippen.</div></div>'+
+      '<div class="wg-step"><span class="wg-n">3</span><div>Oben rechts auf <b>\u201eHinzuf\u00fcgen\u201c</b> tippen. Fertig.</div></div></div>';
+    return;
+  }
+  box.innerHTML='<div class="wg-steps">'+
+    '<div class="wg-step"><span class="wg-n">1</span><div>Im Browser-Men\u00fc auf <b>\u201eApp installieren\u201c</b> bzw. <b>\u201eZum Startbildschirm hinzuf\u00fcgen\u201c</b> tippen.</div></div>'+
+    '<div class="wg-step"><span class="wg-n">2</span><div>Best\u00e4tigen \u2013 Lotse erscheint als Symbol.</div></div></div>';
+}
+function updateInstallUI(){ bannerInit(); renderInstall(); }
+var LOTSE_URL='https://tscharlie168.github.io/lotse/';
+function wgTeilen(){
+  if(navigator.share){ navigator.share({title:'Lotse', text:'Lotse \u2013 die Anlaufstelle f\u00fcr alles', url:LOTSE_URL}).catch(function(){}); }
+  else { wgKopieren(); }
+}
+function wgKopieren(){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(LOTSE_URL).then(function(){ alert('Link kopiert.'); }, function(){ window.prompt('Link zum Kopieren:', LOTSE_URL); });
+  } else { window.prompt('Link zum Kopieren:', LOTSE_URL); }
+}
+bannerInit();
 </script>
 </body>
 </html>
