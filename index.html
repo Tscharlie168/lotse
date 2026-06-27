@@ -373,6 +373,18 @@
           <span class="sub">Pannenhilfe &amp; Mitgliedsnummer</span>
         </button>
 
+        <button class="tile" onclick="go('gemeinschaft')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M15 14.2a4.5 4.5 0 0 1 5.5 4.3"/></svg></span>
+          <span class="lbl">Gemeinschaft erleben</span>
+          <span class="sub">Mitmachen, treffen, dabei sein</span>
+        </button>
+
+        <button class="tile" onclick="go('webcams')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="3.2"/><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/></svg></span>
+          <span class="lbl">Webcams</span>
+          <span class="sub">Live-Bilder aus der Region</span>
+        </button>
+
         <button class="tile" onclick="go('betrug')">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v5c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>
           <span class="lbl">Ist das echt?</span>
@@ -864,6 +876,39 @@
       </details>
     </section>
 
+    <!-- GEMEINSCHAFT ERLEBEN -->
+    <section class="view" id="v-gemeinschaft">
+      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <h2>Gemeinschaft erleben</h2>
+      <p style="color:var(--ink-soft);margin:0 0 14px">Mitmachen, andere treffen, dabei sein – hier finden Sie Anschluss in Ihrer Nähe.</p>
+
+      <h2 style="margin-top:6px;font-size:1.25rem">Treffpunkte in der Nähe</h2>
+      <div class="cats">
+        <button class="cat" onclick="findNear('treff','gemeinschaft')"><span style="font-size:1.7rem">🤝</span>Begegnungsstätte</button>
+        <button class="cat" onclick="findNear('bibliothek','gemeinschaft')"><span style="font-size:1.7rem">📚</span>Bücherei</button>
+        <button class="cat" onclick="findNear('schwimmbad','gemeinschaft')"><span style="font-size:1.7rem">🏊</span>Schwimmbad</button>
+        <button class="cat" onclick="findNear('cafe','gemeinschaft')"><span style="font-size:1.7rem">☕</span>Café</button>
+      </div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Anschluss finden</h2>
+      <div class="rows" id="gemeinschaftRows"></div>
+      <div class="note">Vereine, Kirche und Volkshochschule haben oft besondere Angebote für ältere Menschen – Treffs, Ausflüge, Kurse.</div>
+    </section>
+
+    <!-- WEBCAMS -->
+    <section class="view" id="v-webcams">
+      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <h2>Webcams</h2>
+      <p style="color:var(--ink-soft);margin:0 0 12px">Live-Bilder aus der Region – die nächstgelegene zuerst. Tippen öffnet die Seite des Betreibers.</p>
+      <div class="rows" id="webcamRows"></div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Mehr Webcams</h2>
+      <div class="rows" id="webcamPortale"></div>
+
+      <div class="note" style="margin-top:14px">Eine Webcam oder einen Ort vermisst? Sagen Sie uns Bescheid – wir nehmen sie gern mit auf.</div>
+      <button class="big-btn" style="margin-top:10px" onclick="webcamVorschlag()">Webcam vorschlagen</button>
+    </section>
+
     <!-- SUCHEN -->
     <section class="view" id="v-suchen">
       <button class="back" onclick="go('home')">‹ Zurück</button>
@@ -1058,6 +1103,8 @@ function go(name){
   if(name==='auto') renderMitglied();
   if(name==='kochen') updatePortionUI();
   if(name==='vorlesen') renderVorlesen();
+  if(name==='gemeinschaft') renderGemeinschaft();
+  if(name==='webcams') renderWebcams();
   if(name==='weitergeben') renderInstall();
   window.scrollTo(0,0);
 }
@@ -1141,7 +1188,10 @@ const CAT = {
   busstop:{q:'["highway"="bus_stop"]', t:"Bushaltestellen in der Nähe", n:"Bushaltestelle", steps:[600,2000,6000]},
   atm:{q:'["amenity"="atm"]', t:"Geldautomaten in der Nähe", n:"Geldautomat", steps:[1500,6000,15000]},
   hofladen:{q:'["shop"="farm"]', t:"Hofläden in der Nähe", n:"Hofladen", steps:[3000,10000,25000]},
-  automat:{q:'["amenity"="vending_machine"]["vending"~"eggs|fruit|vegetables|milk|honey|food|cheese|potatoes|farm|wine"]', t:"Verkaufsautomaten in der Nähe", n:"Verkaufsautomat", steps:[2000,6000,15000]}
+  automat:{q:'["amenity"="vending_machine"]["vending"~"eggs|fruit|vegetables|milk|honey|food|cheese|potatoes|farm|wine"]', t:"Verkaufsautomaten in der Nähe", n:"Verkaufsautomat", steps:[2000,6000,15000]},
+  treff:{q:['["amenity"="community_centre"]','["amenity"="social_centre"]'], t:"Treffpunkte in der Nähe", n:"Begegnungsstätte", steps:[3000,10000,25000]},
+  bibliothek:{q:'["amenity"="library"]', t:"Büchereien in der Nähe", n:"Bücherei", steps:[3000,10000,25000]},
+  schwimmbad:{q:['["leisure"="swimming_pool"]','["amenity"="public_bath"]'], t:"Schwimmbäder in der Nähe", n:"Schwimmbad", steps:[3000,10000,25000]}
 };
 let resBack = 'nearby';
 function goResBack(){ go(resBack); }
@@ -2259,6 +2309,52 @@ function renderMitglied(){
       '<div class="row call soft"><div class="main"><b>Meine Mitgliedsnummer</b></div><div class="num">'+lotseEsc(v.nr)+'</div></div>'+
       '<button class="flink" onclick="mitgliedForm()">Nummer \u00e4ndern</button>';
   } else { mitgliedForm(); }
+}
+/* ====================== Gemeinschaft erleben ====================== */
+function gSuche(was){
+  var ort=(STATE.ort && STATE.ort!=='Ihr Standort') ? STATE.ort+' ' : '';
+  return 'https://www.google.com/search?q='+encodeURIComponent(ort+was);
+}
+function renderGemeinschaft(){
+  var box=document.getElementById('gemeinschaftRows'); if(!box) return;
+  var ortTxt=(STATE.ort && STATE.ort!=='Ihr Standort') ? ' in '+STATE.ort : ' in Ihrer N\u00e4he';
+  var rows=[
+    {b:'Nachbarschaft (nebenan.de)', s:'Nachbarn kennenlernen \u2013 Anmeldung mit Name und Adresse n\u00f6tig', url:'https://nebenan.de'},
+    {b:'Vereine'+ortTxt, s:'Sport, Chor, Wandern, Kegeln und mehr', url:gSuche('Vereine')},
+    {b:'Kirchengemeinde'+ortTxt, s:'Gottesdienste, Seniorenkreis, Begegnung', url:gSuche('Kirchengemeinde')},
+    {b:'Volkshochschule'+ortTxt, s:'Kurse und Vortr\u00e4ge, oft auch tags\u00fcber', url:gSuche('Volkshochschule')}
+  ];
+  box.innerHTML=rows.map(function(r){
+    return '<a class="row" href="'+r.url+'" target="_blank" rel="noopener"><div class="main"><b>'+r.b+'</b><small>'+r.s+'</small></div><div class="go">\u00d6ffnen \u203a</div></a>';
+  }).join('');
+}
+/* ====================== Webcams (standortsortiert) ====================== */
+const WEBCAMS = [
+  {n:"Pf\u00e4nder \u00fcber dem Bodensee", o:"Bregenz", bl:"Bodensee", la:47.5063, lo:9.7779, url:"https://www.pfaenderbahn.at/service/webcam-wetter/"},
+  {n:"Lindau \u2013 Hafen & Leuchtturm", o:"Lindau", bl:"Bodensee", la:47.5430, lo:9.6816, url:"https://www.lindau.de/lindau-informiert/webcam/"},
+  {n:"Zugspitze \u2013 Gipfel", o:"Garmisch-Partenkirchen", bl:"Bayern", la:47.4211, lo:10.9853, url:"https://www.foto-webcam.eu/webcam/zugspitze/"},
+  {n:"Hamburg \u2013 Hafen & Landungsbr\u00fccken", o:"Hamburg", bl:"Hamburg", la:53.5459, lo:9.9695, url:"https://www.hamburg.de/tourismus/hamburg-erkunden/webcam"}
+];
+const WEBCAM_PORTALE = [
+  {b:"Mehr Webcams in ganz Deutschland", s:"foto-webcam.eu \u2013 Karte mit vielen Live-Cams", url:"https://www.foto-webcam.eu/"},
+  {b:"Webcams rund um den Bodensee", s:"bodenseewebcam.de \u2013 Cams der ganzen Region", url:"https://www.bodenseewebcam.de/"}
+];
+function webcamDistanz(m){ return m<1000 ? m+' m' : (m<10000 ? (m/1000).toFixed(1).replace('.',',')+' km' : Math.round(m/1000)+' km'); }
+function renderWebcams(){
+  var rows=document.getElementById('webcamRows');
+  if(rows){
+    var liste=WEBCAMS.map(function(w){ return {w:w, m:dist(w.la,w.lo)}; }).sort(function(a,b){ return a.m-b.m; });
+    rows.innerHTML=liste.map(function(x){
+      return '<a class="row" href="'+x.w.url+'" target="_blank" rel="noopener"><div class="main"><b>'+x.w.n+'</b><small>'+x.w.o+' \u00b7 '+webcamDistanz(x.m)+' entfernt</small></div><div class="go">Ansehen \u203a</div></a>';
+    }).join('');
+  }
+  var por=document.getElementById('webcamPortale');
+  if(por) por.innerHTML=WEBCAM_PORTALE.map(function(p){
+    return '<a class="row" href="'+p.url+'" target="_blank" rel="noopener"><div class="main"><b>'+p.b+'</b><small>'+p.s+'</small></div><div class="go">\u00d6ffnen \u203a</div></a>';
+  }).join('');
+}
+function webcamVorschlag(){
+  window.location.href='mailto:info@udo-maier.de?subject='+encodeURIComponent('Lotse \u2013 Webcam-Vorschlag')+'&body='+encodeURIComponent('Ich vermisse folgende Webcam / folgenden Ort:\n\n');
 }
 function betrugSuche(){
   var q=(document.getElementById('betrugQ').value||'').trim();
