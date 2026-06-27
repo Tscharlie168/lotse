@@ -370,7 +370,7 @@
         <button class="tile" onclick="go('auto')">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l1.6-4.4A2 2 0 0 1 8.5 5h7a2 2 0 0 1 1.9 1.6L19 11"/><path d="M3 11h18v5H3z"/><circle cx="7" cy="16.5" r="1.5"/><circle cx="17" cy="16.5" r="1.5"/></svg></span>
           <span class="lbl">Auto &amp; unterwegs</span>
-          <span class="sub">Pannenhilfe, Tankstelle, Ladesäule</span>
+          <span class="sub">Pannenhilfe &amp; Mitgliedsnummer</span>
         </button>
 
         <button class="tile" onclick="go('betrug')">
@@ -422,7 +422,7 @@
         </button>
         <button class="cat" onclick="go('vorlesen')">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>
-          <span>Vorlesen</span>
+          <span>Vorlesen lassen</span>
         </button>
         <button class="cat" onclick="go('parken')">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l1.6-4.8A2 2 0 0 1 8.5 7h7a2 2 0 0 1 1.9 1.2L19 13"/><path d="M4 13h16v4H4z"/><circle cx="7.5" cy="17.5" r="1.4"/><circle cx="16.5" cy="17.5" r="1.4"/></svg>
@@ -548,13 +548,14 @@
     <!-- VORLESEN -->
     <section class="view" id="v-vorlesen">
       <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
-      <h2>Vorlesen</h2>
-      <textarea id="vorText" class="vor-text" placeholder="Text hier eintippen oder einf&uuml;gen &ndash; dann auf Vorlesen tippen."></textarea>
+      <h2>Text vorlesen lassen</h2>
+      <p style="color:var(--ink-soft);margin:0 0 12px">Halten Sie die Handy-Kamera über das Kleingedruckte – Ihr Handy kann den Text erkennen, vergrößern und vorlesen. So geht's:</p>
       <div class="btn-reihe">
-        <button id="vorBtn" onclick="vorlesen()">Vorlesen</button>
-        <button onclick="stopVorlesen()">Stopp</button>
+        <button id="vorIos" onclick="vorSet('ios')">iPhone</button>
+        <button id="vorAnd" onclick="vorSet('android')">Android</button>
       </div>
-      <div class="note">Liest den Text laut auf Deutsch vor. Lautst&auml;rke &uuml;ber die Tasten am Handy.</div>
+      <div id="vorBox"></div>
+      <div class="note">Zum reinen Vergrößern gibt es in „Praktische Helfer" auch die <b>Lupe</b>.</div>
     </section>
 
     <!-- WO GEPARKT -->
@@ -827,11 +828,8 @@
       <div class="rows" id="panneNums"></div>
       <div class="note">Diese Nummern gehören den Automobilclubs. Für Mitglieder ist die Hilfe meist kostenlos, sonst wird sie nach Aufwand berechnet. <b>Bei einem Unfall oder Verletzten zählt der Notruf 112.</b></div>
 
-      <h2 style="margin-top:22px;font-size:1.25rem">In der Nähe</h2>
-      <div class="cats">
-        <button class="cat" onclick="findNear('fuel','auto')"><span style="font-size:1.7rem">⛽</span>Tankstelle</button>
-        <button class="cat" onclick="findNear('charging','auto')"><span style="font-size:1.7rem">🔌</span>Ladesäule</button>
-      </div>
+      <h2 style="margin-top:22px;font-size:1.25rem">Meine Mitgliedsnummer</h2>
+      <div id="mitgliedBox"></div>
 
       <h2 style="margin-top:22px;font-size:1.25rem">Was tun bei einer Panne?</h2>
       <p style="color:var(--ink-soft);margin:0 0 14px">Tippen Sie auf ein Thema, dann klappt die Anleitung auf.</p>
@@ -893,6 +891,12 @@
     <section class="view" id="v-kochen">
       <button class="back" onclick="go('home')">‹ Zurück</button>
       <h2>Was koche ich heute?</h2>
+      <div class="btn-reihe" id="portionWahl" style="margin-bottom:14px">
+        <button onclick="setPortionen(1)">1 Person</button>
+        <button onclick="setPortionen(2)">2 Pers.</button>
+        <button onclick="setPortionen(3)">3 Pers.</button>
+        <button onclick="setPortionen(4)">4 Pers.</button>
+      </div>
       <div id="rezept"></div>
       <button class="big-btn" onclick="neuesRezept()">Anderer Vorschlag</button>
 
@@ -1051,6 +1055,9 @@ function go(name){
   if(name==='taschenlampe') renderLamp();
   if(name==='hilfe') renderHilfe();
   if(name==='betrug') paintBetrug();
+  if(name==='auto') renderMitglied();
+  if(name==='kochen') updatePortionUI();
+  if(name==='vorlesen') renderVorlesen();
   if(name==='weitergeben') renderInstall();
   window.scrollTo(0,0);
 }
@@ -1134,9 +1141,7 @@ const CAT = {
   busstop:{q:'["highway"="bus_stop"]', t:"Bushaltestellen in der Nähe", n:"Bushaltestelle", steps:[600,2000,6000]},
   atm:{q:'["amenity"="atm"]', t:"Geldautomaten in der Nähe", n:"Geldautomat", steps:[1500,6000,15000]},
   hofladen:{q:'["shop"="farm"]', t:"Hofläden in der Nähe", n:"Hofladen", steps:[3000,10000,25000]},
-  automat:{q:'["amenity"="vending_machine"]["vending"~"eggs|fruit|vegetables|milk|honey|food|cheese|potatoes|farm|wine"]', t:"Verkaufsautomaten in der Nähe", n:"Verkaufsautomat", steps:[2000,6000,15000]},
-  fuel:{q:'["amenity"="fuel"]', t:"Tankstellen in der Nähe", n:"Tankstelle", steps:[3000,8000,20000]},
-  charging:{q:'["amenity"="charging_station"]', t:"Ladesäulen in der Nähe", n:"Ladesäule", steps:[5000,15000,30000]}
+  automat:{q:'["amenity"="vending_machine"]["vending"~"eggs|fruit|vegetables|milk|honey|food|cheese|potatoes|farm|wine"]', t:"Verkaufsautomaten in der Nähe", n:"Verkaufsautomat", steps:[2000,6000,15000]}
 };
 let resBack = 'nearby';
 function goResBack(){ go(resBack); }
@@ -1629,56 +1634,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* ---------- Was koche ich heute? (einfach, ausgewogen, offline) ---------- */
-const REZEPTE = [
-  {n:"Pellkartoffeln mit Kräuterquark", pers:2, t:"kalt", warum:"Sättigend, eiweißreich, leicht verdaulich",
-   zut:["4 mittelgroße Kartoffeln","250 g Magerquark","2 EL Milch","1 Bund Schnittlauch oder Petersilie","1 TL Leinöl","Salz, Pfeffer"],
-   s:"Kartoffeln in der Schale weich kochen (ca. 20 Min.). Quark mit Milch, gehackten Kräutern, Leinöl, Salz und Pfeffer verrühren. Kartoffeln pellen und mit dem Quark servieren."},
-  {n:"Haferbrei mit Apfel und Walnuss", pers:1, t:"warm", warum:"Guter Start in den Tag, gut für die Verdauung",
-   zut:["50 g Haferflocken","250 ml Milch","1 Apfel","1 EL gehackte Walnüsse","1 Prise Zimt","etwas Honig"],
-   s:"Haferflocken mit Milch aufkochen, 3–4 Min. quellen lassen. Apfel reiben oder klein schneiden, unterrühren. Mit Walnüssen, Zimt und etwas Honig bestreuen."},
-  {n:"Rührei mit Tomaten", pers:2, t:"neutral", warum:"Schnell, eiweißreich, mit Vollkornbrot ein vollwertiges Essen",
-   zut:["4 Eier","3 Tomaten","2 Scheiben Vollkornbrot","etwas Butter","Salz, Pfeffer, Schnittlauch"],
-   s:"Tomaten würfeln. Eier verquirlen, salzen. Butter erhitzen, Tomaten kurz anbraten, Eier dazugeben und stocken lassen. Mit Vollkornbrot servieren."},
-  {n:"Gemüsesuppe mit Kartoffeln", pers:4, t:"warm", warum:"Wärmend, viel Gemüse, lässt sich gut aufwärmen",
-   zut:["2 Karotten","2 Kartoffeln","1 Stange Lauch","1 Liter Gemüsebrühe","Salz, Pfeffer, Petersilie"],
-   s:"Gemüse klein schneiden. In der Brühe ca. 20 Min. weich kochen. Abschmecken, mit Petersilie bestreuen. Schmeckt am nächsten Tag noch besser."},
-  {n:"Linseneintopf", pers:3, t:"warm", warum:"Pflanzliches Eiweiß, viele Ballaststoffe, hält lange satt",
-   zut:["200 g rote Linsen","2 Karotten","1 Kartoffel","1 Zwiebel","800 ml Brühe","1 Schuss Essig"],
-   s:"Zwiebel anschwitzen, Gemüse würfeln und mitbraten. Linsen und Brühe zugeben, ca. 20 Min. köcheln. Mit etwas Essig, Salz und Pfeffer abschmecken."},
-  {n:"Ofengemüse mit Feta", pers:2, t:"neutral", warum:"Bunt, vitaminreich, fast von allein gekocht",
-   zut:["1 Zucchini","1 Paprika","1 Süßkartoffel oder 2 Kartoffeln","100 g Feta","2 EL Olivenöl","Kräuter der Provence"],
-   s:"Gemüse in Stücke schneiden, mit Öl und Kräutern mischen, auf ein Blech geben. Bei 200 °C ca. 25 Min. backen. Feta darüberbröseln und noch 5 Min. backen."},
-  {n:"Lachs mit Kartoffeln und Brokkoli", pers:2, t:"neutral", warum:"Gute Fette fürs Herz, eiweißreich",
-   zut:["2 Lachsfilets","6 Kartoffeln","1 Brokkoli","1 Zitrone","etwas Butter, Salz"],
-   s:"Kartoffeln kochen. Brokkoli 8 Min. dämpfen. Lachs in der Pfanne in etwas Butter je Seite 3–4 Min. braten, mit Zitrone beträufeln. Zusammen anrichten."},
-  {n:"Vollkornnudeln mit Tomatensauce", pers:2, t:"neutral", warum:"Einfach, sättigend, mit Gemüse aufgewertet",
-   zut:["250 g Vollkornnudeln","1 Dose stückige Tomaten","1 Zwiebel","1 Karotte","1 EL Olivenöl","Basilikum, Parmesan"],
-   s:"Nudeln kochen. Zwiebel und geriebene Karotte in Öl anschwitzen, Tomaten zugeben, 10 Min. köcheln, würzen. Über die Nudeln geben, mit Parmesan bestreuen."},
-  {n:"Quark mit Beeren und Haferflocken", pers:2, t:"kalt", warum:"Leichtes Abendessen, eiweißreich, schnell",
-   zut:["250 g Quark","1 Handvoll Beeren (auch tiefgekühlt)","2 EL Haferflocken","1 TL Honig"],
-   s:"Quark mit etwas Wasser oder Milch cremig rühren. Beeren und Haferflocken untermischen, mit Honig süßen."},
-  {n:"Hühnersuppe", pers:4, t:"warm", warum:"Bekömmlich, wärmend, gut bei Erkältung",
-   zut:["1 Hühnerbrust","2 Karotten","1 Stück Sellerie","1 Stange Lauch","1,2 l Wasser","Suppennudeln, Salz"],
-   s:"Hühnerbrust mit Gemüse und Wasser ca. 30 Min. köcheln. Fleisch herausnehmen, klein schneiden, zurückgeben. Suppennudeln zugeben, weich kochen, salzen."},
-  {n:"Kartoffel-Gemüse-Pfanne", pers:2, t:"neutral", warum:"Resteverwertung, sättigend, anpassbar",
-   zut:["4 gekochte Kartoffeln vom Vortag","1 Zwiebel","1 Paprika","2 Eier","1 EL Öl","Salz, Paprikapulver"],
-   s:"Kartoffeln in Scheiben, Zwiebel und Paprika klein schneiden. Alles in Öl goldbraun braten. Zum Schluss die verquirlten Eier darüber stocken lassen."},
-  {n:"Milchreis mit Zimt", pers:2, t:"warm", warum:"Sanftes warmes Essen, gut bei wenig Appetit",
-   zut:["100 g Milchreis","500 ml Milch","1 EL Zucker","Zimt","nach Wunsch Apfelmus"],
-   s:"Milchreis in der Milch unter Rühren aufkochen, dann bei kleiner Hitze ca. 30 Min. quellen lassen. Mit Zucker und Zimt, nach Wunsch mit Apfelmus servieren."},
-  {n:"Gemüseomelett", pers:2, t:"neutral", warum:"Eiweißreich, viel Gemüse, in 15 Minuten fertig",
-   zut:["4 Eier","1 Zucchini oder Pilze","2 Tomaten","etwas Käse","Öl, Salz, Pfeffer"],
-   s:"Gemüse klein schneiden und in Öl andünsten. Eier verquirlen, würzen, darübergeben. Bei mittlerer Hitze stocken lassen, Käse darüber, zusammenklappen."},
-  {n:"Brotzeit mit Käse und Gemüse", pers:2, t:"kalt", warum:"Kein Kochen nötig, ausgewogen, leicht",
-   zut:["4 Scheiben Vollkornbrot","Käse oder magerer Aufschnitt","Radieschen","Gurke","Tomate","etwas Butter"],
-   s:"Brote bestreichen und belegen. Rohkost in Scheiben dazu. Ein vollwertiges, leichtes Abendessen ohne Aufwand."},
-  {n:"Joghurt mit Obst und Müsli", pers:2, t:"kalt", warum:"Frisch, schnell, gut für den Darm",
-   zut:["250 g Naturjoghurt","1 Banane oder Saisonobst","3 EL Müsli","1 TL Honig","ein paar Nüsse"],
-   s:"Obst klein schneiden, mit Joghurt und Müsli schichten. Mit Honig und Nüssen toppen."},
-  {n:"Kürbis- oder Karottensuppe", pers:3, t:"warm", warum:"Cremig, vitaminreich, leicht zu löffeln",
-   zut:["500 g Kürbis oder Karotten","1 Kartoffel","1 Zwiebel","700 ml Brühe","1 Schuss Sahne","Salz, Muskat"],
-   s:"Zwiebel anschwitzen, Gemüse würfeln, mit Brühe ca. 20 Min. weich kochen. Pürieren, mit Sahne, Salz und Muskat abschmecken."}
-];
+const REZEPTE = [{"n":"Griechischer Bauernsalat mit Feta","base":2,"t":"kalt","warum":"Viel Gemüse, sättigt leicht – ideal an heißen Tagen.","zut":[[300,"g","Tomaten"],[1,"","Salatgurke"],[1,"","rote Zwiebel"],[150,"g","Feta"],[80,"g","schwarze Oliven"],[2,"EL","Olivenöl"],[null,"","Salz, Pfeffer, Oregano"],[2,"","Scheiben Vollkornbrot"]],"s":"Tomaten, Gurke und Zwiebel in mundgerechte Stücke schneiden. Mit Olivenöl, Oregano, Salz und Pfeffer mischen. Feta darüberbröseln, Oliven dazugeben, mit Brot servieren."},{"n":"Quark mit Beeren und Haferflocken","base":2,"t":"kalt","warum":"Eiweißreich und erfrischend, gut für die Muskeln.","zut":[[400,"g","Magerquark"],[150,"g","Beeren"],[4,"EL","Haferflocken"],[2,"EL","Milch"],[1,"TL","Honig"]],"s":"Quark mit der Milch cremig rühren. Beeren und Haferflocken untermengen, mit etwas Honig süßen."},{"n":"Vollkorn-Vesper mit Käse, Ei und Gemüse","base":2,"t":"kalt","warum":"Ohne Kochen, eiweißreich und viel Rohkost.","zut":[[4,"","Scheiben Vollkornbrot"],[2,"","Eier"],[80,"g","Käse"],[1,"","Paprika"],[2,"","Tomaten"],[null,"","etwas Butter"]],"s":"Eier hart kochen und in Scheiben schneiden. Brote dünn buttern, mit Käse und Ei belegen. Paprika und Tomaten in Spalten dazureichen."},{"n":"Tomate-Mozzarella mit Basilikum","base":2,"t":"kalt","warum":"Leicht, mediterran und schnell gemacht.","zut":[[400,"g","Tomaten"],[150,"g","Mozzarella"],[2,"EL","Olivenöl"],[null,"","frischer Basilikum"],[null,"","Salz und Pfeffer"],[2,"","Scheiben Vollkornbrot"]],"s":"Tomaten und Mozzarella in Scheiben abwechselnd anrichten. Mit Olivenöl, Salz, Pfeffer und Basilikum würzen. Brot dazu."},{"n":"Joghurt-Müsli mit Obst","base":2,"t":"kalt","warum":"Frisch, schnell und gut für den Darm.","zut":[[250,"g","Naturjoghurt"],[1,"","Banane oder Saisonobst"],[4,"EL","Müsli"],[20,"g","Nüsse"],[1,"TL","Honig"]],"s":"Obst klein schneiden, mit Joghurt und Müsli schichten. Mit Nüssen und etwas Honig toppen."},{"n":"Kalte Gurken-Joghurt-Suppe","base":2,"t":"kalt","warum":"Kühlt an heißen Tagen und ist leicht verdaulich.","zut":[[1,"","Salatgurke"],[400,"g","Naturjoghurt"],[1,"","Knoblauchzehe"],[1,"EL","Olivenöl"],[null,"","Dill, Salz, Pfeffer"]],"s":"Gurke fein reiben, mit Joghurt, gepresstem Knoblauch und Olivenöl verrühren. Mit Dill, Salz und Pfeffer abschmecken und kühl servieren."},{"n":"Thunfisch-Bohnen-Salat","base":2,"t":"kalt","warum":"Viel Eiweiß und Ballaststoffe, ganz ohne Kochen.","zut":[[1,"","Dose Thunfisch im eigenen Saft"],[1,"","Dose weiße Bohnen"],[1,"","rote Zwiebel"],[2,"","Tomaten"],[2,"EL","Olivenöl"],[null,"","Zitrone, Salz, Pfeffer"]],"s":"Bohnen abspülen, mit abgetropftem Thunfisch, gewürfelter Zwiebel und Tomaten mischen. Mit Olivenöl, Zitrone, Salz und Pfeffer anmachen."},{"n":"Couscous-Salat mit Kichererbsen","base":3,"t":"kalt","warum":"Sättigend, viel Gemüse, schmeckt auch lauwarm.","zut":[[200,"g","Vollkorn-Couscous"],[250,"ml","Brühe"],[1,"","Dose Kichererbsen"],[2,"","Tomaten"],[1,"","Paprika"],[2,"EL","Olivenöl"],[null,"","Zitrone, Petersilie, Salz"]],"s":"Couscous mit heißer Brühe übergießen und quellen lassen. Gewürfeltes Gemüse und Kichererbsen untermengen. Mit Olivenöl, Zitrone, Petersilie und Salz abschmecken."},{"n":"Räucherlachs auf Vollkornbrot","base":2,"t":"kalt","warum":"Wertvolle Omega-3-Fettsäuren und gutes Eiweiß.","zut":[[4,"","Scheiben Vollkornbrot"],[120,"g","Räucherlachs"],[100,"g","Frischkäse"],[1,"","Salatgurke"],[null,"","Dill, Zitrone, Pfeffer"]],"s":"Brote mit Frischkäse bestreichen. Lachs und Gurkenscheiben auflegen, mit Dill, etwas Zitrone und Pfeffer würzen."},{"n":"Hüttenkäse mit Tomate und Schnittlauch","base":2,"t":"kalt","warum":"Sehr eiweißreich, fettarm und schnell.","zut":[[400,"g","körniger Frischkäse"],[3,"","Tomaten"],[null,"","Schnittlauch, Salz, Pfeffer"],[2,"","Scheiben Vollkornbrot"]],"s":"Körnigen Frischkäse mit gewürfelten Tomaten und Schnittlauch mischen, würzen. Mit Vollkornbrot servieren."},{"n":"Linseneintopf mit Gemüse","base":4,"t":"warm","warum":"Pflanzliches Eiweiß und Ballaststoffe, wärmt durch.","zut":[[250,"g","Tellerlinsen"],[3,"","Karotten"],[2,"","Kartoffeln"],[1,"","Zwiebel"],[1000,"ml","Brühe"],[1,"EL","Essig"],[null,"","Salz, Pfeffer, Lorbeer"]],"s":"Zwiebel anschwitzen, gewürfeltes Gemüse und Linsen zugeben. Mit Brühe und Lorbeer ca. 30 Min. weich kochen. Mit Essig, Salz und Pfeffer abschmecken."},{"n":"Hühnersuppe mit Gemüse und Nudeln","base":4,"t":"warm","warum":"Leicht verdaulich, wärmend, gut bei Erkältung.","zut":[[1,"","Hähnchenbrust"],[3,"","Karotten"],[1,"","Stange Lauch"],[1200,"ml","Brühe"],[100,"g","Vollkornnudeln"],[null,"","Petersilie, Salz"]],"s":"Hähnchen in der Brühe gar ziehen, herausnehmen und zerteilen. Gewürfeltes Gemüse 15 Min. kochen, Nudeln zugeben. Fleisch zurück in die Suppe, mit Petersilie und Salz abschmecken."},{"n":"Kürbis-Karotten-Suppe mit Ingwer","base":3,"t":"warm","warum":"Cremig, vitaminreich und leicht zu löffeln.","zut":[[500,"g","Kürbis"],[2,"","Karotten"],[1,"","Kartoffel"],[1,"","Zwiebel"],[700,"ml","Brühe"],[1,"TL","frischer Ingwer"],[null,"","Salz, Muskat"]],"s":"Zwiebel und Ingwer anschwitzen, gewürfeltes Gemüse zugeben. Mit Brühe 20 Min. kochen, dann pürieren. Mit Salz und Muskat abschmecken."},{"n":"Gemüse-Kartoffel-Suppe","base":4,"t":"warm","warum":"Sättigend, gemüsereich und magenfreundlich.","zut":[[4,"","Kartoffeln"],[3,"","Karotten"],[1,"","Stange Lauch"],[1,"","Zwiebel"],[1000,"ml","Brühe"],[null,"","Petersilie, Salz, Pfeffer"]],"s":"Zwiebel anschwitzen, gewürfeltes Gemüse zugeben und mit Brühe 25 Min. kochen. Nach Wunsch leicht pürieren, mit Petersilie, Salz und Pfeffer abschmecken."},{"n":"Haferbrei mit Apfel und Walnuss","base":2,"t":"warm","warum":"Wärmt, hält lange satt, gut für Herz und Darm.","zut":[[80,"g","Haferflocken"],[300,"ml","Milch"],[1,"","Apfel"],[20,"g","Walnüsse"],[1,"TL","Honig"],[null,"","Zimt"]],"s":"Haferflocken mit Milch aufkochen und quellen lassen. Apfel reiben oder würfeln und untermengen. Mit Walnüssen, Honig und Zimt toppen."},{"n":"Rote-Linsen-Dal mit Reis","base":3,"t":"warm","warum":"Pflanzliches Eiweiß, würzig und wärmend.","zut":[[200,"g","rote Linsen"],[1,"","Zwiebel"],[1,"","Knoblauchzehe"],[1,"","Dose Tomaten"],[600,"ml","Brühe"],[150,"g","Reis"],[null,"","Currypulver, Salz"]],"s":"Zwiebel und Knoblauch anschwitzen, Curry zugeben. Linsen, Tomaten und Brühe ca. 20 Min. köcheln, bis es cremig wird. Mit Reis servieren und salzen."},{"n":"Milchreis mit Zimt und Apfel","base":2,"t":"warm","warum":"Wärmt und ist mild; mit Apfel braucht es wenig Zucker.","zut":[[150,"g","Milchreis"],[600,"ml","Milch"],[1,"","Apfel"],[1,"EL","Zucker"],[null,"","Zimt"]],"s":"Milchreis in der Milch unter Rühren ca. 30 Min. weich köcheln. Apfel würfeln oder reiben und untermengen. Mit Zimt und wenig Zucker servieren."},{"n":"Weiße-Bohnen-Eintopf","base":4,"t":"warm","warum":"Ballaststoffreich, pflanzliches Eiweiß, schön deftig.","zut":[[2,"","Dosen weiße Bohnen"],[2,"","Karotten"],[2,"","Tomaten"],[1,"","Zwiebel"],[800,"ml","Brühe"],[1,"EL","Olivenöl"],[null,"","Rosmarin, Salz, Pfeffer"]],"s":"Zwiebel in Olivenöl anschwitzen, gewürfelte Karotten und Tomaten zugeben. Bohnen und Brühe 15 Min. köcheln. Mit Rosmarin, Salz und Pfeffer abschmecken."},{"n":"Wirsing-Kartoffel-Topf","base":4,"t":"warm","warum":"Regionales Wintergemüse mit vielen Vitaminen.","zut":[[500,"g","Wirsing"],[4,"","Kartoffeln"],[1,"","Zwiebel"],[700,"ml","Brühe"],[1,"EL","Olivenöl"],[null,"","Salz, Pfeffer, Muskat"]],"s":"Zwiebel anschwitzen, gewürfelte Kartoffeln und Wirsingstreifen zugeben. Mit Brühe ca. 20 Min. weich schmoren. Mit Salz, Pfeffer und Muskat würzen."},{"n":"Gulaschsuppe mit magerem Rind","base":4,"t":"warm","warum":"Kräftig und wärmend; mageres Fleisch in Maßen.","zut":[[300,"g","mageres Rindfleisch"],[2,"","Paprika"],[2,"","Zwiebeln"],[2,"","Kartoffeln"],[900,"ml","Brühe"],[1,"EL","Paprikapulver"],[null,"","Salz, Pfeffer"]],"s":"Fleisch und Zwiebeln anbraten, Paprikapulver zugeben. Mit Brühe ablöschen, gewürfelte Paprika und Kartoffeln zufügen. Ca. 60 Min. schmoren, abschmecken."},{"n":"Rührei mit Tomaten","base":2,"t":"neutral","warum":"Schnell, eiweißreich und zu jeder Jahreszeit passend.","zut":[[4,"","Eier"],[2,"","Tomaten"],[1,"EL","Olivenöl"],[2,"","Scheiben Vollkornbrot"],[null,"","Schnittlauch, Salz, Pfeffer"]],"s":"Tomaten würfeln und kurz andünsten. Verquirlte Eier zugeben und stocken lassen. Mit Schnittlauch, Salz und Pfeffer würzen, mit Brot servieren."},{"n":"Lachs mit Kartoffeln und Brokkoli","base":2,"t":"neutral","warum":"Omega-3 und viel Gemüse, sättigt ohne zu beschweren.","zut":[[2,"","Lachsfilets"],[500,"g","Kartoffeln"],[1,"","Kopf Brokkoli"],[1,"EL","Olivenöl"],[null,"","Zitrone, Salz, Pfeffer"]],"s":"Kartoffeln kochen, Brokkoli dämpfen. Lachs mit Olivenöl, Salz und Pfeffer ca. 12 Min. im Ofen garen. Mit Zitrone beträufeln."},{"n":"Vollkornnudeln mit Gemüse-Tomatensauce","base":2,"t":"neutral","warum":"Ballaststoffe und viel Gemüse in einem Gericht.","zut":[[200,"g","Vollkornnudeln"],[1,"","Dose Tomaten"],[1,"","Zucchini"],[1,"","Paprika"],[1,"","Zwiebel"],[1,"EL","Olivenöl"],[null,"","Kräuter, Salz, Pfeffer"]],"s":"Zwiebel und gewürfeltes Gemüse in Olivenöl andünsten. Tomaten zugeben und 15 Min. köcheln. Nudeln garen und mit der Sauce und Kräutern mischen."},{"n":"Gemüseomelett","base":2,"t":"neutral","warum":"Eiweißreich, viel Gemüse und leicht.","zut":[[4,"","Eier"],[1,"","Paprika"],[1,"","Tomate"],[1,"","Frühlingszwiebel"],[1,"EL","Olivenöl"],[null,"","Salz, Pfeffer"]],"s":"Gemüse klein schneiden und andünsten. Verquirlte Eier darübergeben und bei milder Hitze stocken lassen. Würzen und zusammenklappen."},{"n":"Hähnchenbrust mit Gemüse und Reis","base":2,"t":"neutral","warum":"Mageres Eiweiß, ausgewogen und gut sättigend.","zut":[[2,"","Hähnchenbrustfilets"],[150,"g","Reis"],[2,"","Karotten"],[1,"","Zucchini"],[1,"EL","Olivenöl"],[null,"","Salz, Pfeffer, Paprika"]],"s":"Reis kochen. Hähnchen mit Gewürzen anbraten. Gewürfeltes Gemüse zugeben und garen, alles zusammen anrichten."},{"n":"Kartoffel-Gemüse-Pfanne","base":2,"t":"neutral","warum":"Sättigend und gemüsereich, alles in einer Pfanne.","zut":[[500,"g","Kartoffeln"],[2,"","Karotten"],[1,"","Zucchini"],[1,"","Zwiebel"],[2,"EL","Olivenöl"],[null,"","Salz, Pfeffer, Kräuter"]],"s":"Vorgekochte Kartoffeln und Gemüse würfeln. In Olivenöl goldbraun braten. Mit Salz, Pfeffer und Kräutern würzen."},{"n":"Seelachs mit Petersilienkartoffeln","base":2,"t":"neutral","warum":"Fettarmer Fisch, leicht und bekömmlich.","zut":[[2,"","Seelachsfilets"],[500,"g","Kartoffeln"],[150,"g","Blattsalat"],[1,"EL","Olivenöl"],[null,"","Petersilie, Zitrone, Salz"]],"s":"Kartoffeln kochen und mit Petersilie schwenken. Fisch in Olivenöl braten, mit Zitrone und Salz würzen. Mit Salat servieren."},{"n":"Vollkorn-Pasta mit Lachs und Spinat","base":2,"t":"neutral","warum":"Omega-3 und grünes Gemüse, schnell fertig.","zut":[[200,"g","Vollkorn-Pasta"],[150,"g","Lachs"],[200,"g","Blattspinat"],[1,"","Knoblauchzehe"],[100,"ml","Kochsahne"],[null,"","Salz, Pfeffer"]],"s":"Pasta kochen. Knoblauch andünsten, Spinat zusammenfallen lassen, Lachsstücke zugeben. Mit etwas Sahne binden, würzen und mit der Pasta mischen."},{"n":"Gefüllte Paprika mit Pute und Reis","base":4,"t":"neutral","warum":"Mageres Eiweiß, viel Gemüse, ein Klassiker.","zut":[[4,"","Paprika"],[300,"g","Putenhackfleisch"],[150,"g","Reis"],[1,"","Zwiebel"],[1,"","Dose Tomaten"],[null,"","Salz, Pfeffer, Paprikapulver"]],"s":"Reis vorkochen. Hack mit Zwiebel anbraten, mit Reis mischen und würzen. Paprika füllen und in der Tomatensauce bei 180 °C ca. 35 Min. backen."},{"n":"Pellkartoffeln mit Kräuterquark","base":2,"t":"neutral","warum":"Eiweißreich, fettarm und ganz einfach.","zut":[[600,"g","Kartoffeln"],[400,"g","Magerquark"],[3,"EL","Milch"],[null,"","Schnittlauch, Petersilie, Salz, Pfeffer"]],"s":"Kartoffeln als Pellkartoffeln kochen. Quark mit Milch glattrühren, Kräuter untermengen und würzen. Zusammen servieren."},{"n":"Ofengemüse mit Kichererbsen und Feta","base":3,"t":"neutral","warum":"Viel Gemüse, pflanzliches Eiweiß und sättigend.","zut":[[600,"g","gemischtes Gemüse"],[1,"","Dose Kichererbsen"],[2,"EL","Olivenöl"],[120,"g","Feta"],[null,"","Salz, Pfeffer, Kräuter"]],"s":"Gemüse und Kichererbsen mit Olivenöl, Salz und Pfeffer mischen. Bei 200 °C ca. 25 Min. backen. Feta darüberbröseln und kurz mitbacken."}];
 /* Pool der heute passenden Rezepte (nach Temperatur bzw. Jahreszeit) */
 function rezeptPool(){
   const ok = erlaubteTemps();
@@ -1687,17 +1643,51 @@ function rezeptPool(){
 }
 let rezeptPoolAkt = [];
 let rezeptPos = 0;
+/* Portionswähler 1–4; Mengen werden vom Grundrezept hochgerechnet */
+let portionen = 2;
+try{ const sp = parseInt(localStorage.getItem('lotse_portionen')); if(sp>=1 && sp<=4) portionen = sp; }catch(e){}
+function fmtZahl(v){
+  const r = Math.round(v*2)/2;            // auf halbe Schritte runden
+  if(r === Math.floor(r)) return String(r);
+  const ganz = Math.floor(r);
+  return (ganz>0 ? ganz : '') + '½';
+}
+function fmtMenge(a, u, f){
+  if(a == null) return '';                // z. B. "Salz und Pfeffer"
+  let v = a * f;
+  if(u === 'g' || u === 'ml'){
+    const step = v < 30 ? 5 : 10;
+    v = Math.max(step, Math.round(v/step)*step);
+    return v + ' ' + u + ' ';
+  }
+  if(u === 'EL' || u === 'TL') return fmtZahl(v) + ' ' + u + ' ';
+  return Math.max(1, Math.round(v)) + ' ';   // Stückzahl (Einheit steckt im Namen)
+}
 function zeigeRezept(){
   const r = REZEPTE[rezeptPoolAkt[rezeptPos]];
+  const f = portionen / r.base;
+  const zut = r.zut.map(z => `<li>${fmtMenge(z[0], z[1], f)}${z[2]}</li>`).join('');
   document.getElementById('rezept').innerHTML = `
     <div class="rezept-card">
       <h3>${r.n}</h3>
       <p class="warum">${r.warum}</p>
-      <h4>Zutaten für ${r.pers} ${r.pers===1?'Person':'Personen'}</h4>
-      <ul>${r.zut.map(z=>`<li>${z}</li>`).join('')}</ul>
+      <h4>Zutaten für ${portionen} ${portionen===1?'Person':'Personen'}</h4>
+      <ul>${zut}</ul>
       <h4>So geht's</h4>
       <p class="schritte">${r.s}</p>
     </div>`;
+}
+function updatePortionUI(){
+  const box = document.getElementById('portionWahl');
+  if(!box) return;
+  const btns = box.querySelectorAll('button');
+  for(let i=0;i<btns.length;i++) btns[i].classList.toggle('an', (i+1)===portionen);
+}
+function setPortionen(p){
+  portionen = p;
+  try{ localStorage.setItem('lotse_portionen', p); }catch(e){}
+  updatePortionUI();
+  if(rezeptPoolAkt.length) zeigeRezept();
 }
 /* Tagesvorschlag: für alle gleich und über den Tag stabil */
 function renderRezept(){
@@ -1712,6 +1702,7 @@ function neuesRezept(){
   zeigeRezept();
 }
 renderRezept();
+updatePortionUI();
 
 /* ---------- Foto des Tages (eigene Vektor-Landschaften) ---------- */
 const FOTO = [
@@ -1729,17 +1720,43 @@ const BUNDLE = ["lavendel.jpg", "garten-gelb.jpg"];
    einen Hinweis (oder mit "ganzjahr" im Namen) erscheint es das ganze Jahr.
    So genügt das Benennen der Datei – kein Eingriff in den Code nötig. */
 const ALLE_SAISON = ['winter','fruehling','frühling','sommer','herbst'];
-function fotoSaisonFilter(list){
-  const jz = jahreszeit(new Date().getMonth());
-  const tok = jz==='fruehling' ? ['fruehling','frühling'] : [jz];
-  const pass = list.filter(u=>{
-    const n = decodeURIComponent(String(u)).toLowerCase();
-    if(n.includes('ganzjahr')) return true;
-    const hatSaison = ALLE_SAISON.some(z=>n.includes(z));
-    if(!hatSaison) return true;             // ungetaggt = ganzjährig
-    return tok.some(z=>n.includes(z));      // passende Jahreszeit
-  });
-  return pass.length ? pass : list;         // nie leer ausliefern
+const MONATE = {januar:0,februar:1,maerz:2,'märz':2,april:3,mai:4,juni:5,juli:6,august:7,september:8,oktober:9,november:10,dezember:11};
+const MONATSNAME = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+const SAISONNAME = {winter:'Winter',fruehling:'Frühling',sommer:'Sommer',herbst:'Herbst'};
+/* Aus dem Dateinamen herauslesen: Monat (z. B. "juli") und/oder Jahreszeit.
+   Monat ist genauer und hat Vorrang; ohne Hinweis (oder "ganzjahr") ganzjährig. */
+function fotoMeta(u){
+  const n = decodeURIComponent(String(u)).toLowerCase();
+  if(n.includes('ganzjahr')) return {mon:null, sea:null, ganz:true};
+  let mon=null;
+  for(const k in MONATE){ if(n.includes(k)){ mon=MONATE[k]; break; } }
+  let sea=null;
+  if(n.includes('winter')) sea='winter';
+  else if(n.includes('fruehling')||n.includes('frühling')) sea='fruehling';
+  else if(n.includes('sommer')) sea='sommer';
+  else if(n.includes('herbst')) sea='herbst';
+  if(sea===null && mon!==null) sea=jahreszeit(mon);
+  return {mon, sea, ganz:(mon===null && sea===null)};
+}
+/* Heute passende Fotos: erst exakter Monat, sonst Jahreszeit, immer plus ganzjährige. */
+function fotoWahl(list){
+  const d=new Date(), cm=d.getMonth(), cs=jahreszeit(cm);
+  const meta=list.map(u=>({u, m:fotoMeta(u)}));
+  const exact = meta.filter(x=>x.m.mon===cm);
+  const season = meta.filter(x=>x.m.sea===cs);
+  const ganz = meta.filter(x=>x.m.ganz);
+  let pool;
+  if(exact.length) pool = exact.concat(ganz);
+  else if(season.length) pool = season.concat(ganz);
+  else if(ganz.length) pool = ganz;
+  else pool = meta;
+  return pool.map(x=>x.u);
+}
+function fotoCaption(u){
+  const m=fotoMeta(u);
+  if(m.mon!==null) return MONATSNAME[m.mon];
+  if(m.sea) return SAISONNAME[m.sea]||'';
+  return '';
 }
 function fotoSvgPool(){
   const jz = jahreszeit(new Date().getMonth());
@@ -1755,18 +1772,24 @@ function renderFoto(){
   const box = document.getElementById('fotoTag');
   const doy = tagDesJahres(new Date());
   fotoListe().then(list=>{
-    const passend = fotoSaisonFilter(list);
-    let img;
+    let img, cap='';
+    const passend = fotoWahl(list);
     if(passend.length){
-      img = `<img src="${passend[doy % passend.length]}" alt="Foto des Tages" onerror="fotoFallback(this)">`;
+      const u = passend[doy % passend.length];
+      cap = fotoCaption(u);
+      img = `<img src="${u}" alt="Foto des Tages" onerror="fotoFallback(this)">`;
     } else if(BUNDLE.length){
-      const b = fotoSaisonFilter(BUNDLE);
-      img = `<img src="${b[doy % b.length]}" alt="Foto des Tages" onerror="fotoFallback(this)">`;
+      const b = fotoWahl(BUNDLE);
+      const u = b[doy % b.length];
+      cap = fotoCaption(u);
+      img = `<img src="${u}" alt="Foto des Tages" onerror="fotoFallback(this)">`;
     } else {
       const pool = fotoSvgPool();
-      img = pool[doy % pool.length].svg;
+      const f = pool[doy % pool.length];
+      img = f.svg; cap = f.cap || '';
     }
-    box.innerHTML = `<div class="foto">${img}</div>`;
+    const capHtml = cap ? `<div style="font-size:.9rem;color:var(--ink-soft);text-align:center;margin-top:6px;font-style:italic">${cap}</div>` : '';
+    box.innerHTML = `<div class="foto">${img}</div>${capHtml}`;
   });
 }
 /* Die Bilder kommen aus dem Ordner /fotos im GitHub-Repository.
@@ -2076,17 +2099,30 @@ function merkToggle(i){ var a=merkLoad(); if(a[i]){ a[i].d=!a[i].d; merkSave(a);
 function merkDel(i){ var a=merkLoad(); a.splice(i,1); merkSave(a); renderMerk(); }
 function merkClearDone(){ merkSave(merkLoad().filter(function(x){return !x.d;})); renderMerk(); }
 
-/* --- Vorlesen --- */
-function vorlesen(){
-  if(!('speechSynthesis' in window)){ alert('Vorlesen wird von diesem Browser nicht unterstuetzt.'); return; }
-  var t=(document.getElementById('vorText').value||'').trim();
-  if(!t) return;
-  window.speechSynthesis.cancel();
-  var u=new SpeechSynthesisUtterance(t);
-  u.lang='de-DE'; u.rate=0.95;
-  try{ var vs=window.speechSynthesis.getVoices().filter(function(v){return /de/i.test(v.lang);}); if(vs.length) u.voice=vs[0]; }catch(e){}
-  window.speechSynthesis.speak(u);
+/* --- Text vorlesen lassen (Anleitung fürs Handy) --- */
+function vorSet(g){
+  var ios=document.getElementById('vorIos'), and=document.getElementById('vorAnd');
+  if(ios&&and){ ios.classList.toggle('an', g==='ios'); and.classList.toggle('an', g==='android'); }
+  var box=document.getElementById('vorBox'); if(!box) return;
+  if(g==='ios'){
+    box.innerHTML='<div class="note" style="font-size:1.05rem;line-height:1.6">'+
+      '<b>iPhone \u2013 mit der Lupe-App:</b><br><br>'+
+      '<b>1.</b> App <b>\u201eLupe\u201c</b> \u00f6ffnen (oder die normale Kamera).<br>'+
+      '<b>2.</b> Auf den Text richten, bei Bedarf mit dem Regler vergr\u00f6\u00dfern.<br>'+
+      '<b>3.</b> Erscheint das Symbol <b>\u201eText erkennen\u201c</b>, darauf tippen.<br>'+
+      '<b>4.</b> Text markieren und auf <b>\u201eVorlesen\u201c</b> tippen.<br><br>'+
+      'Fehlt die Lupe? In den Einstellungen unter \u201eBedienungshilfen \u2192 Lupe\u201c einschalten.</div>';
+  } else {
+    box.innerHTML='<div class="note" style="font-size:1.05rem;line-height:1.6">'+
+      '<b>Android \u2013 mit Google Lens:</b><br><br>'+
+      '<b>1.</b> <b>Kamera</b> oder die App <b>Google Lens</b> \u00f6ffnen.<br>'+
+      '<b>2.</b> Auf den Text richten und auf das <b>Text-Symbol</b> tippen.<br>'+
+      '<b>3.</b> Den erkannten Text antippen bzw. markieren.<br>'+
+      '<b>4.</b> Auf <b>\u201eH\u00f6ren\u201c / \u201eVorlesen\u201c</b> tippen.<br><br>'+
+      'Besonders einfach: die kostenlose Google-App <b>\u201eLookout\u201c</b> \u2013 gemacht f\u00fcrs Vorlesen beim Einkaufen.</div>';
+  }
 }
+function renderVorlesen(){ vorSet(istIOS()?'ios':'android'); }
 function stopVorlesen(){ try{ if('speechSynthesis' in window) window.speechSynthesis.cancel(); }catch(e){} }
 
 /* --- Wo habe ich geparkt? --- */
@@ -2198,6 +2234,32 @@ function renderVertraut(){
 }
 function vertrautCall(){ var v=vertrautLoad(); if(v&&v.tel) window.location.href='tel:'+v.tel.replace(/\s/g,''); }
 function vertrautSms(){ var v=vertrautLoad(); if(v&&v.tel) window.location.href='sms:'+v.tel.replace(/\s/g,''); }
+/* ---------- Pannenhilfe: Mitgliedsnummer (nur lokal) ---------- */
+function mitgliedLoad(){ try{ return JSON.parse(localStorage.getItem('lotse_mitglied')); }catch(e){ return null; } }
+function mitgliedForm(){
+  var box=document.getElementById('mitgliedBox'); if(!box) return;
+  var v=mitgliedLoad()||{};
+  box.innerHTML=
+    '<div class="vertraut-set">'+
+    '<div class="note">Hinterlegen Sie Ihre Mitgliedsnummer (z. B. ADAC oder \u00d6AMTC), damit Sie sie beim Pannenruf gleich zur Hand haben. Bleibt nur auf diesem Ger\u00e4t.</div>'+
+    '<input id="mgNr" type="text" inputmode="numeric" placeholder="Mitgliedsnummer" value="'+lotseEsc(v.nr||'')+'">'+
+    '<button class="big-btn" onclick="mitgliedSave()">Speichern</button></div>';
+}
+function mitgliedSave(){
+  var n=(document.getElementById('mgNr').value||'').trim();
+  if(!n){ alert('Bitte eine Mitgliedsnummer eingeben.'); return; }
+  try{ localStorage.setItem('lotse_mitglied', JSON.stringify({nr:n})); }catch(e){}
+  renderMitglied();
+}
+function renderMitglied(){
+  var box=document.getElementById('mitgliedBox'); if(!box) return;
+  var v=mitgliedLoad();
+  if(v && v.nr){
+    box.innerHTML=
+      '<div class="row call soft"><div class="main"><b>Meine Mitgliedsnummer</b></div><div class="num">'+lotseEsc(v.nr)+'</div></div>'+
+      '<button class="flink" onclick="mitgliedForm()">Nummer \u00e4ndern</button>';
+  } else { mitgliedForm(); }
+}
 function betrugSuche(){
   var q=(document.getElementById('betrugQ').value||'').trim();
   if(!q) return;
