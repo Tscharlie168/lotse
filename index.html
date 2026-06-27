@@ -972,7 +972,7 @@ const LAENDER = {
   }
 };
 
-let STATE = { lat:47.5996, lon:9.5566, ort:"Langenargen", land:"DE", located:false };
+let STATE = { lat:47.5996, lon:9.5566, ort:"Langenargen", land:"DE", located:false, tempC:null };
 
 /* ---------- Navigation ---------- */
 function go(name){
@@ -1025,7 +1025,7 @@ function toggleLand(){
 
 /* ---------- Standort holen ---------- */
 function locate(){
-  if(!navigator.geolocation){ paintLand(); return; }
+  if(!navigator.geolocation){ paintLand(); aktualisiereTempKontext(); return; }
   navigator.geolocation.getCurrentPosition(async pos=>{
     STATE.lat = pos.coords.latitude;
     STATE.lon = pos.coords.longitude;
@@ -1038,10 +1038,12 @@ function locate(){
       STATE.ort = d.address && (d.address.city||d.address.town||d.address.village||d.address.municipality||d.address.county) || "Ihr Standort";
     }catch(e){ STATE.ort = "Ihr Standort"; }
     paintLand();
+    aktualisiereTempKontext();
   }, err=>{
     STATE.located = false;
     document.getElementById('land').textContent = "Standort nicht aktiv – "+LAENDER[STATE.land].name;
     paintLand();
+    aktualisiereTempKontext();
   }, {enableHighAccuracy:true, timeout:8000, maximumAge:60000});
 }
 
@@ -1194,6 +1196,23 @@ const GESUNDHEIT = {
     "Morgens kurz ans Fenster – Licht tut bei kürzeren Tagen gut.",
     "Nach dem Zwiebelprinzip anziehen: mehrere dünne Schichten.",
     "Ein Ingwertee wärmt an den ersten kühlen Tagen."
+  ],
+  hitze:[
+    "Heute wird es heiß: über den Tag verteilt reichlich trinken, am besten Wasser.",
+    "Die pralle Mittagssonne meiden – Besorgungen lieber früh morgens oder abends.",
+    "Wohnung kühl halten: morgens lüften, tagsüber Rollläden und Vorhänge zu.",
+    "Leichte, kühle Kost tut gut – Salat, Joghurt, frisches Obst.",
+    "Ein kühles Arm- oder Fußbad bringt den Kreislauf angenehm herunter.",
+    "Helle, luftige Kleidung und ein Hut helfen gut gegen die Hitze.",
+    "An heißen Tagen ruhig mal bei Nachbarn schauen, denen die Wärme zusetzt."
+  ],
+  kaelte:[
+    "Bei Frost auf festes, rutschsicheres Schuhwerk achten.",
+    "Vor dem Rausgehen warm anziehen – nach dem Zwiebelprinzip in mehreren Schichten.",
+    "Auch bei Kälte ans Trinken denken; eine warme Suppe zählt mit.",
+    "Wege können glatt sein: lieber kleine, sichere Schritte machen.",
+    "Kurz, aber regelmäßig lüften hält die Luft frisch, ohne auszukühlen.",
+    "Eine warme Mahlzeit am Mittag gibt Kraft für den kalten Tag."
   ]
 };
 function jahreszeit(m){
@@ -1201,6 +1220,53 @@ function jahreszeit(m){
   if(m<=4) return 'fruehling';
   if(m<=7) return 'sommer';
   return 'herbst';
+}
+/* ---------- Tageskontext: Jahreszeit (offline) + Temperatur (online) ----------
+   Die Jahreszeit ergibt sich allein aus dem Datum und ist immer verfügbar.
+   Die Temperatur kommt von Open-Meteo und verfeinert die Auswahl, sobald online. */
+function tempBucket(t){
+  if(t==null || isNaN(t)) return null;
+  if(t>=28) return 'hitze';
+  if(t>=18) return 'warm';
+  if(t>=5)  return 'kuehl';
+  return 'kalt';
+}
+/* Gesundheitstipp: echte Hitze/Kälte schlägt die Kalender-Jahreszeit. */
+function tagesTipp(){
+  const b = tempBucket(STATE.tempC);
+  let pool;
+  if(b==='hitze' && GESUNDHEIT.hitze) pool = GESUNDHEIT.hitze;
+  else if(b==='kalt' && GESUNDHEIT.kaelte) pool = GESUNDHEIT.kaelte;
+  else pool = GESUNDHEIT[jahreszeit(new Date().getMonth())];
+  return pool[tagDesJahres(new Date()) % pool.length];
+}
+/* Welche Rezept-Art passt heute (kalt = leicht, warm = wärmend, neutral = immer)? */
+function erlaubteTemps(){
+  const b = tempBucket(STATE.tempC);
+  if(b==='hitze') return ['kalt','neutral'];
+  if(b==='warm')  return ['kalt','neutral','warm'];
+  if(b==='kuehl' || b==='kalt') return ['warm','neutral'];
+  const jz = jahreszeit(new Date().getMonth());   // offline: nach Jahreszeit
+  if(jz==='sommer') return ['kalt','neutral'];
+  if(jz==='winter') return ['warm','neutral'];
+  return ['kalt','neutral','warm'];               // Frühling/Herbst: alles erlaubt
+}
+/* Tipp + Rezept neu setzen, sobald die Temperatur bekannt ist */
+function applyTagescontext(){
+  const tipEl = document.getElementById('tip');
+  if(tipEl) tipEl.textContent = tagesTipp();
+  if(typeof renderRezept==='function') renderRezept();
+}
+/* Holt schlank nur die aktuelle Temperatur und passt die Inhalte daran an */
+async function aktualisiereTempKontext(){
+  try{
+    const u = `https://api.open-meteo.com/v1/forecast?latitude=${STATE.lat}&longitude=${STATE.lon}&current=temperature_2m&timezone=auto`;
+    const r = await fetch(u); const d = await r.json();
+    if(d && d.current && typeof d.current.temperature_2m === 'number'){
+      STATE.tempC = d.current.temperature_2m;
+      applyTagescontext();
+    }
+  }catch(e){}
 }
 const GEHIRN = [
   "Zählen Sie beim Zähneputzen von 100 rückwärts und ziehen Sie immer 7 ab.",
@@ -1418,12 +1484,11 @@ function renderHeute(){
     `<div class="dat">${dat}</div><div class="moon">${mp.emoji} Mond: ${mp.name}</div>`;
   renderHoro();
   document.getElementById('spruch').textContent = SPRUECHE[tagDesJahres(now) % SPRUECHE.length];
-  const pool = GESUNDHEIT[jahreszeit(now.getMonth())];
-  document.getElementById('tip').textContent = pool[tagDesJahres(now) % pool.length];
+  document.getElementById('tip').textContent = tagesTipp();
   document.getElementById('brain').textContent = GEHIRN[tagDesJahres(now) % GEHIRN.length];
-  renderWx(document.getElementById('wxHere'), STATE.lat, STATE.lon, STATE.ort && STATE.ort!=="Ihr Standort" ? STATE.ort : "Ihr Standort");
+  renderWx(document.getElementById('wxHere'), STATE.lat, STATE.lon, STATE.ort && STATE.ort!=="Ihr Standort" ? STATE.ort : "Ihr Standort", true);
 }
-async function renderWx(box, lat, lon, label){
+async function renderWx(box, lat, lon, label, isHome){
   box.innerHTML = `<div class="status"><div class="spin"></div>Wetter wird geladen…</div>`;
   try{
     const u = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
@@ -1432,6 +1497,7 @@ async function renderWx(box, lat, lon, label){
       + `&timezone=auto&forecast_days=3`;
     const r = await fetch(u); const d = await r.json();
     const cur = d.current, dl = d.daily;
+    if(isHome && cur && typeof cur.temperature_2m === 'number'){ STATE.tempC = cur.temperature_2m; applyTagescontext(); }
     const [ct,ce] = wxText(cur.weather_code);
     const sr = dl.sunrise[0].slice(11,16), ss = dl.sunset[0].slice(11,16);
     const tage = ['So','Mo','Di','Mi','Do','Fr','Sa'];
@@ -1484,61 +1550,65 @@ document.addEventListener('keydown',e=>{
 
 /* ---------- Was koche ich heute? (einfach, ausgewogen, offline) ---------- */
 const REZEPTE = [
-  {n:"Pellkartoffeln mit Kräuterquark", pers:2, warum:"Sättigend, eiweißreich, leicht verdaulich",
+  {n:"Pellkartoffeln mit Kräuterquark", pers:2, t:"kalt", warum:"Sättigend, eiweißreich, leicht verdaulich",
    zut:["4 mittelgroße Kartoffeln","250 g Magerquark","2 EL Milch","1 Bund Schnittlauch oder Petersilie","1 TL Leinöl","Salz, Pfeffer"],
    s:"Kartoffeln in der Schale weich kochen (ca. 20 Min.). Quark mit Milch, gehackten Kräutern, Leinöl, Salz und Pfeffer verrühren. Kartoffeln pellen und mit dem Quark servieren."},
-  {n:"Haferbrei mit Apfel und Walnuss", pers:1, warum:"Guter Start in den Tag, gut für die Verdauung",
+  {n:"Haferbrei mit Apfel und Walnuss", pers:1, t:"warm", warum:"Guter Start in den Tag, gut für die Verdauung",
    zut:["50 g Haferflocken","250 ml Milch","1 Apfel","1 EL gehackte Walnüsse","1 Prise Zimt","etwas Honig"],
    s:"Haferflocken mit Milch aufkochen, 3–4 Min. quellen lassen. Apfel reiben oder klein schneiden, unterrühren. Mit Walnüssen, Zimt und etwas Honig bestreuen."},
-  {n:"Rührei mit Tomaten", pers:2, warum:"Schnell, eiweißreich, mit Vollkornbrot ein vollwertiges Essen",
+  {n:"Rührei mit Tomaten", pers:2, t:"neutral", warum:"Schnell, eiweißreich, mit Vollkornbrot ein vollwertiges Essen",
    zut:["4 Eier","3 Tomaten","2 Scheiben Vollkornbrot","etwas Butter","Salz, Pfeffer, Schnittlauch"],
    s:"Tomaten würfeln. Eier verquirlen, salzen. Butter erhitzen, Tomaten kurz anbraten, Eier dazugeben und stocken lassen. Mit Vollkornbrot servieren."},
-  {n:"Gemüsesuppe mit Kartoffeln", pers:4, warum:"Wärmend, viel Gemüse, lässt sich gut aufwärmen",
+  {n:"Gemüsesuppe mit Kartoffeln", pers:4, t:"warm", warum:"Wärmend, viel Gemüse, lässt sich gut aufwärmen",
    zut:["2 Karotten","2 Kartoffeln","1 Stange Lauch","1 Liter Gemüsebrühe","Salz, Pfeffer, Petersilie"],
    s:"Gemüse klein schneiden. In der Brühe ca. 20 Min. weich kochen. Abschmecken, mit Petersilie bestreuen. Schmeckt am nächsten Tag noch besser."},
-  {n:"Linseneintopf", pers:3, warum:"Pflanzliches Eiweiß, viele Ballaststoffe, hält lange satt",
+  {n:"Linseneintopf", pers:3, t:"warm", warum:"Pflanzliches Eiweiß, viele Ballaststoffe, hält lange satt",
    zut:["200 g rote Linsen","2 Karotten","1 Kartoffel","1 Zwiebel","800 ml Brühe","1 Schuss Essig"],
    s:"Zwiebel anschwitzen, Gemüse würfeln und mitbraten. Linsen und Brühe zugeben, ca. 20 Min. köcheln. Mit etwas Essig, Salz und Pfeffer abschmecken."},
-  {n:"Ofengemüse mit Feta", pers:2, warum:"Bunt, vitaminreich, fast von allein gekocht",
+  {n:"Ofengemüse mit Feta", pers:2, t:"neutral", warum:"Bunt, vitaminreich, fast von allein gekocht",
    zut:["1 Zucchini","1 Paprika","1 Süßkartoffel oder 2 Kartoffeln","100 g Feta","2 EL Olivenöl","Kräuter der Provence"],
    s:"Gemüse in Stücke schneiden, mit Öl und Kräutern mischen, auf ein Blech geben. Bei 200 °C ca. 25 Min. backen. Feta darüberbröseln und noch 5 Min. backen."},
-  {n:"Lachs mit Kartoffeln und Brokkoli", pers:2, warum:"Gute Fette fürs Herz, eiweißreich",
+  {n:"Lachs mit Kartoffeln und Brokkoli", pers:2, t:"neutral", warum:"Gute Fette fürs Herz, eiweißreich",
    zut:["2 Lachsfilets","6 Kartoffeln","1 Brokkoli","1 Zitrone","etwas Butter, Salz"],
    s:"Kartoffeln kochen. Brokkoli 8 Min. dämpfen. Lachs in der Pfanne in etwas Butter je Seite 3–4 Min. braten, mit Zitrone beträufeln. Zusammen anrichten."},
-  {n:"Vollkornnudeln mit Tomatensauce", pers:2, warum:"Einfach, sättigend, mit Gemüse aufgewertet",
+  {n:"Vollkornnudeln mit Tomatensauce", pers:2, t:"neutral", warum:"Einfach, sättigend, mit Gemüse aufgewertet",
    zut:["250 g Vollkornnudeln","1 Dose stückige Tomaten","1 Zwiebel","1 Karotte","1 EL Olivenöl","Basilikum, Parmesan"],
    s:"Nudeln kochen. Zwiebel und geriebene Karotte in Öl anschwitzen, Tomaten zugeben, 10 Min. köcheln, würzen. Über die Nudeln geben, mit Parmesan bestreuen."},
-  {n:"Quark mit Beeren und Haferflocken", pers:2, warum:"Leichtes Abendessen, eiweißreich, schnell",
+  {n:"Quark mit Beeren und Haferflocken", pers:2, t:"kalt", warum:"Leichtes Abendessen, eiweißreich, schnell",
    zut:["250 g Quark","1 Handvoll Beeren (auch tiefgekühlt)","2 EL Haferflocken","1 TL Honig"],
    s:"Quark mit etwas Wasser oder Milch cremig rühren. Beeren und Haferflocken untermischen, mit Honig süßen."},
-  {n:"Hühnersuppe", pers:4, warum:"Bekömmlich, wärmend, gut bei Erkältung",
+  {n:"Hühnersuppe", pers:4, t:"warm", warum:"Bekömmlich, wärmend, gut bei Erkältung",
    zut:["1 Hühnerbrust","2 Karotten","1 Stück Sellerie","1 Stange Lauch","1,2 l Wasser","Suppennudeln, Salz"],
    s:"Hühnerbrust mit Gemüse und Wasser ca. 30 Min. köcheln. Fleisch herausnehmen, klein schneiden, zurückgeben. Suppennudeln zugeben, weich kochen, salzen."},
-  {n:"Kartoffel-Gemüse-Pfanne", pers:2, warum:"Resteverwertung, sättigend, anpassbar",
+  {n:"Kartoffel-Gemüse-Pfanne", pers:2, t:"neutral", warum:"Resteverwertung, sättigend, anpassbar",
    zut:["4 gekochte Kartoffeln vom Vortag","1 Zwiebel","1 Paprika","2 Eier","1 EL Öl","Salz, Paprikapulver"],
    s:"Kartoffeln in Scheiben, Zwiebel und Paprika klein schneiden. Alles in Öl goldbraun braten. Zum Schluss die verquirlten Eier darüber stocken lassen."},
-  {n:"Milchreis mit Zimt", pers:2, warum:"Sanftes warmes Essen, gut bei wenig Appetit",
+  {n:"Milchreis mit Zimt", pers:2, t:"warm", warum:"Sanftes warmes Essen, gut bei wenig Appetit",
    zut:["100 g Milchreis","500 ml Milch","1 EL Zucker","Zimt","nach Wunsch Apfelmus"],
    s:"Milchreis in der Milch unter Rühren aufkochen, dann bei kleiner Hitze ca. 30 Min. quellen lassen. Mit Zucker und Zimt, nach Wunsch mit Apfelmus servieren."},
-  {n:"Gemüseomelett", pers:2, warum:"Eiweißreich, viel Gemüse, in 15 Minuten fertig",
+  {n:"Gemüseomelett", pers:2, t:"neutral", warum:"Eiweißreich, viel Gemüse, in 15 Minuten fertig",
    zut:["4 Eier","1 Zucchini oder Pilze","2 Tomaten","etwas Käse","Öl, Salz, Pfeffer"],
    s:"Gemüse klein schneiden und in Öl andünsten. Eier verquirlen, würzen, darübergeben. Bei mittlerer Hitze stocken lassen, Käse darüber, zusammenklappen."},
-  {n:"Brotzeit mit Käse und Gemüse", pers:2, warum:"Kein Kochen nötig, ausgewogen, leicht",
+  {n:"Brotzeit mit Käse und Gemüse", pers:2, t:"kalt", warum:"Kein Kochen nötig, ausgewogen, leicht",
    zut:["4 Scheiben Vollkornbrot","Käse oder magerer Aufschnitt","Radieschen","Gurke","Tomate","etwas Butter"],
    s:"Brote bestreichen und belegen. Rohkost in Scheiben dazu. Ein vollwertiges, leichtes Abendessen ohne Aufwand."},
-  {n:"Joghurt mit Obst und Müsli", pers:2, warum:"Frisch, schnell, gut für den Darm",
+  {n:"Joghurt mit Obst und Müsli", pers:2, t:"kalt", warum:"Frisch, schnell, gut für den Darm",
    zut:["250 g Naturjoghurt","1 Banane oder Saisonobst","3 EL Müsli","1 TL Honig","ein paar Nüsse"],
    s:"Obst klein schneiden, mit Joghurt und Müsli schichten. Mit Honig und Nüssen toppen."},
-  {n:"Kürbis- oder Karottensuppe", pers:3, warum:"Cremig, vitaminreich, leicht zu löffeln",
+  {n:"Kürbis- oder Karottensuppe", pers:3, t:"warm", warum:"Cremig, vitaminreich, leicht zu löffeln",
    zut:["500 g Kürbis oder Karotten","1 Kartoffel","1 Zwiebel","700 ml Brühe","1 Schuss Sahne","Salz, Muskat"],
    s:"Zwiebel anschwitzen, Gemüse würfeln, mit Brühe ca. 20 Min. weich kochen. Pürieren, mit Sahne, Salz und Muskat abschmecken."}
 ];
-let letztesRezept = -1;
-function neuesRezept(){
-  let i;
-  do { i = Math.floor(Math.random()*REZEPTE.length); } while(i===letztesRezept && REZEPTE.length>1);
-  letztesRezept = i;
-  const r = REZEPTE[i];
+/* Pool der heute passenden Rezepte (nach Temperatur bzw. Jahreszeit) */
+function rezeptPool(){
+  const ok = erlaubteTemps();
+  const pool = REZEPTE.map((r,i)=>i).filter(i => ok.includes(REZEPTE[i].t || 'neutral'));
+  return pool.length ? pool : REZEPTE.map((r,i)=>i);
+}
+let rezeptPoolAkt = [];
+let rezeptPos = 0;
+function zeigeRezept(){
+  const r = REZEPTE[rezeptPoolAkt[rezeptPos]];
   document.getElementById('rezept').innerHTML = `
     <div class="rezept-card">
       <h3>${r.n}</h3>
@@ -1549,34 +1619,72 @@ function neuesRezept(){
       <p class="schritte">${r.s}</p>
     </div>`;
 }
-neuesRezept();
+/* Tagesvorschlag: für alle gleich und über den Tag stabil */
+function renderRezept(){
+  rezeptPoolAkt = rezeptPool();
+  rezeptPos = tagDesJahres(new Date()) % rezeptPoolAkt.length;
+  zeigeRezept();
+}
+/* "Anderer Vorschlag": nächstes Gericht im heute passenden Pool */
+function neuesRezept(){
+  if(!rezeptPoolAkt.length) rezeptPoolAkt = rezeptPool();
+  rezeptPos = (rezeptPos + 1) % rezeptPoolAkt.length;
+  zeigeRezept();
+}
+renderRezept();
 
 /* ---------- Foto des Tages (eigene Vektor-Landschaften) ---------- */
 const FOTO = [
   {cap:"Sonnenaufgang über dem See", tipp:"Gönnen Sie sich heute einen ruhigen Moment.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="a1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe2b0"/><stop offset="1" stop-color="#ffc299"/></linearGradient><linearGradient id="a2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9cdde"/><stop offset="1" stop-color="#7aa9c4"/></linearGradient></defs><rect width="400" height="120" fill="url(#a1)"/><circle cx="200" cy="86" r="30" fill="#fff0b8"/><path d="M0 120 Q90 96 180 108 Q300 122 400 100 L400 120 Z" fill="#b6a98f" opacity="0.55"/><rect y="120" width="400" height="80" fill="url(#a2)"/><ellipse cx="200" cy="138" rx="30" ry="5" fill="#fff0b8" opacity="0.6"/><g stroke="#fff" stroke-opacity="0.45" stroke-width="2"><line x1="50" y1="150" x2="130" y2="150"/><line x1="250" y1="166" x2="350" y2="166"/><line x1="120" y1="178" x2="210" y2="178"/></g></svg>`},
-  {cap:"Lavendel im Sommer", tipp:"Riechen Sie heute bewusst an etwas Schönem.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="b1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe0f2"/><stop offset="1" stop-color="#e8f4fb"/></linearGradient></defs><rect width="400" height="96" fill="url(#b1)"/><circle cx="330" cy="40" r="20" fill="#fff4cf"/><rect y="96" width="400" height="104" fill="#cfe3b0"/><g fill="#7fae6a" opacity="0.45"><rect y="150" width="400" height="6"/><rect y="128" width="400" height="5"/><rect y="112" width="400" height="4"/></g><g fill="#9d83cf"><circle cx="30" cy="150" r="4"/><circle cx="80" cy="150" r="4"/><circle cx="130" cy="150" r="4"/><circle cx="180" cy="150" r="4"/><circle cx="230" cy="150" r="4"/><circle cx="280" cy="150" r="4"/><circle cx="330" cy="150" r="4"/><circle cx="380" cy="150" r="4"/><circle cx="55" cy="128" r="3"/><circle cx="105" cy="128" r="3"/><circle cx="155" cy="128" r="3"/><circle cx="205" cy="128" r="3"/><circle cx="255" cy="128" r="3"/><circle cx="305" cy="128" r="3"/><circle cx="355" cy="128" r="3"/><circle cx="40" cy="112" r="2.5"/><circle cx="120" cy="112" r="2.5"/><circle cx="200" cy="112" r="2.5"/><circle cx="280" cy="112" r="2.5"/><circle cx="360" cy="112" r="2.5"/></g></svg>`},
+  {cap:"Lavendel im Sommer", jz:"sommer", tipp:"Riechen Sie heute bewusst an etwas Schönem.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="b1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe0f2"/><stop offset="1" stop-color="#e8f4fb"/></linearGradient></defs><rect width="400" height="96" fill="url(#b1)"/><circle cx="330" cy="40" r="20" fill="#fff4cf"/><rect y="96" width="400" height="104" fill="#cfe3b0"/><g fill="#7fae6a" opacity="0.45"><rect y="150" width="400" height="6"/><rect y="128" width="400" height="5"/><rect y="112" width="400" height="4"/></g><g fill="#9d83cf"><circle cx="30" cy="150" r="4"/><circle cx="80" cy="150" r="4"/><circle cx="130" cy="150" r="4"/><circle cx="180" cy="150" r="4"/><circle cx="230" cy="150" r="4"/><circle cx="280" cy="150" r="4"/><circle cx="330" cy="150" r="4"/><circle cx="380" cy="150" r="4"/><circle cx="55" cy="128" r="3"/><circle cx="105" cy="128" r="3"/><circle cx="155" cy="128" r="3"/><circle cx="205" cy="128" r="3"/><circle cx="255" cy="128" r="3"/><circle cx="305" cy="128" r="3"/><circle cx="355" cy="128" r="3"/><circle cx="40" cy="112" r="2.5"/><circle cx="120" cy="112" r="2.5"/><circle cx="200" cy="112" r="2.5"/><circle cx="280" cy="112" r="2.5"/><circle cx="360" cy="112" r="2.5"/></g></svg>`},
   {cap:"Blick auf die Berge", tipp:"Atmen Sie heute einmal tief durch.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="c1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfeaf6"/><stop offset="1" stop-color="#eef7fb"/></linearGradient></defs><rect width="400" height="200" fill="url(#c1)"/><circle cx="320" cy="46" r="18" fill="#fff3c4"/><path d="M0 200 L70 110 L120 160 L150 130 L210 200 Z" fill="#8fb0a6"/><path d="M150 200 L240 90 L300 150 L330 120 L400 200 Z" fill="#6d9489"/><path d="M240 90 L223 116 L257 116 Z" fill="#fff"/><path d="M70 110 L58 130 L82 130 Z" fill="#fff"/><rect y="184" width="400" height="16" fill="#5c8378"/></svg>`},
-  {cap:"Herbst am Wegrand", tipp:"Gehen Sie heute ein paar Schritte an der frischen Luft.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="d1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dceff3"/><stop offset="1" stop-color="#f3f0e4"/></linearGradient></defs><rect width="400" height="160" fill="url(#d1)"/><rect y="160" width="400" height="40" fill="#cdbf8e"/><rect x="190" y="96" width="14" height="74" fill="#8a6a45"/><circle cx="197" cy="80" r="46" fill="#e8923b"/><circle cx="165" cy="92" r="30" fill="#d2772a"/><circle cx="230" cy="92" r="30" fill="#f0b24a"/><g fill="#d2772a"><circle cx="120" cy="172" r="4"/><circle cx="270" cy="176" r="4"/><circle cx="320" cy="168" r="4"/><circle cx="70" cy="178" r="4"/></g></svg>`},
-  {cap:"Stiller Wintertag", tipp:"Wärmen Sie sich heute mit einer Tasse Tee.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="e1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c3d4e2"/><stop offset="1" stop-color="#e8eef4"/></linearGradient></defs><rect width="400" height="200" fill="url(#e1)"/><path d="M0 200 L0 150 Q120 120 220 150 Q320 178 400 145 L400 200 Z" fill="#ffffff"/><rect x="250" y="96" width="9" height="60" fill="#7c6a55"/><g stroke="#7c6a55" stroke-width="4" stroke-linecap="round"><line x1="254" y1="120" x2="234" y2="104"/><line x1="254" y1="118" x2="276" y2="100"/><line x1="254" y1="138" x2="236" y2="126"/><line x1="254" y1="136" x2="274" y2="124"/></g><g fill="#ffffff"><circle cx="60" cy="40" r="3"/><circle cx="120" cy="70" r="2.5"/><circle cx="180" cy="35" r="3"/><circle cx="300" cy="55" r="2.5"/><circle cx="350" cy="30" r="3"/><circle cx="90" cy="100" r="2.5"/></g></svg>`},
-  {cap:"Blumenwiese", tipp:"Freuen Sie sich heute an einer kleinen Farbe.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe6f5"/><stop offset="1" stop-color="#e9f6fb"/></linearGradient></defs><rect width="400" height="110" fill="url(#g1)"/><circle cx="60" cy="42" r="20" fill="#fff3c4"/><rect y="110" width="400" height="90" fill="#bfe0a0"/><g><circle cx="50" cy="150" r="6" fill="#e8657a"/><circle cx="120" cy="165" r="6" fill="#f3c34a"/><circle cx="190" cy="150" r="6" fill="#fff"/><circle cx="260" cy="168" r="6" fill="#e8657a"/><circle cx="330" cy="152" r="6" fill="#f3c34a"/><circle cx="90" cy="182" r="5" fill="#fff"/><circle cx="220" cy="184" r="5" fill="#e8657a"/><circle cx="300" cy="182" r="5" fill="#fff"/><circle cx="160" cy="180" r="5" fill="#f3c34a"/></g><g stroke="#7fae6a" stroke-width="2"><line x1="50" y1="156" x2="50" y2="172"/><line x1="120" y1="171" x2="120" y2="186"/><line x1="190" y1="156" x2="190" y2="172"/><line x1="260" y1="174" x2="260" y2="188"/><line x1="330" y1="158" x2="330" y2="174"/></g></svg>`}
+  {cap:"Herbst am Wegrand", jz:"herbst", tipp:"Gehen Sie heute ein paar Schritte an der frischen Luft.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="d1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dceff3"/><stop offset="1" stop-color="#f3f0e4"/></linearGradient></defs><rect width="400" height="160" fill="url(#d1)"/><rect y="160" width="400" height="40" fill="#cdbf8e"/><rect x="190" y="96" width="14" height="74" fill="#8a6a45"/><circle cx="197" cy="80" r="46" fill="#e8923b"/><circle cx="165" cy="92" r="30" fill="#d2772a"/><circle cx="230" cy="92" r="30" fill="#f0b24a"/><g fill="#d2772a"><circle cx="120" cy="172" r="4"/><circle cx="270" cy="176" r="4"/><circle cx="320" cy="168" r="4"/><circle cx="70" cy="178" r="4"/></g></svg>`},
+  {cap:"Stiller Wintertag", jz:"winter", tipp:"Wärmen Sie sich heute mit einer Tasse Tee.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="e1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c3d4e2"/><stop offset="1" stop-color="#e8eef4"/></linearGradient></defs><rect width="400" height="200" fill="url(#e1)"/><path d="M0 200 L0 150 Q120 120 220 150 Q320 178 400 145 L400 200 Z" fill="#ffffff"/><rect x="250" y="96" width="9" height="60" fill="#7c6a55"/><g stroke="#7c6a55" stroke-width="4" stroke-linecap="round"><line x1="254" y1="120" x2="234" y2="104"/><line x1="254" y1="118" x2="276" y2="100"/><line x1="254" y1="138" x2="236" y2="126"/><line x1="254" y1="136" x2="274" y2="124"/></g><g fill="#ffffff"><circle cx="60" cy="40" r="3"/><circle cx="120" cy="70" r="2.5"/><circle cx="180" cy="35" r="3"/><circle cx="300" cy="55" r="2.5"/><circle cx="350" cy="30" r="3"/><circle cx="90" cy="100" r="2.5"/></g></svg>`},
+  {cap:"Blumenwiese", jz:"fruehling", tipp:"Freuen Sie sich heute an einer kleinen Farbe.", svg:`<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe6f5"/><stop offset="1" stop-color="#e9f6fb"/></linearGradient></defs><rect width="400" height="110" fill="url(#g1)"/><circle cx="60" cy="42" r="20" fill="#fff3c4"/><rect y="110" width="400" height="90" fill="#bfe0a0"/><g><circle cx="50" cy="150" r="6" fill="#e8657a"/><circle cx="120" cy="165" r="6" fill="#f3c34a"/><circle cx="190" cy="150" r="6" fill="#fff"/><circle cx="260" cy="168" r="6" fill="#e8657a"/><circle cx="330" cy="152" r="6" fill="#f3c34a"/><circle cx="90" cy="182" r="5" fill="#fff"/><circle cx="220" cy="184" r="5" fill="#e8657a"/><circle cx="300" cy="182" r="5" fill="#fff"/><circle cx="160" cy="180" r="5" fill="#f3c34a"/></g><g stroke="#7fae6a" stroke-width="2"><line x1="50" y1="156" x2="50" y2="172"/><line x1="120" y1="171" x2="120" y2="186"/><line x1="190" y1="156" x2="190" y2="172"/><line x1="260" y1="174" x2="260" y2="188"/><line x1="330" y1="158" x2="330" y2="174"/></g></svg>`}
 ];
 /* feste, für alle sichtbare Fotos (vom Betreiber bereitgestellt) */
 const BUNDLE = ["lavendel.jpg", "garten-gelb.jpg"];
+/* Jahreszeit über den Dateinamen steuern: enthält der Name "winter", "fruehling",
+   "sommer" oder "herbst", wird das Foto nur in dieser Jahreszeit gezeigt. Ohne so
+   einen Hinweis (oder mit "ganzjahr" im Namen) erscheint es das ganze Jahr.
+   So genügt das Benennen der Datei – kein Eingriff in den Code nötig. */
+const ALLE_SAISON = ['winter','fruehling','frühling','sommer','herbst'];
+function fotoSaisonFilter(list){
+  const jz = jahreszeit(new Date().getMonth());
+  const tok = jz==='fruehling' ? ['fruehling','frühling'] : [jz];
+  const pass = list.filter(u=>{
+    const n = decodeURIComponent(String(u)).toLowerCase();
+    if(n.includes('ganzjahr')) return true;
+    const hatSaison = ALLE_SAISON.some(z=>n.includes(z));
+    if(!hatSaison) return true;             // ungetaggt = ganzjährig
+    return tok.some(z=>n.includes(z));      // passende Jahreszeit
+  });
+  return pass.length ? pass : list;         // nie leer ausliefern
+}
+function fotoSvgPool(){
+  const jz = jahreszeit(new Date().getMonth());
+  const pool = FOTO.filter(f=>!f.jz || f.jz===jz);
+  return pool.length ? pool : FOTO;
+}
 function fotoFallback(img){
   const wrap = img.closest('.foto');
-  if(wrap) wrap.innerHTML = FOTO[tagDesJahres(new Date()) % FOTO.length].svg;
+  const pool = fotoSvgPool();
+  if(wrap) wrap.innerHTML = pool[tagDesJahres(new Date()) % pool.length].svg;
 }
 function renderFoto(){
   const box = document.getElementById('fotoTag');
   const doy = tagDesJahres(new Date());
   fotoListe().then(list=>{
+    const passend = fotoSaisonFilter(list);
     let img;
-    if(list.length){
-      img = `<img src="${list[doy % list.length]}" alt="Foto des Tages" onerror="fotoFallback(this)">`;
+    if(passend.length){
+      img = `<img src="${passend[doy % passend.length]}" alt="Foto des Tages" onerror="fotoFallback(this)">`;
     } else if(BUNDLE.length){
-      img = `<img src="${BUNDLE[doy % BUNDLE.length]}" alt="Foto des Tages" onerror="fotoFallback(this)">`;
+      const b = fotoSaisonFilter(BUNDLE);
+      img = `<img src="${b[doy % b.length]}" alt="Foto des Tages" onerror="fotoFallback(this)">`;
     } else {
-      img = FOTO[doy % FOTO.length].svg;
+      const pool = fotoSvgPool();
+      img = pool[doy % pool.length].svg;
     }
     box.innerHTML = `<div class="foto">${img}</div>`;
   });
