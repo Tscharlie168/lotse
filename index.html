@@ -367,6 +367,12 @@
           <span class="sub">Bahn und Bus in der Region</span>
         </button>
 
+        <button class="tile" onclick="go('auto')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l1.6-4.4A2 2 0 0 1 8.5 5h7a2 2 0 0 1 1.9 1.6L19 11"/><path d="M3 11h18v5H3z"/><circle cx="7" cy="16.5" r="1.5"/><circle cx="17" cy="16.5" r="1.5"/></svg></span>
+          <span class="lbl">Auto &amp; unterwegs</span>
+          <span class="sub">Pannenhilfe, Tankstelle, Ladesäule</span>
+        </button>
+
         <button class="tile" onclick="go('betrug')">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v5c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>
           <span class="lbl">Ist das echt?</span>
@@ -800,7 +806,7 @@
 
     <!-- ERGEBNISSE -->
     <section class="view" id="v-results">
-      <button class="back" onclick="go('nearby')">‹ Zurück</button>
+      <button class="back" onclick="goResBack()">‹ Zurück</button>
       <h2 id="resTitle">In der Nähe</h2>
       <div id="resBody"></div>
     </section>
@@ -810,6 +816,54 @@
       <button class="back" onclick="go('home')">‹ Zurück</button>
       <h2>Fahrplan & Bus</h2>
       <div class="rows" id="fahrRows"></div>
+    </section>
+
+    <!-- AUTO & UNTERWEGS -->
+    <section class="view" id="v-auto">
+      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <h2>Auto &amp; unterwegs</h2>
+
+      <h2 style="margin-top:6px;font-size:1.25rem">Pannenhilfe rufen</h2>
+      <div class="rows" id="panneNums"></div>
+      <div class="note">Diese Nummern gehören den Automobilclubs. Für Mitglieder ist die Hilfe meist kostenlos, sonst wird sie nach Aufwand berechnet. <b>Bei einem Unfall oder Verletzten zählt der Notruf 112.</b></div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">In der Nähe</h2>
+      <div class="cats">
+        <button class="cat" onclick="findNear('fuel','auto')"><span style="font-size:1.7rem">⛽</span>Tankstelle</button>
+        <button class="cat" onclick="findNear('charging','auto')"><span style="font-size:1.7rem">🔌</span>Ladesäule</button>
+      </div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Was tun bei einer Panne?</h2>
+      <p style="color:var(--ink-soft);margin:0 0 14px">Tippen Sie auf ein Thema, dann klappt die Anleitung auf.</p>
+
+      <details class="fa" open>
+        <summary>① Sicher anhalten und absichern</summary>
+        <div class="fa-body">
+          <ol>
+            <li><b>Warnblinker</b> einschalten – sofort, sobald etwas nicht stimmt.</li>
+            <li>Möglichst <b>rechts heranfahren</b>, auf den Standstreifen oder weg von der Fahrbahn.</li>
+            <li><b>Warnweste anziehen – noch im Auto</b>, bevor Sie aussteigen.</li>
+            <li>Auf der <b>vom Verkehr abgewandten Seite</b> aussteigen.</li>
+            <li><b>Warndreieck</b> aufstellen: innerorts ca. 50 m, Landstraße ca. 100 m, Autobahn ca. 150–200 m hinter dem Fahrzeug.</li>
+            <li><b>Hinter die Leitplanke</b> bzw. weg von der Fahrbahn in Sicherheit gehen – nicht im Auto sitzen bleiben.</li>
+            <li>In Ruhe die <b>Pannenhilfe rufen</b> (Knopf oben).</li>
+          </ol>
+          <p class="fa-key">Bei Gefahr, einem Unfall oder Verletzten zuerst den <b>Notruf 112</b>.</p>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>② Was die Pannenhilfe wissen will</summary>
+        <div class="fa-body">
+          <p>Legen Sie sich das kurz zurecht, dann geht es schneller:</p>
+          <ol>
+            <li><b>Wo</b> stehen Sie? Ort und Straße, auf der Autobahn die <b>Kilometer-Angabe</b> und die Fahrtrichtung.</li>
+            <li><b>Welches Auto</b> – Marke, Modell und Kennzeichen.</li>
+            <li><b>Was</b> ist passiert (z. B. Reifen, Motor springt nicht an, Batterie leer)?</li>
+            <li>Wenn vorhanden, die <b>Mitgliedsnummer</b> Ihres Clubs bereithalten.</li>
+          </ol>
+        </div>
+      </details>
     </section>
 
     <!-- SUCHEN -->
@@ -950,7 +1004,11 @@ const LAENDER = {
     betrug:[
       {b:"Verbraucherzentrale", s:"Warnungen, Fakeshop-Finder, Musterbriefe", url:"https://www.verbraucherzentrale.de"},
       {b:"Polizei: Beratung & Anzeige", s:"Betrug erkennen und melden", url:"https://www.polizei-beratung.de"}
-    ]
+    ],
+    panne:[
+      {label:"ADAC Pannenhilfe", num:"089 20 20 4000"}
+    ],
+    panneInfo:{club:"ADAC", url:"https://www.adac.de/services/pannenhilfe/"}
   },
   AT: {
     name:"Österreich",
@@ -968,7 +1026,12 @@ const LAENDER = {
     betrug:[
       {b:"Watchlist Internet", s:"Aktuelle Maschen – Foto einreichen & prüfen lassen", url:"https://www.watchlist-internet.at"},
       {b:"Polizei Österreich", s:"Betrug melden", url:"https://www.polizei.gv.at"}
-    ]
+    ],
+    panne:[
+      {label:"ÖAMTC Pannennotruf", num:"120"},
+      {label:"ARBÖ Pannennotruf", num:"123", soft:true}
+    ],
+    panneInfo:{club:"ÖAMTC", url:"https://www.oeamtc.at/nothilfe/"}
   }
 };
 
@@ -1003,6 +1066,18 @@ function paintLand(){
     <a class="row call ${n.soft?'soft':''}" href="tel:${n.num.replace(/\s/g,'')}">
       <div class="main"><b>${n.label}</b></div><div class="num">${n.num}</div>
     </a>`).join('');
+  // Pannenhilfe (kein Notfall-Rot – bewusst andere Optik als 112/110)
+  const panneBox = document.getElementById('panneNums');
+  if(panneBox){
+    const P = L.panne || [];
+    panneBox.innerHTML = P.map(n=>`
+      <a class="row call soft" href="tel:${n.num.replace(/\s/g,'')}">
+        <div class="main"><b>${n.label}</b></div><div class="num">${n.num}</div>
+      </a>`).join('') + (L.panneInfo ? `
+      <a class="row" href="${L.panneInfo.url}" target="_blank" rel="noopener">
+        <div class="main"><b>${L.panneInfo.club} – Hilfe online anfordern</b><small>Per App oder Internet, mit Standort</small></div><div class="go">Öffnen ›</div>
+      </a>` : '');
+  }
   // Fahrplan: Verbindung von hier aus (mit Abfahrtszeiten) + landesweiter Planer
   document.getElementById('fahrRows').innerHTML = `
     <a class="row" href="javascript:void(0)" onclick="planRoute()">
@@ -1059,16 +1134,21 @@ const CAT = {
   busstop:{q:'["highway"="bus_stop"]', t:"Bushaltestellen in der Nähe", n:"Bushaltestelle", steps:[600,2000,6000]},
   atm:{q:'["amenity"="atm"]', t:"Geldautomaten in der Nähe", n:"Geldautomat", steps:[1500,6000,15000]},
   hofladen:{q:'["shop"="farm"]', t:"Hofläden in der Nähe", n:"Hofladen", steps:[3000,10000,25000]},
-  automat:{q:'["amenity"="vending_machine"]["vending"~"eggs|fruit|vegetables|milk|honey|food|cheese|potatoes|farm|wine"]', t:"Verkaufsautomaten in der Nähe", n:"Verkaufsautomat", steps:[2000,6000,15000]}
+  automat:{q:'["amenity"="vending_machine"]["vending"~"eggs|fruit|vegetables|milk|honey|food|cheese|potatoes|farm|wine"]', t:"Verkaufsautomaten in der Nähe", n:"Verkaufsautomat", steps:[2000,6000,15000]},
+  fuel:{q:'["amenity"="fuel"]', t:"Tankstellen in der Nähe", n:"Tankstelle", steps:[3000,8000,20000]},
+  charging:{q:'["amenity"="charging_station"]', t:"Ladesäulen in der Nähe", n:"Ladesäule", steps:[5000,15000,30000]}
 };
+let resBack = 'nearby';
+function goResBack(){ go(resBack); }
 function dist(la,lo){
   const R=6371000,r=Math.PI/180;
   const dLa=(la-STATE.lat)*r, dLo=(lo-STATE.lon)*r;
   const a=Math.sin(dLa/2)**2+Math.cos(STATE.lat*r)*Math.cos(la*r)*Math.sin(dLo/2)**2;
   return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
 }
-async function findNear(cat){
+async function findNear(cat, back){
   const c = CAT[cat];
+  resBack = back || 'nearby';
   go('results');
   document.getElementById('resTitle').textContent = c.t;
   document.getElementById('resBody').innerHTML = `<div class="status"><div class="spin"></div>Suche in Ihrer Umgebung…</div>`;
