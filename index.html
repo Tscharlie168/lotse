@@ -432,6 +432,11 @@
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
           <span>Merkzettel</span>
         </button>
+
+        <button class="cat" onclick="go('sprachnotiz')">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/><path d="M9 21h6"/></svg>
+          <span>Sprachnotiz</span>
+        </button>
         <button class="cat" onclick="go('vorlesen')">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>
           <span>Vorlesen lassen</span>
@@ -555,6 +560,16 @@
       </div>
       <div id="merkListe" class="merk-liste"></div>
       <button class="flink" id="merkClear" onclick="merkClearDone()" style="display:none">Erledigte entfernen</button>
+    </section>
+
+    <!-- SPRACHNOTIZ -->
+    <section class="view" id="v-sprachnotiz">
+      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <h2>Sprachnotiz</h2>
+      <p style="color:var(--ink-soft);margin:0 0 14px">Sprechen Sie eine kurze Notiz auf &ndash; zum Beispiel einen Einkauf oder eine Erinnerung &ndash; und h&ouml;ren Sie sie sp&auml;ter wieder ab. Die Notizen bleiben nur auf diesem Ger&auml;t.</p>
+      <button class="big-btn" id="snRecBtn" onclick="snToggle()">&#127908; Aufnehmen</button>
+      <div id="snStatus" class="note" style="margin-top:10px"></div>
+      <div id="snListe" class="merk-liste"></div>
     </section>
 
     <!-- VORLESEN -->
@@ -1092,10 +1107,12 @@ function go(name){
   document.getElementById('v-'+name).classList.add('active');
   if(typeof stopLupe==='function') stopLupe();
   if(typeof stopVorlesen==='function') stopVorlesen();
+  if(typeof snLeave==='function') snLeave();
   if(typeof lampOff==='function' && name!=='taschenlampe') lampOff();
   if(name==='heute') renderHeute();
   if(name==='lupe') startLupe();
   if(name==='merkzettel') renderMerk();
+  if(name==='sprachnotiz') renderSprachnotizen();
   if(name==='parken') renderParken();
   if(name==='taschenlampe') renderLamp();
   if(name==='hilfe') renderHilfe();
@@ -2174,6 +2191,105 @@ function vorSet(g){
 }
 function renderVorlesen(){ vorSet(istIOS()?'ios':'android'); }
 function stopVorlesen(){ try{ if('speechSynthesis' in window) window.speechSynthesis.cancel(); }catch(e){} }
+
+/* --- Sprachnotiz: aufnehmen (MediaRecorder), speichern (IndexedDB), abrufen --- */
+var snDB=null, snRec=null, snChunks=[], snStream=null, snTimer=null, snStart=0, snAudio=null;
+function snDbOpen(){
+  return new Promise(function(res,rej){
+    if(snDB) return res(snDB);
+    try{
+      var r=indexedDB.open('lotse_sprachnotizen',1);
+      r.onupgradeneeded=function(e){ var db=e.target.result; if(!db.objectStoreNames.contains('notizen')) db.createObjectStore('notizen',{keyPath:'id'}); };
+      r.onsuccess=function(e){ snDB=e.target.result; res(snDB); };
+      r.onerror=function(){ rej(r.error); };
+    }catch(e){ rej(e); }
+  });
+}
+function snDbAll(){ return snDbOpen().then(function(db){ return new Promise(function(res,rej){
+  var q=db.transaction('notizen','readonly').objectStore('notizen').getAll();
+  q.onsuccess=function(){ res(q.result||[]); }; q.onerror=function(){ rej(q.error); };
+});});}
+function snDbPut(o){ return snDbOpen().then(function(db){ return new Promise(function(res,rej){
+  var q=db.transaction('notizen','readwrite').objectStore('notizen').put(o);
+  q.onsuccess=function(){ res(); }; q.onerror=function(){ rej(q.error); };
+});});}
+function snDbDel(id){ return snDbOpen().then(function(db){ return new Promise(function(res,rej){
+  var q=db.transaction('notizen','readwrite').objectStore('notizen').delete(id);
+  q.onsuccess=function(){ res(); }; q.onerror=function(){ rej(q.error); };
+});});}
+function snFmtDauer(ms){ var s=Math.round(ms/1000); return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2); }
+function snStatus(t){ var el=document.getElementById('snStatus'); if(el) el.textContent=t; }
+function snZeitText(ts){ var d=new Date(ts); function z(n){return (n<10?'0':'')+n;} return z(d.getDate())+'.'+z(d.getMonth()+1)+'.'+d.getFullYear()+', '+z(d.getHours())+':'+z(d.getMinutes())+' Uhr'; }
+function snBtnAufnahme(an){ var b=document.getElementById('snRecBtn'); if(!b) return; if(an){ b.innerHTML='\u23f9 Stopp'; b.style.background='var(--alarm)'; } else { b.innerHTML='\uD83C\uDFA4 Aufnehmen'; b.style.background=''; } }
+function snToggle(){
+  if(snRec && snRec.state==='recording'){ try{ snRec.stop(); }catch(e){} return; }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder){
+    snStatus('Aufnehmen wird von diesem Ger\u00e4t/Browser leider nicht unterst\u00fctzt.'); return;
+  }
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    snStream=stream; snChunks=[];
+    var opt={}; try{ if(window.MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/webm')) opt={mimeType:'audio/webm'}; }catch(e){}
+    snRec=new MediaRecorder(stream, opt);
+    snRec.ondataavailable=function(e){ if(e.data && e.data.size>0) snChunks.push(e.data); };
+    snRec.onstop=function(){ snSave(); };
+    snStart=Date.now();
+    snRec.start();
+    snBtnAufnahme(true);
+    snStatus('\u25cf Aufnahme l\u00e4uft \u2026 0:00');
+    snTimer=setInterval(function(){ snStatus('\u25cf Aufnahme l\u00e4uft \u2026 '+snFmtDauer(Date.now()-snStart)); },250);
+  }).catch(function(){ snStatus('Kein Zugriff auf das Mikrofon. Bitte die Mikrofon-Freigabe erlauben.'); });
+}
+function snAufraeumen(){
+  if(snTimer){ clearInterval(snTimer); snTimer=null; }
+  if(snStream){ snStream.getTracks().forEach(function(t){ t.stop(); }); snStream=null; }
+  snBtnAufnahme(false);
+}
+function snSave(){
+  snAufraeumen();
+  var dauer=Date.now()-snStart;
+  if(!snChunks.length){ snStatus('Die Aufnahme war leer.'); return; }
+  var typ=(snRec && snRec.mimeType) ? snRec.mimeType : 'audio/webm';
+  var blob=new Blob(snChunks, {type:typ});
+  snChunks=[];
+  snDbPut({ id:Date.now(), t:Date.now(), dauer:dauer, typ:typ, blob:blob })
+    .then(function(){ snStatus('Notiz gespeichert.'); renderSprachnotizen(); })
+    .catch(function(){ snStatus('Speichern nicht m\u00f6glich \u2013 evtl. ist der Speicher voll.'); });
+}
+function renderSprachnotizen(){
+  var box=document.getElementById('snListe'); if(!box) return;
+  snDbAll().then(function(list){
+    list.sort(function(a,b){ return b.t-a.t; });
+    if(!list.length){ box.innerHTML='<div class="note" style="margin-top:14px">Noch keine Sprachnotizen. Tippen Sie oben auf \u201eAufnehmen\u201c.</div>'; return; }
+    box.innerHTML=list.map(function(o){
+      return '<div class="merk-item">'+
+        '<button onclick="snPlay('+o.id+')" aria-label="Abspielen" style="flex:0 0 auto;width:46px;height:46px;border-radius:10px;border:0;background:var(--sea);color:#fff;font-size:1.25rem;cursor:pointer">\u25b6</button>'+
+        '<div class="txt">Notiz vom '+snZeitText(o.t)+'<br><small style="color:var(--ink-soft)">Dauer '+snFmtDauer(o.dauer)+'</small></div>'+
+        '<button class="del" onclick="snDel('+o.id+')" aria-label="L\u00f6schen">\u00d7</button>'+
+      '</div>';
+    }).join('');
+  }).catch(function(){ box.innerHTML='<div class="note">Notizen konnten nicht geladen werden.</div>'; });
+}
+function snPlay(id){
+  if(snAudio){ try{ snAudio.pause(); }catch(e){} if(snAudio._url) URL.revokeObjectURL(snAudio._url); snAudio=null; }
+  snDbOpen().then(function(db){
+    var req=db.transaction('notizen','readonly').objectStore('notizen').get(id);
+    req.onsuccess=function(){
+      var o=req.result; if(!o || !o.blob) return;
+      var url=URL.createObjectURL(o.blob);
+      snAudio=new Audio(url); snAudio._url=url;
+      snAudio.onended=function(){ URL.revokeObjectURL(url); snAudio=null; };
+      snAudio.play().catch(function(){ snStatus('Abspielen nicht m\u00f6glich.'); });
+    };
+  });
+}
+function snDel(id){
+  if(!confirm('Diese Sprachnotiz l\u00f6schen?')) return;
+  snDbDel(id).then(function(){ renderSprachnotizen(); });
+}
+function snLeave(){
+  if(snRec && snRec.state==='recording'){ snRec.onstop=null; try{ snRec.stop(); }catch(e){} snAufraeumen(); snChunks=[]; }
+  if(snAudio){ try{ snAudio.pause(); }catch(e){} if(snAudio._url) URL.revokeObjectURL(snAudio._url); snAudio=null; }
+}
 
 /* --- Wo habe ich geparkt? --- */
 function parkLoad(){ try{ return JSON.parse(localStorage.getItem('lotse_park')); }catch(e){ return null; } }
