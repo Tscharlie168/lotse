@@ -385,6 +385,12 @@
           <span class="sub">Live-Bilder aus der Region</span>
         </button>
 
+        <button class="tile" onclick="go('unterhaltung')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01"/><path d="M8.5 14.5a4 4 0 0 0 7 0"/></svg></span>
+          <span class="lbl">Unterhaltung</span>
+          <span class="sub">Witz, Rätsel &amp; Schon gewusst?</span>
+        </button>
+
         <button class="tile" onclick="go('betrug')">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v5c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>
           <span class="lbl">Ist das echt?</span>
@@ -436,6 +442,11 @@
         <button class="cat" onclick="go('sprachnotiz')">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/><path d="M9 21h6"/></svg>
           <span>Sprachnotiz</span>
+        </button>
+
+        <button class="cat" onclick="go('barcode')">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 8v8M10 8v8M13 8v8M17 8v8"/></svg>
+          <span>Produkt scannen</span>
         </button>
         <button class="cat" onclick="go('vorlesen')">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>
@@ -570,6 +581,43 @@
       <button class="big-btn" id="snRecBtn" onclick="snToggle()">&#127908; Aufnehmen</button>
       <div id="snStatus" class="note" style="margin-top:10px"></div>
       <div id="snListe" class="merk-liste"></div>
+    </section>
+
+    <!-- UNTERHALTUNG -->
+    <section class="view" id="v-unterhaltung">
+      <button class="back" onclick="go('home')">&lsaquo; Zur&uuml;ck</button>
+      <h2>Unterhaltung</h2>
+
+      <h2 style="margin-top:6px;font-size:1.25rem">Witz des Tages</h2>
+      <div class="rezept-card"><p id="unWitz" style="font-size:1.15rem;line-height:1.5;margin:0"></p></div>
+      <button class="big-btn" onclick="unWitzNext()">N&auml;chster Witz</button>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Schon gewusst?</h2>
+      <div class="rezept-card"><p id="unFakt" style="font-size:1.15rem;line-height:1.5;margin:0"></p></div>
+      <button class="big-btn" onclick="unFaktNext()">N&auml;chste</button>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Kleines Quiz</h2>
+      <div class="rezept-card">
+        <p id="unQuizFrage" style="font-size:1.15rem;line-height:1.5;margin:0 0 12px"></p>
+        <div id="unQuizOpt" class="merk-liste"></div>
+        <p id="unQuizInfo" style="margin:12px 0 0;line-height:1.5"></p>
+      </div>
+      <button class="big-btn" onclick="unQuizNext()">N&auml;chste Frage</button>
+    </section>
+
+    <!-- PRODUKT SCANNEN (Barcode) -->
+    <section class="view" id="v-barcode">
+      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <h2>Produkt scannen</h2>
+      <p style="color:var(--ink-soft);margin:0 0 12px">Halten Sie den Strichcode (Barcode) einer Lebensmittel-Packung vor die Kamera. Sie sehen dann Name, Zutaten, Allergene und den Nutri-Score. Daf&uuml;r ist eine Internet-Verbindung n&ouml;tig.</p>
+      <button class="big-btn" id="bcStartBtn" onclick="bcToggleScan()">Scan starten</button>
+      <div id="bcReader" style="display:none;margin-top:12px;border-radius:14px;overflow:hidden"></div>
+      <div id="bcStatus" class="note" style="margin-top:10px"></div>
+      <div class="search-box" style="margin-top:12px">
+        <input id="bcInput" type="text" inputmode="numeric" placeholder="oder Nummer unter dem Strichcode eintippen" enterkeyhint="search" onkeydown="if(event.key==='Enter')bcManuell()">
+        <button onclick="bcManuell()">Suchen</button>
+      </div>
+      <div id="bcResult" style="margin-top:14px"></div>
     </section>
 
     <!-- VORLESEN -->
@@ -1108,11 +1156,13 @@ function go(name){
   if(typeof stopLupe==='function') stopLupe();
   if(typeof stopVorlesen==='function') stopVorlesen();
   if(typeof snLeave==='function') snLeave();
+  if(typeof bcStop==='function') bcStop();
   if(typeof lampOff==='function' && name!=='taschenlampe') lampOff();
   if(name==='heute') renderHeute();
   if(name==='lupe') startLupe();
   if(name==='merkzettel') renderMerk();
   if(name==='sprachnotiz') renderSprachnotizen();
+  if(name==='unterhaltung') renderUnterhaltung();
   if(name==='parken') renderParken();
   if(name==='taschenlampe') renderLamp();
   if(name==='hilfe') renderHilfe();
@@ -2289,6 +2339,161 @@ function snDel(id){
 function snLeave(){
   if(snRec && snRec.state==='recording'){ snRec.onstop=null; try{ snRec.stop(); }catch(e){} snAufraeumen(); snChunks=[]; }
   if(snAudio){ try{ snAudio.pause(); }catch(e){} if(snAudio._url) URL.revokeObjectURL(snAudio._url); snAudio=null; }
+}
+
+/* ====================== Unterhaltung ====================== */
+const WITZE = [
+  "Sagt der eine Schneemann zum anderen: \u201eRiechst du auch Karotten?\u201c",
+  "Treffen sich zwei Kerzen. Fragt die eine: \u201eIst Feuer eigentlich gef\u00e4hrlich?\u201c \u2013 \u201eNa klar, davon kann man ausgehen!\u201c",
+  "Kommt ein Pferd in die Bar. Fragt der Wirt: \u201eWarum so ein langes Gesicht?\u201c",
+  "Was macht ein Pirat am Computer? Er dr\u00fcckt die Enter-Taste.",
+  "Zwei Tomaten gehen \u00fcber die Stra\u00dfe. Eine wird \u00fcberfahren. Sagt die andere: \u201eKomm, Ketchup!\u201c",
+  "Was ist wei\u00df und st\u00f6rt beim Fr\u00fchst\u00fcck? Eine Lawine.",
+  "Wie nennt man einen Bumerang, der nicht zur\u00fcckkommt? Ein Stock.",
+  "Warum k\u00f6nnen Geister so schlecht l\u00fcgen? Weil man durch sie hindurchsieht.",
+  "Was liegt am Strand und spricht undeutlich? Eine Nuschel.",
+  "Der Lehrer fragt: \u201eFritzchen, nenne mir drei Tiere aus Afrika.\u201c \u2013 \u201eZwei L\u00f6wen und ein Elefant.\u201c",
+  "Was macht ein Clown im B\u00fcro? Faxen.",
+  "Treffen sich zwei B\u00e4ume. Sagt der eine: \u201eIch glaube, da hinten steht ein Spanner.\u201c"
+];
+const FAKTEN = [
+  "Honig verdirbt nicht. In \u00e4gyptischen Gr\u00e4bern fand man \u00fcber 3000 Jahre alten, noch essbaren Honig.",
+  "Bananen sind botanisch gesehen Beeren \u2013 Erdbeeren dagegen nicht.",
+  "Ein Tag auf der Venus dauert l\u00e4nger als ein ganzes Jahr auf der Venus.",
+  "Schmetterlinge schmecken mit den F\u00fc\u00dfen.",
+  "Die Seekuh ist mit dem Elefanten verwandt.",
+  "Otter halten beim Schlafen oft Pf\u00f6tchen, damit sie nicht auseinandertreiben.",
+  "Der Eiffelturm ist im Sommer etwa 15 cm h\u00f6her, weil sich das Metall bei W\u00e4rme ausdehnt.",
+  "Das menschliche Herz schl\u00e4gt rund 100.000-mal am Tag.",
+  "Es gibt mehr Sterne im Universum als Sandk\u00f6rner an allen Str\u00e4nden der Erde.",
+  "K\u00fche haben Freundinnen und werden unruhig, wenn man sie voneinander trennt.",
+  "Der Bodensee ist an der tiefsten Stelle \u00fcber 250 Meter tief.",
+  "Ein erwachsener Mensch hat rund 100.000 Kilometer Blutgef\u00e4\u00dfe im K\u00f6rper."
+];
+const QUIZ = [
+  {f:"Wie viele Bundesl\u00e4nder hat Deutschland?", o:["14","16","18"], r:1, i:"Deutschland hat 16 Bundesl\u00e4nder."},
+  {f:"Welches ist das gr\u00f6\u00dfte Tier der Welt?", o:["Afrikanischer Elefant","Blauwal","Giraffe"], r:1, i:"Der Blauwal ist das gr\u00f6\u00dfte Tier, das je gelebt hat."},
+  {f:"In welchem Land steht der Eiffelturm?", o:["Italien","Frankreich","Spanien"], r:1, i:"Der Eiffelturm steht in Paris, Frankreich."},
+  {f:"Welche Farbe ergibt Blau und Gelb gemischt?", o:["Gr\u00fcn","Orange","Lila"], r:0, i:"Blau und Gelb ergeben Gr\u00fcn."},
+  {f:"Wie hei\u00dft die Hauptstadt der Schweiz?", o:["Z\u00fcrich","Genf","Bern"], r:2, i:"Bern ist die Bundesstadt der Schweiz."},
+  {f:"Welches Vitamin bildet der K\u00f6rper mit Sonnenlicht?", o:["Vitamin C","Vitamin D","Vitamin B12"], r:1, i:"Mit Sonnenlicht bildet die Haut Vitamin D."},
+  {f:"Welcher Planet ist der Sonne am n\u00e4chsten?", o:["Venus","Merkur","Mars"], r:1, i:"Merkur ist der sonnenn\u00e4chste Planet."},
+  {f:"Wie viele Minuten hat ein Tag?", o:["1440","1240","960"], r:0, i:"24 Stunden \u00d7 60 = 1440 Minuten."},
+  {f:"Welches Gew\u00fcrz ist das teuerste der Welt?", o:["Safran","Pfeffer","Vanille"], r:0, i:"Safran ist das teuerste Gew\u00fcrz \u2013 es wird von Hand geerntet."},
+  {f:"An welchem Fluss liegt die Stadt K\u00f6ln?", o:["Elbe","Rhein","Donau"], r:1, i:"K\u00f6ln liegt am Rhein."}
+];
+let unQuizIdx=0, unQuizAntwort=-1;
+function unWitzNext(){ var b=document.getElementById('unWitz'); if(!b) return; var n=parseInt(b.getAttribute('data-i')||'-1')+1; b.setAttribute('data-i',n); b.textContent=WITZE[n%WITZE.length]; }
+function unFaktNext(){ var b=document.getElementById('unFakt'); if(!b) return; var n=parseInt(b.getAttribute('data-i')||'-1')+1; b.setAttribute('data-i',n); b.textContent=FAKTEN[n%FAKTEN.length]; }
+function unQuizRender(){
+  var q=QUIZ[unQuizIdx%QUIZ.length];
+  document.getElementById('unQuizFrage').textContent=q.f;
+  var opt=document.getElementById('unQuizOpt');
+  opt.innerHTML=q.o.map(function(o,i){
+    var bg='#eef5f7', col='var(--sea)', bord='#cfe0e6';
+    if(unQuizAntwort>-1){
+      if(i===q.r){ bg='#1e8f4e'; col='#fff'; bord='#1e8f4e'; }
+      else if(i===unQuizAntwort){ bg='var(--alarm)'; col='#fff'; bord='var(--alarm)'; }
+    }
+    return '<button onclick="unQuizPick('+i+')" style="text-align:left;background:'+bg+';color:'+col+';border:1px solid '+bord+';border-radius:12px;padding:14px;font-size:1.05rem;font-weight:700;cursor:pointer;font-family:inherit">'+o+'</button>';
+  }).join('');
+  var info=document.getElementById('unQuizInfo');
+  if(unQuizAntwort>-1){ info.textContent=(unQuizAntwort===q.r?'Richtig! ':'Leider falsch. ')+q.i; info.style.color=(unQuizAntwort===q.r?'#1e8f4e':'var(--ink)'); }
+  else { info.textContent=''; }
+}
+function unQuizPick(i){ if(unQuizAntwort>-1) return; unQuizAntwort=i; unQuizRender(); }
+function unQuizNext(){ unQuizIdx=(unQuizIdx+1)%QUIZ.length; unQuizAntwort=-1; unQuizRender(); }
+function renderUnterhaltung(){
+  var doy=tagDesJahres(new Date());
+  var w=document.getElementById('unWitz'); if(w && !w.textContent){ w.setAttribute('data-i', doy%WITZE.length); w.textContent=WITZE[doy%WITZE.length]; }
+  var f=document.getElementById('unFakt'); if(f && !f.textContent){ f.setAttribute('data-i', doy%FAKTEN.length); f.textContent=FAKTEN[doy%FAKTEN.length]; }
+  if(document.getElementById('unQuizFrage') && !document.getElementById('unQuizFrage').textContent){ unQuizIdx=doy%QUIZ.length; unQuizAntwort=-1; unQuizRender(); }
+}
+
+/* ====================== Produkt scannen (Barcode + Open Food Facts) ====================== */
+var bcScanner=null, bcScanning=false;
+function bcStatus(t){ var e=document.getElementById('bcStatus'); if(e) e.textContent=t; }
+function bcLoadLib(){
+  return new Promise(function(res,rej){
+    if(window.Html5Qrcode) return res();
+    var sc=document.createElement('script');
+    sc.src='https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js';
+    sc.onload=function(){ res(); }; sc.onerror=function(){ rej(); };
+    document.head.appendChild(sc);
+  });
+}
+function bcToggleScan(){ if(bcScanning) { bcStop(); bcStatus(''); } else bcStart(); }
+function bcStart(){
+  document.getElementById('bcResult').innerHTML='';
+  bcStatus('Kamera wird gestartet \u2026 bitte die Freigabe erlauben.');
+  bcLoadLib().then(function(){
+    var box=document.getElementById('bcReader'); box.style.display='block';
+    try{
+      bcScanner=new Html5Qrcode('bcReader',{ formatsToSupport:[
+        Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E
+      ], useBarCodeDetectorIfSupported:true });
+    }catch(e){ bcStatus('Scanner nicht verf\u00fcgbar.'); return; }
+    bcScanner.start({facingMode:'environment'}, {fps:10, qrbox:{width:260,height:160}},
+      function(text){ bcOnScan(text); }, function(){}
+    ).then(function(){
+      bcScanning=true; bcStatus('Halten Sie den Strichcode in den Rahmen.');
+      var b=document.getElementById('bcStartBtn'); if(b) b.textContent='Abbrechen';
+    }).catch(function(){
+      bcStatus('Kamera nicht verf\u00fcgbar. Bitte die Freigabe pr\u00fcfen oder die Nummer eintippen.');
+      box.style.display='none';
+    });
+  }).catch(function(){ bcStatus('Scanner konnte nicht geladen werden \u2013 ist Internet vorhanden?'); });
+}
+function bcStop(){
+  if(bcScanner && bcScanning){ try{ bcScanner.stop().then(function(){ try{ bcScanner.clear(); }catch(e){} }).catch(function(){}); }catch(e){} }
+  bcScanning=false;
+  var b=document.getElementById('bcStartBtn'); if(b) b.textContent='Scan starten';
+  var box=document.getElementById('bcReader'); if(box) box.style.display='none';
+}
+function bcOnScan(text){ bcStop(); bcLookup(text); }
+function bcManuell(){
+  var v=(document.getElementById('bcInput').value||'').replace(/\D/g,'');
+  if(v.length<6){ bcStatus('Bitte die Nummer unter dem Strichcode eingeben.'); return; }
+  bcLookup(v);
+}
+function bcNutriBadge(g){
+  if(!g) return ''; g=String(g).toUpperCase();
+  var f={A:'#1e8f4e',B:'#7ac547',C:'#f5c518',D:'#ef8200',E:'#e2231a'}[g]; if(!f) return '';
+  return '<span style="display:inline-block;background:'+f+';color:#fff;font-weight:900;border-radius:8px;padding:5px 14px;font-size:1.15rem">Nutri-Score '+g+'</span>';
+}
+var BC_ALLERG={gluten:'Gluten',milk:'Milch',eggs:'Eier',nuts:'Schalenfr\u00fcchte',peanuts:'Erdn\u00fcsse',soybeans:'Soja',fish:'Fisch',crustaceans:'Krebstiere',molluscs:'Weichtiere',celery:'Sellerie',mustard:'Senf','sesame-seeds':'Sesam',lupin:'Lupinen','sulphur-dioxide-and-sulphites':'Sulfite'};
+function bcAllerg(str){
+  if(!str) return '';
+  return str.split(',').map(function(a){ a=a.trim().replace(/^[a-z]{2}:/,''); return BC_ALLERG[a]||(a.charAt(0).toUpperCase()+a.slice(1)); }).filter(Boolean).join(', ');
+}
+function bcLookup(code){
+  bcStatus('Produkt wird gesucht \u2026'); document.getElementById('bcResult').innerHTML='';
+  var url='https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(code)+'.json?lc=de&fields=product_name,product_name_de,brands,quantity,nutriscore_grade,ingredients_text_de,ingredients_text,allergens,nutriments';
+  fetch(url).then(function(r){ return r.json(); }).then(function(d){
+    if(!d || d.status!==1 || !d.product){ bcStatus('Kein Produkt zu dieser Nummer gefunden ('+code+').'); return; }
+    bcStatus(''); var p=d.product;
+    var name=p.product_name_de || p.product_name || 'Unbekanntes Produkt';
+    var marke=(p.brands||'')+(p.quantity?(p.brands?' \u00b7 ':'')+p.quantity:'');
+    var zut=p.ingredients_text_de || p.ingredients_text || '';
+    var allerg=bcAllerg(p.allergens);
+    var n=p.nutriments||{};
+    function nz(k,u){ var v=n[k]; return (v||v===0)?(Math.round(v*10)/10+(u||'')):'\u2013'; }
+    var naehr='<table style="width:100%;border-collapse:collapse;font-size:1.02rem;margin-top:6px">'+
+      '<tr><td>Energie</td><td style="text-align:right">'+nz('energy-kcal_100g',' kcal')+'</td></tr>'+
+      '<tr><td>Fett</td><td style="text-align:right">'+nz('fat_100g',' g')+'</td></tr>'+
+      '<tr><td>davon Zucker</td><td style="text-align:right">'+nz('sugars_100g',' g')+'</td></tr>'+
+      '<tr><td>Salz</td><td style="text-align:right">'+nz('salt_100g',' g')+'</td></tr></table>'+
+      '<div style="font-size:.82rem;color:var(--ink-soft);margin-top:2px">Werte je 100 g/ml</div>';
+    var html='<div class="rezept-card"><h3>'+name+'</h3>'+
+      (marke?'<small style="color:var(--ink-soft)">'+marke+'</small>':'')+
+      (p.nutriscore_grade?'<div style="margin:12px 0">'+bcNutriBadge(p.nutriscore_grade)+'</div>':'')+
+      (allerg?'<p style="margin:8px 0"><b>Enth\u00e4lt:</b> '+allerg+'</p>':'')+
+      (zut?'<h4>Zutaten</h4><p class="schritte">'+zut+'</p>':'')+
+      '<h4>N\u00e4hrwerte</h4>'+naehr+
+      '<div style="font-size:.82rem;color:var(--ink-soft);margin-top:10px">Quelle: Open Food Facts</div></div>';
+    document.getElementById('bcResult').innerHTML=html;
+  }).catch(function(){ bcStatus('Abfrage nicht m\u00f6glich. Ist eine Internet-Verbindung da?'); });
 }
 
 /* --- Wo habe ich geparkt? --- */
