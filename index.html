@@ -2413,12 +2413,13 @@ function musikStop(){ if(musikEl){ try{ musikEl.pause(); }catch(e){} } var stp=d
 function musikShuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function musikSpiele(){ if(!musikUrl) return; var a=musikEnsure(); try{ a.src=musikUrl; }catch(e){} var stp=document.getElementById('muStop'); if(stp) stp.style.display='block'; var p=a.play(); if(p&&p.catch){ p.catch(function(){ var st=document.getElementById('muStatus'); if(st) st.textContent='Tippen Sie auf „Nochmal hören“, um den Ausschnitt zu starten.'; var rp=document.getElementById('muReplay'); if(rp) rp.style.display='inline-block'; if(stp) stp.style.display='none'; }); } }
 function musikReplay(){ musikSpiele(); }
-function musikRunde(){
-  musikUnlock();
+function musikRunde(){ musikUnlock(); musikStartVersuch(0); }
+function musikStartVersuch(musikVersuch){
   musikStop();
   var st=document.getElementById('muStatus'), opt=document.getElementById('muOpt'), inf=document.getElementById('muInfo');
   var sb=document.getElementById('muStartBtn'), rp=document.getElementById('muReplay');
   if(!st) return;
+  if(musikVersuch>=4){ opt.innerHTML=''; inf.textContent=''; if(rp) rp.style.display='none'; st.textContent='Konnte gerade kein Lied von Apple laden – das liegt nicht an Ihrem Internet. Bitte noch einmal auf „Nächstes Lied“ tippen.'; if(sb) sb.textContent='Nochmal versuchen'; return; }
   inf.textContent=''; opt.innerHTML=''; if(rp) rp.style.display='none';
   st.textContent='Lied wird geladen \u2026';
   if(sb) sb.textContent='N\u00e4chstes Lied';
@@ -2428,7 +2429,7 @@ function musikRunde(){
     var lieder=(d&&d.results?d.results:[]).filter(function(x){ return x.previewUrl && x.trackName && x.artistName; });
     var seen={}, uniq=[];
     lieder.forEach(function(x){ var key=x.trackName.toLowerCase(); if(!seen[key]){ seen[key]=1; uniq.push(x); } });
-    if(uniq.length<2){ musikRunde(); return; }
+    if(uniq.length<2){ musikStartVersuch(musikVersuch+1); return; }
     musikShuffle(uniq);
     var richtig=uniq[0];
     musikOpts=[richtig];
@@ -2440,7 +2441,7 @@ function musikRunde(){
     opt.innerHTML=musikOpts.map(function(o,i){ return '<button onclick="musikTipp('+i+')" style="text-align:left;background:#eef5f7;color:var(--sea);border:1px solid #cfe0e6;border-radius:12px;padding:14px;font-size:1.05rem;font-weight:700;cursor:pointer;font-family:inherit">'+lotseEsc(o.trackName)+'</button>'; }).join('');
     if(rp) rp.style.display='inline-block';
     musikSpiele();
-  }).catch(function(){ st.textContent='Konnte kein Lied laden \u2013 ist Internet vorhanden? Bitte erneut versuchen.'; });
+  }).catch(function(){ musikStartVersuch(musikVersuch+1); });
 }
 function musikTipp(i){
   if(!musikOpts.length || !musikLoesung) return;
