@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0E3553">
+<title>BSB Fahrplan – Bodensee</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{--ink:#0A2233;--navy:#103A5A;--blue:#15679E;--azure:#2BA6C9;--red:#C8472F;--sky:#EAF2F8;--paper:#F4F8FB;--line:#D8E5EF;--muted:#5C7488;--gold:#B9842B;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--paper);line-height:1.5;-webkit-font-smoothing:antialiased;}
+.lg-app{max-width:560px;margin:0 auto;min-height:100vh;background:var(--paper);}
+select,input,button{font-family:inherit;}
+
+.lg-head{position:relative;background:linear-gradient(160deg,#0E3553 0%,#15679E 100%);color:#fff;padding:26px 22px 34px;overflow:hidden;}
+.lg-head-inner{position:relative;z-index:2;}
+.lg-back{display:inline-flex;align-items:center;gap:4px;color:#D5E6F1;text-decoration:none;font-size:14px;font-weight:600;margin-bottom:12px;-webkit-tap-highlight-color:transparent;}
+.lg-back:hover,.lg-back:active{color:#fff;}
+.lg-eyebrow{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:600;color:#9FD4E6;}
+.lg-head h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:38px;line-height:1.02;margin:6px 0 0;letter-spacing:.01em;}
+.lg-head h1 span{color:#62D0E8;}
+.lg-sub{margin:8px 0 0;font-size:14px;color:#D5E6F1;max-width:38ch;}
+.lg-wave{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:48px;z-index:1;fill:var(--paper);}
+
+.lg-tabs{display:flex;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;}
+.lg-tabs button{flex:1;border:none;background:none;padding:14px 6px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:16px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;transition:.15s;}
+.lg-tabs button.is-active{color:var(--blue);border-bottom-color:var(--azure);}
+
+.lg-panel{padding:18px 16px 8px;}
+.lg-lead{font-size:14px;color:var(--navy);background:#fff;border:1px solid var(--line);border-left:4px solid var(--azure);border-radius:10px;padding:12px 14px;margin:0 0 16px;}
+
+.lg-route{display:flex;align-items:flex-end;gap:8px;}
+.lg-field{flex:1;display:flex;flex-direction:column;gap:5px;}
+.lg-field>span{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:12px;font-weight:600;color:var(--muted);}
+.lg-field select,.lg-field input{appearance:none;-webkit-appearance:none;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:12px;font-size:15px;font-weight:500;color:var(--ink);width:100%;}
+.lg-field select:focus,.lg-field input:focus{outline:none;border-color:var(--azure);box-shadow:0 0 0 3px rgba(43,166,201,.18);}
+.lg-swap{flex:0 0 auto;width:44px;height:46px;border:none;border-radius:10px;background:var(--blue);color:#fff;font-size:20px;cursor:pointer;transition:.15s;}
+.lg-swap:hover{background:var(--navy);}
+
+.lg-controls{display:flex;align-items:flex-end;gap:8px;margin-top:12px;}
+.lg-field--date{flex:0 0 auto;min-width:160px;}
+.lg-star{margin-left:auto;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:12px 14px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;height:46px;white-space:nowrap;transition:.15s;}
+.lg-star.is-on{color:var(--gold);border-color:var(--gold);background:#FBF4E6;}
+
+.lg-banner{margin-top:14px;background:#FCEFE9;border:1px solid #EBC3B5;color:#8C3B25;border-radius:10px;padding:11px 13px;font-size:13.5px;}
+.lg-loc{width:100%;margin-top:12px;border:1.5px dashed var(--azure);background:#fff;color:var(--blue);border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;}
+.lg-loc:hover{background:var(--sky);}
+.lg-loc:active{transform:scale(.99);}
+.lg-loc-status{margin-top:8px;font-size:13px;color:var(--muted);}
+
+.lg-favs{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px;}
+.lg-fav{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:500;color:var(--navy);cursor:pointer;transition:.15s;}
+.lg-fav:hover{border-color:var(--azure);color:var(--blue);}
+
+.lg-result-head{display:flex;justify-content:space-between;align-items:baseline;margin:20px 2px 10px;}
+.lg-result-route{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:var(--navy);}
+.lg-result-route em{color:var(--azure);font-style:normal;margin:0 4px;}
+.lg-result-day{font-size:13px;color:var(--muted);font-weight:500;}
+
+.lg-board{display:flex;flex-direction:column;gap:9px;}
+.lg-row{position:relative;background:#0E3553;color:#fff;border-radius:12px;padding:13px 40px 13px 15px;cursor:pointer;box-shadow:0 1px 2px rgba(16,58,90,.18);transition:.15s;}
+.lg-row:hover{background:#13456C;}
+.lg-row.is-open{background:#0B2C46;}
+.lg-row-main{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+.lg-times{display:flex;align-items:center;gap:10px;}
+.lg-clock{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:21px;letter-spacing:.02em;}
+.lg-track{display:flex;align-items:center;gap:3px;opacity:.85;}
+.lg-dot{width:7px;height:7px;border-radius:50%;background:#62D0E8;}
+.lg-dot--end{background:#fff;}
+.lg-line{width:13px;height:2px;background:rgba(255,255,255,.4);}
+.lg-boat{font-size:12px;line-height:1;}
+.lg-meta{display:flex;align-items:center;gap:8px;}
+.lg-kurs{font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.04em;font-size:14px;background:rgba(255,255,255,.14);padding:3px 9px;border-radius:6px;}
+.lg-kurs.sm{font-size:12px;background:var(--sky);color:var(--navy);}
+.lg-dur{font-size:12.5px;color:#A9CBDD;font-variant-numeric:tabular-nums;}
+.lg-tag{font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;letter-spacing:.02em;}
+.lg-tag--rest{background:#7FE0C4;color:#063B2E;}
+.lg-tag--snack{background:#FBE0A6;color:#5C3F08;}
+.lg-warn{margin-top:9px;font-size:13px;color:#FFD9CC;background:rgba(200,71,47,.22);border-radius:7px;padding:6px 10px;}
+.lg-legs{margin-top:11px;padding-top:11px;border-top:1px dashed rgba(255,255,255,.22);display:flex;flex-direction:column;gap:5px;}
+.lg-leg{display:flex;gap:12px;align-items:baseline;font-size:13.5px;}
+.lg-leg-t{font-family:'IBM Plex Mono',monospace;font-size:13px;color:#9FD4E6;min-width:46px;}
+.lg-leg-n{color:#E8F1F7;}
+.lg-chev{position:absolute;right:14px;top:15px;font-size:10px;color:#8FB6CC;}
+
+.lg-empty{text-align:center;padding:34px 20px;background:#fff;border:1px dashed var(--line);border-radius:12px;color:var(--muted);}
+.lg-empty-mark{font-size:30px;color:var(--azure);margin-bottom:6px;}
+.lg-empty p{margin:4px 0;font-size:14px;}
+.lg-empty-hint{font-size:13px;color:var(--muted);}
+
+.lg-trip{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(16,58,90,.07);}
+.lg-trip-badge{display:inline-block;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;border-radius:6px;}
+.lg-trip-badge.alt{background:var(--muted);}
+.lg-trip h3{font-family:'Barlow Condensed',sans-serif;font-size:23px;font-weight:700;margin:10px 0 12px;color:var(--navy);}
+.lg-trip-leg{margin-bottom:10px;}
+.lg-trip-dir{display:block;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:600;color:var(--azure);margin-bottom:3px;}
+.lg-trip-line,.lg-trip-line2{font-size:14.5px;color:var(--ink);display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+.lg-trip-line b,.lg-trip-line2 b{font-family:'IBM Plex Mono',monospace;color:var(--blue);}
+.lg-trip-line em,.lg-trip-line2 em{color:var(--azure);font-style:normal;}
+.lg-trip-line2{margin-bottom:9px;}
+.lg-trip-foot{margin-top:8px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:9px;}
+.lg-trip--alt{background:#FAFCFD;}
+
+.lg-mini{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px;}
+.lg-mini h4{font-family:'Barlow Condensed',sans-serif;font-size:15px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 3px;}
+.lg-mini h4:first-child{margin-top:0;}
+.lg-mini p{margin:0;font-size:15px;}
+.lg-mini b{font-family:'IBM Plex Mono',monospace;color:var(--blue);}
+
+.lg-note{font-size:13.5px;color:#5A4220;background:#FBF4E6;border:1px solid #EBD9B0;border-radius:12px;padding:13px 15px;}
+
+.lg-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px 16px;margin-bottom:13px;}
+.lg-card h3{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--navy);margin:0 0 7px;}
+.lg-card p{margin:0;font-size:14px;color:var(--ink);}
+.lg-card ul{margin:0;padding-left:18px;font-size:14px;}
+.lg-card li{margin-bottom:7px;}
+.lg-card--alert{border-left:4px solid var(--red);}
+.lg-card-tip{margin-top:9px;font-size:13px;color:var(--muted);}
+.lg-muted{color:var(--muted);}
+.lg-disclaimer{font-size:12px;color:var(--muted);margin:6px 2px 0;}
+
+.lg-foot{text-align:center;font-size:11.5px;color:var(--muted);padding:18px 16px 30px;}
+
+@media (max-width:420px){
+  .lg-head h1{font-size:32px;}
+  .lg-clock{font-size:19px;}
+  .lg-controls{flex-wrap:wrap;}
+  .lg-star{margin-left:0;width:100%;}
+}
+</style>
+</head>
+<body>
+<div class="lg-app">
+  <header class="lg-head">
+    <div class="lg-head-inner">
+      <a class="lg-back" href="./">&#8249; Zur&uuml;ck zum Lotse</a>
+      <div class="lg-eyebrow">Bodensee · Hauptsaison 2026 · 14. Mai – 13. Sep</div>
+      <h1>BSB <span>Fahrplan</span></h1>
+      <p class="lg-sub">Beide Richtungen, Zwischenhäfen und die Schweiz — sauber an einem Ort.</p>
+    </div>
+    <svg class="lg-wave" viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0 30 Q 180 0 360 30 T 720 30 T 1080 30 T 1440 30 V60 H0 Z"/></svg>
+  </header>
+
+  <nav class="lg-tabs">
+    <button data-tab="planer" class="is-active">Verbindung</button>
+    <button data-tab="schweiz">Schweiz</button>
+    <button data-tab="hinweise">Hinweise</button>
+  </nav>
+
+  <main id="lg-main"></main>
+  <footer class="lg-foot">Persönlicher Planer · kein offizieller Fahrplan · Angaben ohne Gewähr</footer>
+</div>
+
+<script>
+"use strict";
+
+var PORTS = ["Konstanz","Mainau","Meersburg","Hagnau","Immenstaad","Friedrichshafen","Langenargen","Kressbronn","Nonnenhorn","Wasserburg","Lindau","Bregenz"];
+// ungefähre Hafenkoordinaten [lat,lng] für die Standort-Erkennung
+var COORDS = [[47.659,9.178],[47.705,9.197],[47.694,9.271],[47.685,9.318],[47.677,9.367],[47.651,9.480],[47.598,9.547],[47.586,9.600],[47.583,9.628],[47.560,9.638],[47.545,9.685],[47.504,9.747]];
+function nearestPort(lat,lng){var best=-1,bd=Infinity;for(var i=0;i<COORDS.length;i++){var dlat=lat-COORDS[i][0],dlng=(lng-COORDS[i][1])*Math.cos(lat*Math.PI/180),d=dlat*dlat+dlng*dlng;if(d<bd){bd=d;best=i;}}return {idx:best,far:Math.sqrt(bd)>0.6};}
+function resolvePort(s){if(s==null)return -1;var t=String(s).trim();var num=parseInt(t,10);if(!isNaN(num)&&String(num)===t&&num>=0&&num<PORTS.length)return num;t=t.toLowerCase();for(var i=0;i<PORTS.length;i++){if(PORTS[i].toLowerCase()===t)return i;}return -1;}
+
+// stop = [portIndex, ankunft, abfahrt]
+var COURSES = [
+  {no:141,svc:"restaurant",stops:[[5,"9:10","9:10"],[6,"9:35","9:35"],[7,"9:55","9:55"],[8,"10:05","10:05"],[9,"10:15","10:15"],[10,"10:35","10:35"]]},
+  {no:111,svc:"restaurant",stops:[[0,"9:05","9:05"],[2,"9:35","9:45"],[3,"10:00","10:00"],[4,"10:15","10:15"],[5,"10:45","10:55"],[6,"11:20","11:20"],[7,"11:40","11:40"],[8,"11:50","11:50"],[9,"12:00","12:00"],[10,"12:20","12:25"],[11,"12:47","12:47"]]},
+  {no:143,svc:"restaurant",stops:[[5,"12:30","12:30"],[6,"12:55","12:55"],[7,"13:15","13:15"],[8,"13:25","13:25"],[9,"13:35","13:35"],[10,"13:55","14:00"],[11,"14:22","14:22"]]},
+  {no:125,svc:"snack",stops:[[5,"14:20","14:20"],[6,"14:45","14:45"],[7,"15:05","15:05"],[8,"15:15","15:15"],[9,"15:25","15:25"],[10,"15:45","15:50"],[11,"16:12","16:12"]]},
+  {no:145,svc:"restaurant",stops:[[5,"16:35","16:35"],[6,"17:00","17:00"],[7,"17:20","17:20"],[8,"17:30","17:30"],[9,"17:40","17:40"],[10,"18:00","18:05"],[11,"18:27","18:27"]]},
+  {no:153,svc:"snack",stops:[[0,"15:15","15:15"],[2,"16:15","16:25"],[3,"16:40","16:40"],[4,"16:55","16:55"],[5,"17:25","17:35"],[6,"18:00","18:00"],[7,"18:20","18:20"],[8,"18:30","18:30"],[9,"18:40","18:40"],[10,"19:00","19:05"],[11,"19:27","19:27"]]},
+  {no:150,svc:"snack",stops:[[11,"9:20","9:20"],[10,"9:42","9:50"],[9,"10:10","10:10"],[8,"10:20","10:20"],[7,"10:30","10:30"],[6,"10:50","10:50"],[5,"11:15","11:25"],[4,"11:55","11:55"],[3,"12:10","12:10"],[2,"12:25","12:35"],[1,"13:00","13:00"],[0,"13:30","13:30"]]},
+  {no:142,svc:"restaurant",stops:[[11,"10:25","10:25"],[10,"10:47","10:55"],[9,"11:15","11:15"],[8,"11:25","11:25"],[7,"11:35","11:35"],[6,"11:55","11:55"],[5,"12:20","12:20"]]},
+  {no:124,svc:"snack",stops:[[11,"12:15","12:15"],[10,"12:37","12:50"],[9,"13:10","13:10"],[8,"13:20","13:20"],[7,"13:30","13:30"],[6,"13:50","13:50"],[5,"14:15","14:15"]]},
+  {no:144,svc:"restaurant",stops:[[11,"14:30","14:30"],[10,"14:52","15:00"],[9,"15:20","15:20"],[8,"15:30","15:30"],[7,"15:40","15:40"],[6,"16:00","16:00"],[5,"16:25","16:25"]]},
+  {no:116,svc:"restaurant",stops:[[11,"15:40","15:40"],[10,"16:02","16:10"],[9,"16:30","16:30"],[8,"16:40","16:40"],[7,"16:50","16:50"],[6,"17:10","17:10"],[5,"17:35","17:40"],[4,"18:10","18:10"],[3,"18:25","18:25"],[2,"18:40","18:50"],[0,"19:20","19:20"]]},
+  {no:126,svc:"snack",stops:[[11,"16:25","16:25"],[10,"16:47","16:55"],[9,"17:15","17:15"],[8,"17:25","17:25"],[7,"17:35","17:35"],[6,"17:55","17:55"],[5,"18:20","18:20"]]}
+];
+
+var WEEKDAYS = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+function toMin(t){var p=t.split(":");return (+p[0])*60+(+p[1]);}
+function pad(t){var p=t.split(":");return (p[0].length<2?"0"+p[0]:p[0])+":"+p[1];}
+function fmtDur(m){if(m>=60){var h=Math.floor(m/60),r=m%60;return h+" h"+(r?" "+r+" min":"");}return m+" min";}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function exception(no,fromIdx,toIdx,date){
+  var FN=5;
+  if(date==="2026-07-18"){
+    if(no===143||no===144) return {removed:true};
+    if(no===111&&fromIdx<=FN&&toIdx>FN) return {warn:"Am 18.7.: Umstieg in Friedrichshafen"};
+    if(no===116&&fromIdx>FN&&toIdx<=FN) return {warn:"Am 18.7.: Umstieg in Friedrichshafen"};
+  }
+  if(date==="2026-08-08"){
+    if(no===153&&toIdx===11) return {warn:"Am 8.8.: Umstieg in Lindau"};
+    if(no===150&&fromIdx>=10&&toIdx<10) return {warn:"Am 8.8.: Umstieg in Lindau"};
+  }
+  return {};
+}
+
+function findConnections(fromIdx,toIdx,date){
+  if(fromIdx===toIdx) return [];
+  var out=[];
+  for(var i=0;i<COURSES.length;i++){
+    var c=COURSES[i],pf=-1,pt=-1;
+    for(var j=0;j<c.stops.length;j++){if(c.stops[j][0]===fromIdx)pf=j;if(c.stops[j][0]===toIdx)pt=j;}
+    if(pf===-1||pt===-1||pf>=pt) continue;
+    var ex=exception(c.no,fromIdx,toIdx,date);
+    if(ex.removed) continue;
+    var dep=c.stops[pf][2],arr=c.stops[pt][1],legs=[];
+    for(var k=pf;k<=pt;k++) legs.push({name:PORTS[c.stops[k][0]],t:c.stops[k][1]});
+    out.push({no:c.no,svc:c.svc,dep:dep,arr:arr,dur:toMin(arr)-toMin(dep),warn:ex.warn,legs:legs});
+  }
+  out.sort(function(a,b){return toMin(a.dep)-toMin(b.dep);});
+  return out;
+}
+
+// ---- state ----
+var state={tab:"planer",from:6,to:11,date:"2026-06-28",open:null,favs:[],locStatus:null};
+try{var f=localStorage.getItem("lgg-favs");if(f)state.favs=JSON.parse(f);}catch(e){}
+function saveFavs(){try{localStorage.setItem("lgg-favs",JSON.stringify(state.favs));}catch(e){}}
+
+function svcTag(svc){return svc==="restaurant"?'<span class="lg-tag lg-tag--rest">Restaurant</span>':'<span class="lg-tag lg-tag--snack">Snacks</span>';}
+
+function selectOptions(sel){var h="";for(var i=0;i<PORTS.length;i++){h+='<option value="'+i+'"'+(i===sel?" selected":"")+'>'+PORTS[i]+'</option>';}return h;}
+
+function boardHTML(rows){
+  if(!rows.length){
+    return '<div class="lg-empty"><div class="lg-empty-mark">&#8709;</div><p>Keine direkte Schiffsverbindung an diesem Tag.</p><p class="lg-empty-hint">Tipp: Erst nach <strong>Friedrichshafen</strong> oder <strong>Lindau</strong> fahren und dort umsteigen — oder ein anderes Datum w&auml;hlen.</p></div>';
+  }
+  var h="";
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i],isOpen=(state.open===i);
+    h+='<div class="lg-row'+(isOpen?" is-open":"")+'" data-row="'+i+'">';
+    h+='<div class="lg-row-main"><div class="lg-times"><span class="lg-clock">'+pad(r.dep)+'</span><span class="lg-track"><span class="lg-dot"></span><span class="lg-line"></span><span class="lg-boat">&#9972;</span><span class="lg-line"></span><span class="lg-dot lg-dot--end"></span></span><span class="lg-clock">'+pad(r.arr)+'</span></div>';
+    h+='<div class="lg-meta"><span class="lg-kurs">Kurs '+r.no+'</span>'+svcTag(r.svc)+'<span class="lg-dur">'+fmtDur(r.dur)+'</span></div></div>';
+    if(r.warn) h+='<div class="lg-warn">&#9888; '+esc(r.warn)+'</div>';
+    if(isOpen){h+='<div class="lg-legs">';for(var k=0;k<r.legs.length;k++){h+='<div class="lg-leg"><span class="lg-leg-t">'+pad(r.legs[k].t)+'</span><span class="lg-leg-n">'+esc(r.legs[k].name)+'</span></div>';}h+='</div>';}
+    h+='<span class="lg-chev">'+(isOpen?"&#9650;":"&#9660;")+'</span></div>';
+  }
+  return h;
+}
+
+function planerHTML(){
+  var rows=findConnections(state.from,state.to,state.date);
+  var d=new Date(state.date+"T12:00:00");
+  var dateLabel=WEEKDAYS[d.getDay()]+", "+d.getDate()+"."+(d.getMonth()+1)+".";
+  var special=state.date==="2026-07-18"?"Sondertag 18.7.":state.date==="2026-08-08"?"Sondertag 8.8.":null;
+  var isFav=state.favs.some(function(x){return x.f===state.from&&x.t===state.to;});
+  var h='<section class="lg-panel">';
+  h+='<div class="lg-route"><label class="lg-field"><span>Von</span><select id="lg-from">'+selectOptions(state.from)+'</select></label>';
+  h+='<button class="lg-swap" id="lg-swap" aria-label="Richtung tauschen">&#8645;</button>';
+  h+='<label class="lg-field"><span>Nach</span><select id="lg-to">'+selectOptions(state.to)+'</select></label></div>';
+  h+='<button class="lg-loc" id="lg-loc">&#128205; N&auml;chsten Hafen verwenden</button>';
+  if(state.locStatus) h+='<div class="lg-loc-status">'+esc(state.locStatus)+'</div>';
+  h+='<div class="lg-controls"><label class="lg-field lg-field--date"><span>Tag</span><input type="date" id="lg-date" min="2026-05-14" max="2026-09-13" value="'+state.date+'"></label>';
+  h+='<button class="lg-star'+(isFav?" is-on":"")+'" id="lg-star">'+(isFav?"&#9733; Gemerkt":"&#9734; Merken")+'</button></div>';
+  if(special) h+='<div class="lg-banner">'+special+' — einzelne Kurse fallen aus oder fahren mit Umstieg. Details stehen direkt an der Verbindung.</div>';
+  if(state.favs.length){h+='<div class="lg-favs">';for(var i=0;i<state.favs.length;i++){h+='<button class="lg-fav" data-fav="'+i+'">'+PORTS[state.favs[i].f]+' &rarr; '+PORTS[state.favs[i].t]+'</button>';}h+='</div>';}
+  h+='<div class="lg-result-head"><span class="lg-result-route">'+PORTS[state.from]+' <em>&rarr;</em> '+PORTS[state.to]+'</span><span class="lg-result-day">'+dateLabel+'</span></div>';
+  h+='<div class="lg-board">'+boardHTML(rows)+'</div></section>';
+  return h;
+}
+
+function schweizHTML(){
+  return '<section class="lg-panel">'+
+  '<p class="lg-lead">Die Schweiz-Verbindung ist im Papierfahrplan un&uuml;bersichtlich, weil die R&uuml;ckfahrt <strong>nicht</strong> spiegelbildlich l&auml;uft. Hier der fertige Tagesausflug — alles auf einem Schiff bzw. einem Anbieter (SBS).</p>'+
+  '<div class="lg-trip"><div class="lg-trip-badge">Empfohlen · ganzt&auml;gig</div><h3>Langenargen &harr; Rorschach</h3>'+
+  '<div class="lg-trip-leg"><span class="lg-trip-dir">Hinfahrt</span><div class="lg-trip-line"><b>10:10</b> Langenargen <em>&rarr;</em> <b>10:52</b> Rorschach <span class="lg-kurs sm">Kurs 7220</span></div></div>'+
+  '<div class="lg-trip-leg"><span class="lg-trip-dir">R&uuml;ckfahrt</span><div class="lg-trip-line"><b>14:10</b> Rorschach <em>&rarr;</em> Horn <em>&rarr;</em> Arbon <em>&rarr;</em> <b>15:20</b> Langenargen <span class="lg-kurs sm">Kurs 7223</span></div></div>'+
+  '<div class="lg-trip-foot">&asymp; 3 h 18 min in Rorschach · durchgehende SBS-Schiffe</div></div>'+
+  '<div class="lg-trip lg-trip--alt"><div class="lg-trip-badge alt">Alternative · &uuml;ber Lindau</div><h3>Falls du l&auml;nger bleiben willst</h3>'+
+  '<div class="lg-trip-line2">Rorschach <b>14:20</b> &rarr; Lindau <b>15:40</b>, umsteigen, Lindau <b>16:10</b> &rarr; Langenargen <b>17:10</b> <span class="lg-kurs sm">Kurs 116</span></div>'+
+  '<div class="lg-trip-line2">oder Rorschach <b>13:05</b> &rarr; Lindau <b>14:15</b>, umsteigen, Lindau <b>15:00</b> &rarr; Langenargen <b>16:00</b> <span class="lg-kurs sm">Kurs 144 · nicht am 18.7.</span></div></div>'+
+  '<div class="lg-mini"><h4>Direkt ab Langenargen &rarr; Rorschach</h4><p><b>10:10</b> &rarr; 10:52 · <b>13:25</b> &rarr; 14:07</p>'+
+  '<h4>Direkt nach Langenargen (aus Romanshorn / Arbon)</h4><p>Ankunft <b>10:05</b> · <b>13:20</b> · <b>15:20</b></p></div>'+
+  '<div class="lg-note"><strong>Wichtig zur Schweiz-Strecke:</strong> gilt nur <strong>27.6.–13.9.</strong> · Tickets ausschlie&szlig;lich &uuml;ber die Schweizerische Bodensee-Schifffahrt (SBS) · Fahrradmitnahme eingeschr&auml;nkt, nicht rollstuhlg&auml;ngig · eine echte Rorschach&rarr;Langenargen-Direktfahrt gibt es nicht (deshalb der Bogen &uuml;ber Arbon bzw. Lindau).</div>'+
+  '</section>';
+}
+
+function hinweiseHTML(){
+  return '<section class="lg-panel">'+
+  '<div class="lg-card"><h3>Wann fahren die Schiffe?</h3><p>In der Hauptsaison (14.5.–13.9.) f&auml;hrt eure Linie Konstanz&harr;Bregenz <strong>t&auml;glich</strong>. Feiertage &auml;ndern daran nichts — anders als auf dem Untersee (Schaffhausen/Stein am Rhein), wo Wochentag/Feiertag den Plan bestimmen.</p></div>'+
+  '<div class="lg-card lg-card--alert"><h3>Die zwei Sondertage</h3><ul>'+
+  '<li><strong>18.7.</strong> — der 12:55-Kurs nach Bregenz (Kurs 143) und der 16:00-Kurs Richtung Friedrichshafen (Kurs 144) <strong>fallen aus</strong>. Durchgehende Fahrten Konstanz&harr;Bregenz nur mit Umstieg in Friedrichshafen.</li>'+
+  '<li><strong>8.8.</strong> — der 18:00-Kurs Langenargen&rarr;Bregenz (Kurs 153) f&auml;hrt nur mit <strong>Umstieg in Lindau</strong>.</li></ul>'+
+  '<p class="lg-card-tip">W&auml;hle im Reiter &bdquo;Verbindung&ldquo; einfach das Datum — der Planer blendet betroffene Kurse aus oder markiert den Umstieg.</p></div>'+
+  '<div class="lg-card"><h3>Feiertage in der Saison</h3><p>Chr. Himmelfahrt 14.5. · Pfingstsonntag 24.5. · Pfingstmontag 25.5. · Fronleichnam 4.6. · Schweizer Nationalfeiertag 1.8. <span class="lg-muted">(Linie f&auml;hrt normal weiter.)</span></p></div>'+
+  '<div class="lg-card"><h3>An Bord</h3><p><span class="lg-tag lg-tag--rest">Restaurant</span> warme K&uuml;che an Bord · <span class="lg-tag lg-tag--snack">Snacks</span> Snacks &amp; Getr&auml;nke erh&auml;ltlich.</p></div>'+
+  '<div class="lg-card"><h3>Tickets &amp; Tarif</h3><p>Kinder bis 5 J. gratis, 6–15 J. zum halben Preis. Tageskarten erlauben beliebiges Aus- und Einsteigen in der gew&auml;hlten Zone — ideal f&uuml;r eure Zwischenhafen-Ausfl&uuml;ge. F&uuml;r die Schweiz-Strecke gelten SBS-Tickets, f&uuml;r die Autof&auml;hre Konstanz–Meersburg eigene Tarife.</p></div>'+
+  '<p class="lg-disclaimer">Daten aus dem VSU-Fahrplan, Stand 11/2025. Alle Angaben ohne Gew&auml;hr — bei Nebel, Sturm oder hohem Andrang sind Versp&auml;tungen/Ausf&auml;lle m&ouml;glich.</p>'+
+  '</section>';
+}
+
+function render(){
+  var main=document.getElementById("lg-main");
+  if(state.tab==="planer") main.innerHTML=planerHTML();
+  else if(state.tab==="schweiz") main.innerHTML=schweizHTML();
+  else main.innerHTML=hinweiseHTML();
+  bind();
+}
+
+function bind(){
+  if(state.tab!=="planer") return;
+  var from=document.getElementById("lg-from"),to=document.getElementById("lg-to"),date=document.getElementById("lg-date");
+  from.addEventListener("change",function(){state.from=+this.value;state.open=null;render();});
+  to.addEventListener("change",function(){state.to=+this.value;state.open=null;render();});
+  date.addEventListener("change",function(){if(this.value){state.date=this.value;state.open=null;render();}});
+  document.getElementById("lg-swap").addEventListener("click",function(){var t=state.from;state.from=state.to;state.to=t;state.open=null;render();});
+  var loc=document.getElementById("lg-loc");
+  if(loc) loc.addEventListener("click",function(){
+    if(!navigator.geolocation){state.locStatus="Standort wird vom Browser nicht unterst\u00fctzt \u2013 bitte Hafen manuell w\u00e4hlen.";render();return;}
+    state.locStatus="Standort wird ermittelt \u2026";render();
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var n=nearestPort(pos.coords.latitude,pos.coords.longitude);
+      if(n.far){state.locStatus="Du scheinst nicht am Bodensee zu sein \u2013 bitte Hafen manuell w\u00e4hlen.";render();return;}
+      state.from=n.idx;state.open=null;state.locStatus="N\u00e4chster Hafen erkannt: "+PORTS[n.idx];render();
+    },function(){
+      state.locStatus="Standort nicht verf\u00fcgbar (Freigabe n\u00f6tig) \u2013 bitte Hafen manuell w\u00e4hlen.";render();
+    },{enableHighAccuracy:true,timeout:10000,maximumAge:60000});
+  });
+  document.getElementById("lg-star").addEventListener("click",function(){
+    var idx=-1;for(var i=0;i<state.favs.length;i++){if(state.favs[i].f===state.from&&state.favs[i].t===state.to){idx=i;break;}}
+    if(idx>=0) state.favs.splice(idx,1); else state.favs.push({f:state.from,t:state.to});
+    saveFavs();render();
+  });
+  var favBtns=document.querySelectorAll("[data-fav]");
+  favBtns.forEach(function(b){b.addEventListener("click",function(){var fv=state.favs[+this.getAttribute("data-fav")];state.from=fv.f;state.to=fv.t;state.open=null;render();});});
+  var rows=document.querySelectorAll("[data-row]");
+  rows.forEach(function(r){r.addEventListener("click",function(){var n=+this.getAttribute("data-row");state.open=(state.open===n?null:n);render();});});
+}
+
+document.querySelectorAll(".lg-tabs button").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    document.querySelectorAll(".lg-tabs button").forEach(function(b){b.classList.remove("is-active");});
+    this.classList.add("is-active");
+    state.tab=this.getAttribute("data-tab");state.open=null;render();
+  });
+});
+
+// Übergabe von außen (z. B. Lotse): ?lat=..&lng=.. oder ?from=Wasserburg&to=Bregenz
+(function(){
+  try{
+    var q=new URLSearchParams(location.search);
+    var lat=parseFloat(q.get("lat")),lng=parseFloat(q.get("lng"));
+    if(!isNaN(lat)&&!isNaN(lng)){
+      var n=nearestPort(lat,lng);
+      if(!n.far){state.from=n.idx;state.locStatus="Standort \u00fcbernommen: "+PORTS[n.idx];}
+      else{state.locStatus="\u00dcbergebener Standort liegt nicht am Bodensee \u2013 bitte Hafen w\u00e4hlen.";}
+    }else{
+      var fp=resolvePort(q.get("from"));if(fp>=0)state.from=fp;
+    }
+    var tp=resolvePort(q.get("to"));if(tp>=0)state.to=tp;
+  }catch(e){}
+})();
+
+render();
+</script>
+</body>
+</html>
