@@ -115,6 +115,8 @@
   .row .go{color:var(--sea);font-weight:800;font-size:.95rem;white-space:nowrap}
   .row .ic-right{flex:0 0 auto;width:34px;height:26px;margin-left:10px;display:flex;align-items:center;justify-content:center}
   .row .ic-right svg{width:100%;height:100%}
+  .zdel{flex:0 0 auto;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink-soft);font-size:1.5rem;line-height:1;cursor:pointer;font-family:inherit}
+  .zdel:active{background:var(--tap)}
 
   .call{background:var(--alarm);border-color:var(--alarm-dark);color:#fff}
   .call:active{background:var(--alarm-dark)}
@@ -382,16 +384,16 @@
           <span class="sub">Pannenhilfe &amp; Mitgliedsnummer</span>
         </button>
 
-        <button class="tile" onclick="go('gemeinschaft')">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M15 14.2a4.5 4.5 0 0 1 5.5 4.3"/></svg></span>
-          <span class="lbl">Gemeinschaft erleben</span>
-          <span class="sub">Mitmachen, treffen, dabei sein</span>
-        </button>
-
         <button class="tile" onclick="go('webcams')">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="3.2"/><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/></svg></span>
           <span class="lbl">Webcams</span>
           <span class="sub">Live-Bilder aus der Region</span>
+        </button>
+
+        <button class="tile" onclick="go('gemeinschaft')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M15 14.2a4.5 4.5 0 0 1 5.5 4.3"/></svg></span>
+          <span class="lbl">Gemeinschaft erleben</span>
+          <span class="sub">Mitmachen, treffen, dabei sein</span>
         </button>
 
         <button class="tile" onclick="go('unterhaltung')">
@@ -914,6 +916,14 @@
       <button class="back" onclick="go('home')">‹ Zurück</button>
       <h2>Fahrplan & Bus</h2>
       <div class="rows" id="fahrRows"></div>
+
+      <h2 style="margin-top:24px;font-size:1.25rem">Gemerkte Ziele</h2>
+      <p style="color:var(--ink-soft);margin:0 0 12px">Tippen Sie auf ein Ziel – die Verbindung von hier aus öffnet sich mit Bus &amp; Bahn.</p>
+      <div class="rows" id="zieleBox" style="margin-bottom:12px"></div>
+      <div class="search-box">
+        <input id="zielInput" type="text" placeholder="Ziel, z. B. Friedrichshafen" autocomplete="off">
+        <button onclick="zielAdd()">Merken</button>
+      </div>
     </section>
 
     <!-- AUTO & UNTERWEGS -->
@@ -1195,6 +1205,7 @@ function go(name){
   if(name==='vorlesen') renderVorlesen();
   if(name==='gemeinschaft') renderGemeinschaft();
   if(name==='webcams') renderWebcams();
+  if(name==='fahrplan') renderZiele();
   if(name==='weitergeben') renderInstall();
   window.scrollTo(0,0);
 }
@@ -1353,6 +1364,31 @@ function doSearch(){
 }
 function quick(t){ document.getElementById('q').value=t; doSearch(); }
 function nearStops(){ window.open(mapsAround('Haltestelle'),'_blank','noopener'); }
+
+/* ---------- Gemerkte Ziele (Bus & Bahn – reine Verlinkung, offline gespeichert) ---------- */
+function zieleLoad(){ try{ const z=JSON.parse(localStorage.getItem('lotse_ziele')); return Array.isArray(z)?z:[]; }catch(e){ return []; } }
+function zieleSave(z){ try{ localStorage.setItem('lotse_ziele', JSON.stringify(z)); }catch(e){} }
+function renderZiele(){
+  const box=document.getElementById('zieleBox'); if(!box) return;
+  const z=zieleLoad();
+  if(!z.length){ box.innerHTML='<p style="color:var(--ink-soft);margin:0">Noch keine Ziele gemerkt. Tippen Sie unten ein Ziel ein und auf „Merken“.</p>'; return; }
+  box.innerHTML=z.map((name,i)=>{
+    const safe=String(name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return '<div class="row" onclick="zielOpen('+i+')"><div class="main"><b>'+safe+'</b><small>Verbindung von hier aus – Bus &amp; Bahn</small></div><button class="zdel" onclick="event.stopPropagation();zielDel('+i+')" aria-label="Ziel entfernen">&times;</button></div>';
+  }).join('');
+}
+function zielAdd(){
+  const inp=document.getElementById('zielInput'); if(!inp) return;
+  const v=(inp.value||'').trim(); if(!v) return;
+  const z=zieleLoad();
+  if(!z.some(x=>String(x).toLowerCase()===v.toLowerCase())) z.push(v);
+  zieleSave(z); inp.value=''; renderZiele();
+}
+function zielDel(i){ const z=zieleLoad(); z.splice(i,1); zieleSave(z); renderZiele(); }
+function zielOpen(i){
+  const z=zieleLoad(); const name=z[i]; if(!name) return;
+  window.open('https://www.google.com/maps/dir/?api=1&origin='+STATE.lat+','+STATE.lon+'&destination='+encodeURIComponent(name)+'&travelmode=transit','_blank','noopener');
+}
 function eventsNear(){
   const ort = (STATE.ort && STATE.ort!=="Ihr Standort") ? STATE.ort : "in der Nähe";
   window.open(`https://www.google.com/search?q=${encodeURIComponent('Veranstaltungen heute '+ort)}`,'_blank','noopener');
@@ -1782,6 +1818,7 @@ document.addEventListener('keydown',e=>{
   const id = document.activeElement && document.activeElement.id;
   if(id==='q') doSearch();
   if(id==='wxQ') wxTarget();
+  if(id==='zielInput') zielAdd();
 });
 
 /* ---------- Was koche ich heute? (einfach, ausgewogen, offline) ---------- */
