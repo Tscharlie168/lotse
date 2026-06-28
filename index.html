@@ -175,10 +175,12 @@
 
   /* --- Mein Tag --- */
   .tile.day{background:#eef5f7;border-color:#cfe0e6}
-  .daybar{display:flex;align-items:center;gap:16px;width:100%;background:#eef5f7;border:1px solid #cfe0e6;border-radius:18px;padding:18px 20px;margin-bottom:14px;cursor:pointer;text-align:left;font:inherit;box-shadow:0 1px 0 rgba(15,38,48,.04),0 6px 16px rgba(15,38,48,.05);transition:transform .05s ease}
+  .daybar{display:flex;align-items:center;gap:16px;width:100%;background:linear-gradient(135deg,#1f7796,#155a72);border:1px solid #134f64;border-radius:18px;padding:20px;margin-bottom:16px;cursor:pointer;text-align:left;font:inherit;box-shadow:0 2px 0 rgba(15,38,48,.06),0 8px 20px rgba(29,110,140,.28);transition:transform .05s ease}
   .daybar:active{transform:translateY(1px)}
-  .daybar .ic{width:40px;height:40px;flex:0 0 auto}
-  .daybar .lbl{font-size:1.35rem;font-weight:800;color:var(--ink)}
+  .daybar .ic{width:42px;height:42px;flex:0 0 auto}
+  .daybar .ic svg{stroke:#fff}
+  .daybar .lbl{font-size:1.45rem;font-weight:800;color:#fff;letter-spacing:.01em}
+  .daybar::after{content:"\203A";margin-left:auto;color:#fff;font-size:1.9rem;font-weight:800;line-height:1;opacity:.9}
   .foto{border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:14px;box-shadow:0 6px 16px rgba(15,38,48,.06);background:var(--card)}
   .foto img{display:block;width:100%;aspect-ratio:8 / 5;object-fit:cover}
   .foto svg{display:block;width:100%;height:auto}
