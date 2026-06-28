@@ -603,6 +603,16 @@
         <p id="unQuizInfo" style="margin:12px 0 0;line-height:1.5"></p>
       </div>
       <button class="big-btn" onclick="unQuizNext()">N&auml;chste Frage</button>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Lied raten</h2>
+      <div class="rezept-card">
+        <p style="color:var(--ink-soft);margin:0 0 10px">H&ouml;ren Sie einen kurzen Ausschnitt und raten Sie den Titel. (Braucht Internet.)</p>
+        <div id="muStatus" style="font-size:1.1rem;line-height:1.4;margin-bottom:10px"></div>
+        <div id="muOpt" class="merk-liste"></div>
+        <p id="muInfo" style="margin:12px 0 0;line-height:1.5"></p>
+        <button class="flink" id="muReplay" onclick="musikReplay()" style="display:none;margin-top:8px">&#9654; Nochmal h&ouml;ren</button>
+      </div>
+      <button class="big-btn" id="muStartBtn" onclick="musikRunde()">Spiel starten</button>
     </section>
 
     <!-- PRODUKT SCANNEN (Barcode) -->
@@ -1157,6 +1167,7 @@ function go(name){
   if(typeof stopVorlesen==='function') stopVorlesen();
   if(typeof snLeave==='function') snLeave();
   if(typeof bcStop==='function') bcStop();
+  if(typeof musikLeave==='function') musikLeave();
   if(typeof lampOff==='function' && name!=='taschenlampe') lampOff();
   if(name==='heute') renderHeute();
   if(name==='lupe') startLupe();
@@ -2373,6 +2384,86 @@ function renderUnterhaltung(){
   var w=document.getElementById('unWitz'); if(w && !w.textContent){ w.setAttribute('data-i', doy%WITZE.length); w.textContent=WITZE[doy%WITZE.length]; }
   var f=document.getElementById('unFakt'); if(f && !f.textContent){ f.setAttribute('data-i', doy%FAKTEN.length); f.textContent=FAKTEN[doy%FAKTEN.length]; }
   if(document.getElementById('unQuizFrage') && !document.getElementById('unQuizFrage').textContent){ unQuizIdx=doy%QUIZ.length; unQuizAntwort=-1; unQuizRender(); }
+  if(typeof musikInit==='function') musikInit();
+}
+
+/* ====================== Lied raten (iTunes-Hörausschnitte, JSONP) ====================== */
+var MUSIK_KUENSTLER=[
+  "Udo Jürgens","Peter Alexander","Roy Black","Howard Carpendale","Heino","Vicky Leandros","Rex Gildo",
+  "Freddy Quinn","Wencke Myhre","Mireille Mathieu","Karel Gott","Nana Mouskouri","Costa Cordalis",
+  "Marianne Rosenberg","Nicole","Die Flippers","Andrea Berg","Helene Fischer","Roland Kaiser","Andy Borg",
+  "Hansi Hinterseer","Semino Rossi","Gitte Haenning","Bata Illic","Michael Holm","Jürgen Drews",
+  "Drafi Deutscher","Adamo","Rex Allen","Dalida","Connie Francis","Caterina Valente","Catarina Valente",
+  "Bernhard Brink","G.G. Anderson","Tony Marshall","Rudi Carrell","Mary Roos","Daliah Lavi"
+];
+var musikAudio=null, musikUrl=null, musikLoesung=null, musikOpts=[];
+function musikJsonp(url){
+  return new Promise(function(res,rej){
+    var cb='__itc'+Date.now()+Math.floor(Math.random()*1000);
+    var sc=document.createElement('script');
+    var done=false;
+    var timer=setTimeout(function(){ if(!done){ cleanup(); rej(); } },9000);
+    function cleanup(){ done=true; clearTimeout(timer); try{ delete window[cb]; }catch(e){ window[cb]=undefined; } if(sc.parentNode) sc.parentNode.removeChild(sc); }
+    window[cb]=function(data){ if(done) return; cleanup(); res(data); };
+    sc.onerror=function(){ if(!done){ cleanup(); rej(); } };
+    sc.src=url+(url.indexOf('?')>-1?'&':'?')+'callback='+cb;
+    document.head.appendChild(sc);
+  });
+}
+function musikStop(){ if(musikAudio){ try{ musikAudio.pause(); }catch(e){} musikAudio=null; } }
+function musikShuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function musikSpiele(){ musikStop(); if(!musikUrl) return; musikAudio=new Audio(musikUrl); musikAudio.play().catch(function(){}); }
+function musikReplay(){ musikSpiele(); }
+function musikRunde(){
+  musikStop();
+  var st=document.getElementById('muStatus'), opt=document.getElementById('muOpt'), inf=document.getElementById('muInfo');
+  var sb=document.getElementById('muStartBtn'), rp=document.getElementById('muReplay');
+  if(!st) return;
+  inf.textContent=''; opt.innerHTML=''; if(rp) rp.style.display='none';
+  st.textContent='Lied wird geladen \u2026';
+  if(sb) sb.textContent='N\u00e4chstes Lied';
+  var k=MUSIK_KUENSTLER[Math.floor(Math.random()*MUSIK_KUENSTLER.length)];
+  var url='https://itunes.apple.com/search?term='+encodeURIComponent(k)+'&media=music&entity=song&country=DE&limit=25';
+  musikJsonp(url).then(function(d){
+    var lieder=(d&&d.results?d.results:[]).filter(function(x){ return x.previewUrl && x.trackName && x.artistName; });
+    var seen={}, uniq=[];
+    lieder.forEach(function(x){ var key=x.trackName.toLowerCase(); if(!seen[key]){ seen[key]=1; uniq.push(x); } });
+    if(uniq.length<2){ musikRunde(); return; }
+    musikShuffle(uniq);
+    var richtig=uniq[0];
+    musikOpts=[richtig];
+    for(var i=1;i<uniq.length && musikOpts.length<4;i++) musikOpts.push(uniq[i]);
+    musikShuffle(musikOpts);
+    musikLoesung={track:richtig.trackName, artist:richtig.artistName};
+    musikUrl=richtig.previewUrl;
+    st.textContent='Lied von '+richtig.artistName+' \u2013 welcher Titel l\u00e4uft?';
+    opt.innerHTML=musikOpts.map(function(o,i){ return '<button onclick="musikTipp('+i+')" style="text-align:left;background:#eef5f7;color:var(--sea);border:1px solid #cfe0e6;border-radius:12px;padding:14px;font-size:1.05rem;font-weight:700;cursor:pointer;font-family:inherit">'+lotseEsc(o.trackName)+'</button>'; }).join('');
+    if(rp) rp.style.display='inline-block';
+    musikSpiele();
+  }).catch(function(){ st.textContent='Konnte kein Lied laden \u2013 ist Internet vorhanden? Bitte erneut versuchen.'; });
+}
+function musikTipp(i){
+  if(!musikOpts.length || !musikLoesung) return;
+  var gewaehlt=musikOpts[i]; if(!gewaehlt) return;
+  var richtig = gewaehlt.trackName===musikLoesung.track;
+  var btns=document.getElementById('muOpt').querySelectorAll('button');
+  for(var j=0;j<btns.length;j++){
+    btns[j].disabled=true;
+    if(musikOpts[j].trackName===musikLoesung.track){ btns[j].style.background='#1e8f4e'; btns[j].style.color='#fff'; btns[j].style.borderColor='#1e8f4e'; }
+    else if(j===i){ btns[j].style.background='var(--alarm)'; btns[j].style.color='#fff'; btns[j].style.borderColor='var(--alarm)'; }
+  }
+  var inf=document.getElementById('muInfo');
+  inf.textContent=(richtig?'Richtig! ':'Leider falsch. ')+'Es war: \u201e'+musikLoesung.track+'\u201c von '+musikLoesung.artist+'.';
+  inf.style.color=(richtig?'#1e8f4e':'var(--ink)');
+}
+function musikLeave(){ musikStop(); }
+function musikInit(){
+  musikStop();
+  var st=document.getElementById('muStatus'), opt=document.getElementById('muOpt'), inf=document.getElementById('muInfo');
+  var sb=document.getElementById('muStartBtn'), rp=document.getElementById('muReplay');
+  if(st) st.textContent=''; if(opt) opt.innerHTML=''; if(inf) inf.textContent='';
+  if(rp) rp.style.display='none'; if(sb) sb.textContent='Spiel starten';
+  musikOpts=[]; musikLoesung=null; musikUrl=null;
 }
 
 /* ====================== Produkt scannen (Barcode + Open Food Facts) ====================== */
