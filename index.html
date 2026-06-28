@@ -1023,7 +1023,14 @@
       <h2>Gemeinschaft erleben</h2>
       <p style="color:var(--ink-soft);margin:0 0 14px">Mitmachen, andere treffen, dabei sein – hier finden Sie Anschluss in Ihrer Nähe.</p>
 
-      <h2 style="margin-top:6px;font-size:1.25rem">Treffpunkte in der Nähe</h2>
+      <h2 style="margin-top:6px;font-size:1.25rem">Etwas Bestimmtes suchen</h2>
+      <div class="search-box">
+        <input id="gQ" type="text" placeholder="z. B. Tischtennis, Englischkurs, Chor" enterkeyhint="search" onkeydown="if(event.key==='Enter')gFreitext()">
+        <button onclick="gFreitext()">Suchen</button>
+      </div>
+      <div class="note" style="margin-top:0">Verein, Hobby oder Kurs gesucht? Stichwort eingeben – die Suche schaut in Ihrem Ort <b>und der Umgebung</b>, falls es vor Ort nichts gibt.</div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Treffpunkte in der Nähe</h2>
       <div class="cats">
         <button class="cat" onclick="findNear('treff','gemeinschaft')"><span style="font-size:1.7rem">🤝</span>Begegnungsstätte</button>
         <button class="cat" onclick="findNear('bibliothek','gemeinschaft')"><span style="font-size:1.7rem">📚</span>Bücherei</button>
@@ -2899,6 +2906,13 @@ function renderMitglied(){
 function gSuche(was){
   var ort=(STATE.ort && STATE.ort!=='Ihr Standort') ? STATE.ort+' ' : '';
   return 'https://www.google.com/search?q='+encodeURIComponent(ort+was);
+}
+function gFreitext(){
+  var inp=document.getElementById('gQ'); if(!inp) return;
+  var q=(inp.value||'').trim(); if(!q) return;
+  var ort=(STATE.ort && STATE.ort!=='Ihr Standort') ? STATE.ort : '';
+  var query = ort ? (q+' in '+ort+' und Umgebung') : (q+' in der N\u00e4he');
+  window.open('https://www.google.com/search?q='+encodeURIComponent(query),'_blank','noopener');
 }
 function renderGemeinschaft(){
   var box=document.getElementById('gemeinschaftRows'); if(!box) return;
