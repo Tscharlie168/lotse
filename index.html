@@ -160,6 +160,12 @@
   .wchip b{display:block;font-size:.98rem}
   .wchip .ce{font-size:1.5rem;line-height:1.4}
   .wchip .mm{color:#15679e;font-weight:800;font-size:.92rem}
+  .wchip .wct{font-weight:700;font-size:1.02rem;display:block}
+  .monbars{display:flex;align-items:flex-end;gap:6px;height:64px;padding-top:4px}
+  .monbar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+  .monbar i{display:block;width:60%;min-width:10px;background:#2BA6C9;border-radius:4px 4px 0 0}
+  .monbar i.snow{background:#9fc6e0}
+  .monbar span{font-size:.72rem;color:var(--ink-soft);margin-top:4px;height:14px;white-space:nowrap}
   .wchip small{display:block;color:var(--ink-soft);font-size:.82rem}
   .wday{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
   .wday:first-child{border-top:0}
@@ -172,6 +178,8 @@
   .wwarn b{display:block;font-size:1.08rem;margin-bottom:4px;color:#7a2c18}
   .wwarn small{color:#7a3622;font-size:.98rem}
   .wquelle{font-size:.85rem;color:var(--ink-soft);margin:2px 2px 0}
+  .wleg{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:1rem;color:var(--ink)}
+  .wleg span{white-space:nowrap}
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
   .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 15px;font-size:.98rem;cursor:pointer}
   .chip:active{background:var(--tap)}
@@ -1857,7 +1865,8 @@ async function renderWetter(lat, lon, label){
   try{
     const u = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
       + `&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m`
-      + `&hourly=weather_code,precipitation,precipitation_probability,snowfall`
+      + `&minutely_15=precipitation,snowfall`
+      + `&hourly=temperature_2m,weather_code,precipitation,precipitation_probability,snowfall`
       + `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset`
       + `&timezone=auto&forecast_days=7`;
     const r = await fetch(u); const d = await r.json();
@@ -1874,6 +1883,32 @@ async function renderWetter(lat, lon, label){
       + `<p class="wmeta">\u2600\ufe0f Aufgang ${sr} \u00b7 \ud83c\udf19 Untergang ${ss}</p></div>`;
 
     const now = new Date();
+
+    // Regen-Monitor: nächste 2 Stunden im 15-Minuten-Takt (DWD-Modell über Open-Meteo)
+    if(d.minutely_15 && d.minutely_15.time){
+      const mt = d.minutely_15.time, mp = d.minutely_15.precipitation || [], msn = d.minutely_15.snowfall || [];
+      let ms = mt.findIndex(t => new Date(t) >= now);
+      if(ms < 0) ms = 0;
+      const MN = Math.min(8, mt.length - ms);            // 8 × 15 min = 2 Stunden
+      let maxv = 0.5;
+      for(let k=0;k<MN;k++){ const v = Math.max(mp[ms+k]||0, (msn[ms+k]||0)>0 ? 0.6 : 0); if(v>maxv) maxv = v; }
+      let monFirst = -1, monSnow = false, bars = '';
+      for(let k=0;k<MN;k++){
+        const i = ms+k, mm = mp[i]||0, sn = msn[i]||0, wet = (mm>=0.1 || sn>0);
+        if(wet && monFirst<0){ monFirst = i; monSnow = (sn>0 && mm<0.1); }
+        const val = Math.max(mm, sn>0 ? 0.6 : 0);
+        const h = wet ? Math.max(4, Math.round(val/maxv*46)) : 3;
+        const lab = (k % 2 === 0) ? mt[i].slice(11,16) : '';
+        bars += `<div class="monbar"><i class="${sn>0?'snow':''}" style="height:${h}px"></i><span>${lab}</span></div>`;
+      }
+      let monTxt;
+      if(monFirst < 0){ monTxt = 'Die n\u00e4chsten 2 Stunden bleiben trocken.'; }
+      else if(monFirst === ms){ monTxt = 'Es ' + (monSnow ? 'schneit' : 'regnet') + ' gerade.'; }
+      else { monTxt = (monSnow ? 'Schnee' : 'Regen') + ` ab etwa ${mt[monFirst].slice(11,16)} Uhr.`; }
+      html += `<div class="wcard"><p class="wsub">Regen-Monitor \u2013 n\u00e4chste 2 Stunden</p><p class="wsummary">${monTxt}</p><div class="monbars">${bars}</div></div>`;
+    }
+
+    // Vorhersage Stunde für Stunde – 12 Stunden
     let start = hr.time.findIndex(t => new Date(t) >= now);
     if(start < 0) start = 0;
     const N = Math.min(12, hr.time.length - start);
@@ -1887,12 +1922,13 @@ async function renderWetter(lat, lon, label){
       const wet = (mm >= 0.1 || sn > 0);
       if(wet && firstWet < 0){ firstWet = i; firstSnow = (sn > 0 && mm < 0.1); }
       const amount = sn > 0 ? (wKomma(sn)+' cm') : (mm >= 0.1 ? (wKomma(mm)+' mm') : '\u2013');
-      chips += `<div class="wchip${wet?' rain':''}"><b>${hh} Uhr</b><span class="ce">${e}</span><span class="${wet?'mm':''}">${amount}</span><small>${hr.precipitation_probability[i] ?? 0}%</small></div>`;
+      const tmp = Math.round(hr.temperature_2m[i]);
+      chips += `<div class="wchip${wet?' rain':''}"><b>${hh} Uhr</b><span class="ce">${e}</span><span class="wct">${tmp}°</span><span class="${wet?'mm':''}">${amount}</span><small>${hr.precipitation_probability[i] ?? 0}%</small></div>`;
     }
     let summary;
-    if(firstWet < 0){ summary = 'Die n\u00e4chsten Stunden bleiben trocken.'; }
+    if(firstWet < 0){ summary = 'Die n\u00e4chsten 12 Stunden bleiben trocken.'; }
     else { const wh = +hr.time[firstWet].slice(11,13); summary = (firstSnow ? 'Schnee' : 'Regen') + ` ab etwa ${wh} Uhr.`; }
-    html += `<div class="wcard"><p class="wsub">Regen & Schnee \u2013 n\u00e4chste Stunden</p><p class="wsummary">${summary}</p><div class="wstrip">${chips}</div></div>`;
+    html += `<div class="wcard"><p class="wsub">Vorhersage n\u00e4chste Stunden</p><p class="wsummary">${summary}</p><div class="wstrip">${chips}</div></div>`;
 
     let days = '';
     for(let i=0;i<dl.time.length;i++){
@@ -1901,6 +1937,11 @@ async function renderWetter(lat, lon, label){
       days += `<div class="wday"><span class="wde">${e}</span><span class="wdn">${wd}</span><span class="wdt">${Math.round(dl.temperature_2m_min[i])}° / ${Math.round(dl.temperature_2m_max[i])}°</span><span class="wdp">${dl.precipitation_probability_max[i] ?? 0}%</span></div>`;
     }
     html += `<div class="wcard"><p class="wsub" style="margin-bottom:8px">7-Tage-Vorhersage</p>${days}</div>`;
+
+    html += `<div class="wcard"><p class="wsub" style="margin-bottom:8px">Was die Zeichen bedeuten</p><div class="wleg">`
+      + `<span>\u2600\ufe0f sonnig</span><span>\u26c5 wolkig</span><span>\u2601\ufe0f bedeckt</span><span>\ud83c\udf2b\ufe0f Nebel</span>`
+      + `<span>\ud83c\udf26\ufe0f Schauer</span><span>\ud83c\udf27\ufe0f Regen</span><span>\ud83c\udf28\ufe0f Schnee</span><span>\u26c8\ufe0f Gewitter</span>`
+      + `</div></div>`;
 
     box.innerHTML = html;
     ladeWarnungen(lat, lon);
