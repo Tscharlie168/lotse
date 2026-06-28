@@ -16,8 +16,8 @@ select,input,button{font-family:inherit;}
 
 .lg-head{position:relative;background:linear-gradient(160deg,#0E3553 0%,#15679E 100%);color:#fff;padding:26px 22px 34px;overflow:hidden;}
 .lg-head-inner{position:relative;z-index:2;}
-.lg-back{display:inline-flex;align-items:center;gap:4px;color:#D5E6F1;text-decoration:none;font-size:14px;font-weight:600;margin-bottom:12px;-webkit-tap-highlight-color:transparent;}
-.lg-back:hover,.lg-back:active{color:#fff;}
+.lg-back{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:15px;letter-spacing:.05em;text-transform:uppercase;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.45);border-radius:999px;padding:9px 16px;margin-bottom:14px;-webkit-tap-highlight-color:transparent;transition:.15s;}
+.lg-back:hover,.lg-back:active{background:rgba(255,255,255,.30);border-color:#fff;}
 .lg-eyebrow{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:600;color:#9FD4E6;}
 .lg-head h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:38px;line-height:1.02;margin:6px 0 0;letter-spacing:.01em;}
 .lg-head h1 span{color:#62D0E8;}
@@ -179,6 +179,11 @@ var COURSES = [
 ];
 
 var WEEKDAYS = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+var SAISON_MIN="2026-05-14", SAISON_MAX="2026-09-13";
+function pad2(n){return n<10?"0"+n:""+n;}
+function todayISO(){var d=new Date();return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());}
+function nowMin(){var d=new Date();return d.getHours()*60+d.getMinutes();}
+function defaultDate(){var t=todayISO();if(t<SAISON_MIN)return SAISON_MIN;if(t>SAISON_MAX)return SAISON_MAX;return t;}
 function toMin(t){var p=t.split(":");return (+p[0])*60+(+p[1]);}
 function pad(t){var p=t.split(":");return (p[0].length<2?"0"+p[0]:p[0])+":"+p[1];}
 function fmtDur(m){if(m>=60){var h=Math.floor(m/60),r=m%60;return h+" h"+(r?" "+r+" min":"");}return m+" min";}
@@ -216,7 +221,7 @@ function findConnections(fromIdx,toIdx,date){
 }
 
 // ---- state ----
-var state={tab:"planer",from:6,to:11,date:"2026-06-28",open:null,favs:[],locStatus:null};
+var state={tab:"planer",from:6,to:11,date:defaultDate(),open:null,favs:[],locStatus:null};
 try{var f=localStorage.getItem("lgg-favs");if(f)state.favs=JSON.parse(f);}catch(e){}
 function saveFavs(){try{localStorage.setItem("lgg-favs",JSON.stringify(state.favs));}catch(e){}}
 
@@ -224,9 +229,12 @@ function svcTag(svc){return svc==="restaurant"?'<span class="lg-tag lg-tag--rest
 
 function selectOptions(sel){var h="";for(var i=0;i<PORTS.length;i++){h+='<option value="'+i+'"'+(i===sel?" selected":"")+'>'+PORTS[i]+'</option>';}return h;}
 
-function boardHTML(rows){
+function boardHTML(rows,emptyKind){
   if(!rows.length){
-    return '<div class="lg-empty"><div class="lg-empty-mark">&#8709;</div><p>Keine direkte Schiffsverbindung an diesem Tag.</p><p class="lg-empty-hint">Tipp: Erst nach <strong>Friedrichshafen</strong> oder <strong>Lindau</strong> fahren und dort umsteigen — oder ein anderes Datum w&auml;hlen.</p></div>';
+    if(emptyKind==="past"){
+      return '<div class="lg-empty"><div class="lg-empty-mark">&#128338;</div><p>F&uuml;r heute f&auml;hrt auf dieser Strecke kein Schiff mehr.</p><p class="lg-empty-hint">W&auml;hle <strong>morgen</strong> oder einen anderen Tag &mdash; dann erscheinen wieder alle Fahrten.</p></div>';
+    }
+    return '<div class="lg-empty"><div class="lg-empty-mark">&#8709;</div><p>Keine direkte Schiffsverbindung an diesem Tag.</p><p class="lg-empty-hint">Tipp: Erst nach <strong>Friedrichshafen</strong> oder <strong>Lindau</strong> fahren und dort umsteigen &mdash; oder ein anderes Datum w&auml;hlen.</p></div>';
   }
   var h="";
   for(var i=0;i<rows.length;i++){
@@ -243,6 +251,12 @@ function boardHTML(rows){
 
 function planerHTML(){
   var rows=findConnections(state.from,state.to,state.date);
+  var pastFiltered=false;
+  if(state.date===todayISO()){
+    var nm=nowMin(), n0=rows.length;
+    rows=rows.filter(function(r){return toMin(r.dep)>=nm;});
+    if(rows.length<n0) pastFiltered=true;
+  }
   var d=new Date(state.date+"T12:00:00");
   var dateLabel=WEEKDAYS[d.getDay()]+", "+d.getDate()+"."+(d.getMonth()+1)+".";
   var special=state.date==="2026-07-18"?"Sondertag 18.7.":state.date==="2026-08-08"?"Sondertag 8.8.":null;
@@ -258,7 +272,8 @@ function planerHTML(){
   if(special) h+='<div class="lg-banner">'+special+' — einzelne Kurse fallen aus oder fahren mit Umstieg. Details stehen direkt an der Verbindung.</div>';
   if(state.favs.length){h+='<div class="lg-favs">';for(var i=0;i<state.favs.length;i++){h+='<button class="lg-fav" data-fav="'+i+'">'+PORTS[state.favs[i].f]+' &rarr; '+PORTS[state.favs[i].t]+'</button>';}h+='</div>';}
   h+='<div class="lg-result-head"><span class="lg-result-route">'+PORTS[state.from]+' <em>&rarr;</em> '+PORTS[state.to]+'</span><span class="lg-result-day">'+dateLabel+'</span></div>';
-  h+='<div class="lg-board">'+boardHTML(rows)+'</div></section>';
+  if(pastFiltered&&rows.length) h+='<div class="lg-loc-status">Vergangene Abfahrten f&uuml;r heute sind ausgeblendet.</div>';
+  h+='<div class="lg-board">'+boardHTML(rows,pastFiltered?"past":null)+'</div></section>';
   return h;
 }
 
