@@ -142,6 +142,17 @@
   .search-box{display:flex;gap:10px;margin-bottom:14px}
   .search-box input{flex:1;min-width:0;font-size:1.1rem;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
   .search-box button{flex-shrink:0;white-space:nowrap;background:var(--sea);color:#fff;border:0;border-radius:12px;padding:0 20px;font-size:1.05rem;font-weight:700;cursor:pointer}
+  #radarMap{height:300px;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+  .radar-bar{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+  .radar-play{background:var(--sea);color:#fff;border:0;border-radius:10px;padding:10px 16px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit}
+  #radarStatus{color:var(--ink-soft);font-size:.95rem}
+  .mond-top{display:flex;align-items:center;gap:14px}
+  .mond-emo{font-size:2.8rem;line-height:1}
+  .mond-name{font-weight:800;font-size:1.25rem}
+  .mond-sub{color:var(--ink-soft);font-size:.95rem;margin-top:2px}
+  .mond-full{margin-top:10px;font-weight:600}
+  .mond-brauch{margin-top:10px;line-height:1.5}
+  .mond-hinweis{margin-top:10px;font-size:.8rem;color:var(--ink-soft)}
   /* ---- Wetter-Ansicht ---- */
   .wbtn-here{display:inline-flex;align-items:center;gap:8px;background:#e6f1f4;border:1.5px solid var(--sea);color:var(--sea);font-weight:700;font-size:1.05rem;border-radius:12px;padding:12px 16px;margin:0 0 14px;cursor:pointer;font-family:inherit}
   .wbtn-here:active{background:var(--tap)}
@@ -964,6 +975,18 @@
       <button class="wbtn-here" onclick="wetterHier()">📍 Mein Standort</button>
       <div id="wetterBox"></div>
       <p class="wquelle">Vorhersage über Open-Meteo · amtliche Warnungen vom Deutschen Wetterdienst (DWD)</p>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Regenradar</h2>
+      <p style="color:var(--ink-soft);margin:0 0 10px">Sehen Sie von oben, wie der Regen zieht – mit Blick auf die nächste Stunde.</p>
+      <button class="big-btn" id="radarBtn" onclick="radarToggle()">🌧️ Regenradar anzeigen</button>
+      <div id="radarWrap" style="display:none;margin-top:12px">
+        <div id="radarMap"></div>
+        <div class="radar-bar">
+          <button class="radar-play" id="radarPlay" onclick="radarPlayToggle()">⏸ Pause</button>
+          <span id="radarStatus"></span>
+        </div>
+        <p class="wquelle">Radardaten: <a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer</a> · Karte © OpenStreetMap</p>
+      </div>
     </section>
 
     <section class="view" id="v-fahrplan">
@@ -1179,6 +1202,9 @@
         <button onclick="wxTarget()">Zeigen</button>
       </div>
       <div id="wxThere"></div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Mond heute</h2>
+      <div class="card-info mond" id="mondBox"></div>
     </section>
   </main>
 </div>
@@ -1680,8 +1706,48 @@ function moonPhase(d){
     [12.92,"zunehmender Mond","🌔"],[16.61,"Vollmond","🌕"],[20.30,"abnehmender Mond","🌖"],
     [23.99,"abnehmender Halbmond","🌗"],[27.68,"abnehmende Sichel","🌘"]
   ];
-  for(const [lim,name,emo] of ph){ if(age < lim) return {name,emoji:emo}; }
+  let _name="Neumond", _emo="\ud83c\udf11";
+  for(const [lim,name,emo] of ph){ if(age < lim){ _name=name; _emo=emo; break; } }
+  const illum = Math.round((1 - Math.cos(2*Math.PI*age/synodic))/2 * 100);
+  const waxing = age < synodic/2;
+  const toFull = (((synodic/2 - age) % synodic) + synodic) % synodic;
+  const toNew = (synodic - age) % synodic;
+  return {name:_name, emoji:_emo, age:age, illum:illum, waxing:waxing, toFull:toFull, toNew:toNew};
   return {name:"Neumond",emoji:"🌑"};
+}
+function mondBrauch(mp){
+  var T={
+    neu:['Neumond gilt im Volksmund als guter Zeitpunkt f\u00fcr einen Neuanfang \u2013 Vors\u00e4tze fassen, Neues beginnen, auss\u00e4en.','Bei Neumond f\u00e4llt das Anfangen leicht, sagt die alte \u00dcberlieferung: aufr\u00e4umen, was lange liegt, und frisch starten.'],
+    zu:['Bei zunehmendem Mond soll alles gut gelingen, was kr\u00e4ftig werden soll \u2013 einpflanzen, was \u00fcber der Erde w\u00e4chst, oder die Haare schneiden f\u00fcr volleres Nachwachsen.','Zunehmender Mond steht nach altem Brauch f\u00fcrs Aufbauen und Auftanken \u2013 ein guter Moment, etwas Neues zu beginnen.'],
+    voll:['Vollmond \u2013 traditionell die Zeit der vollen Kraft und der Ernte. Ein sch\u00f6ner Abend f\u00fcr einen Mondspaziergang.','Beim Vollmond ist nach \u00dcberlieferung alles auf dem H\u00f6hepunkt \u2013 gute Zeit, Fr\u00fcchte und Kr\u00e4uter zu ernten.'],
+    ab:['Bei abnehmendem Mond r\u00e4t die \u00dcberlieferung zum Loslassen und Aufr\u00e4umen: gr\u00fcndlich putzen, entr\u00fcmpeln, Unkraut j\u00e4ten, Wurzelgem\u00fcse ernten.','Abnehmender Mond gilt als Zeit zum Entlasten \u2013 W\u00e4sche waschen, Vorr\u00e4te anlegen, Ballast abwerfen, hei\u00dft es im Volksmund.']
+  };
+  var key=mp.waxing?'zu':'ab';
+  if(mp.name==='Neumond') key='neu';
+  if(mp.name==='Vollmond') key='voll';
+  var arr=T[key];
+  return arr[tagDesJahres(new Date()) % arr.length];
+}
+function renderMond(){
+  var box=document.getElementById('mondBox'); if(!box) return;
+  var now=new Date();
+  var mp=moonPhase(now);
+  var richtung=(mp.name==='Neumond'||mp.name==='Vollmond')?'':(mp.waxing?'zunehmend':'abnehmend');
+  var tageBisVoll=Math.round(mp.toFull);
+  var vollTxt;
+  if(tageBisVoll<=0){ vollTxt='Heute ist Vollmond!'; }
+  else{
+    var full=new Date(now.getTime()+mp.toFull*86400000);
+    var fullStr=full.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});
+    vollTxt='N\u00e4chster Vollmond: '+fullStr+' (in '+tageBisVoll+' Tag'+(tageBisVoll===1?'':'en')+')';
+  }
+  box.innerHTML=
+    '<div class="mond-top"><span class="mond-emo">'+mp.emoji+'</span>'+
+    '<div><div class="mond-name">'+mp.name+'</div>'+
+    '<div class="mond-sub">'+(richtung?richtung+' \u00b7 ':'')+'zu '+mp.illum+' % beleuchtet</div></div></div>'+
+    '<div class="mond-full">'+vollTxt+'</div>'+
+    '<div class="mond-brauch"><b>Nach altem Brauch:</b> '+mondBrauch(mp)+'</div>'+
+    '<div class="mond-hinweis">Mondphase astronomisch berechnet \u00b7 die Brauchtumstipps sind \u00fcberlieferte Tradition, kein wissenschaftlicher Rat.</div>';
 }
 function wxText(code){
   const m = {
@@ -1787,6 +1853,7 @@ function renderHeute(){
   document.getElementById('tip').textContent = tagesTipp();
   document.getElementById('brain').textContent = GEHIRN[tagDesJahres(now) % GEHIRN.length];
   renderWx(document.getElementById('wxHere'), STATE.lat, STATE.lon, STATE.ort && STATE.ort!=="Ihr Standort" ? STATE.ort : "Ihr Standort", true);
+  renderMond();
 }
 async function renderWx(box, lat, lon, label, isHome){
   box.innerHTML = `<div class="status"><div class="spin"></div>Wetter wird geladen…</div>`;
@@ -3017,6 +3084,81 @@ function wgKopieren(){
     navigator.clipboard.writeText(LOTSE_URL).then(function(){ alert('Link kopiert.'); }, function(){ window.prompt('Link zum Kopieren:', LOTSE_URL); });
   } else { window.prompt('Link zum Kopieren:', LOTSE_URL); }
 }
+/* ====================== Regenradar (RainViewer) ====================== */
+var RADAR={built:false,map:null,frames:[],layers:[],idx:0,timer:null,host:'',pastCount:0};
+function radarLoadLeaflet(){
+  return new Promise(function(res,rej){
+    if(window.L) return res();
+    var css=document.createElement('link');
+    css.rel='stylesheet';
+    css.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+    document.head.appendChild(css);
+    var sc=document.createElement('script');
+    sc.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+    sc.onload=function(){ res(); };
+    sc.onerror=function(){ rej(); };
+    document.head.appendChild(sc);
+  });
+}
+function radarStatus(t){ var e=document.getElementById('radarStatus'); if(e) e.textContent=t; }
+function radarToggle(){
+  var wrap=document.getElementById('radarWrap'), btn=document.getElementById('radarBtn');
+  if(!wrap||!btn) return;
+  if(wrap.style.display==='block'){
+    wrap.style.display='none'; radarStop(); btn.textContent='\ud83c\udf27\ufe0f Regenradar anzeigen'; return;
+  }
+  wrap.style.display='block';
+  btn.textContent='Regenradar ausblenden';
+  if(RADAR.built){ if(RADAR.map){ RADAR.map.invalidateSize(); } radarPlay(); return; }
+  radarBuild();
+}
+function radarBuild(){
+  radarStatus('Radar wird geladen \u2026');
+  radarLoadLeaflet().then(function(){
+    return fetch('https://api.rainviewer.com/public/weather-maps.json');
+  }).then(function(r){ return r.json(); }).then(function(d){
+    RADAR.host=d.host;
+    var past=(d.radar&&d.radar.past)||[];
+    var nc=(d.radar&&d.radar.nowcast)||[];
+    RADAR.pastCount=past.length;
+    RADAR.frames=past.concat(nc);
+    if(!RADAR.frames.length){ radarStatus('Im Moment liegen keine Radardaten vor.'); return; }
+    var map=L.map('radarMap').setView([STATE.lat,STATE.lon],8);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:12,attribution:'\u00a9 OpenStreetMap'}).addTo(map);
+    L.marker([STATE.lat,STATE.lon]).addTo(map);
+    RADAR.map=map; RADAR.layers=[];
+    RADAR.frames.forEach(function(f){
+      var lyr=L.tileLayer(RADAR.host+f.path+'/256/{z}/{x}/{y}/2/1_1.png',{opacity:0,zIndex:5});
+      lyr.addTo(map); RADAR.layers.push(lyr);
+    });
+    RADAR.built=true;
+    setTimeout(function(){ if(RADAR.map) RADAR.map.invalidateSize(); },300);
+    radarShow(RADAR.pastCount>0?RADAR.pastCount-1:0);
+    radarPlay();
+  }).catch(function(){
+    radarStatus('Regenradar gerade nicht verf\u00fcgbar \u2013 bitte Internet pr\u00fcfen und erneut versuchen.');
+  });
+}
+function radarShow(i){
+  if(!RADAR.layers.length) return;
+  RADAR.idx=((i%RADAR.layers.length)+RADAR.layers.length)%RADAR.layers.length;
+  for(var j=0;j<RADAR.layers.length;j++){ RADAR.layers[j].setOpacity(j===RADAR.idx?0.75:0); }
+  var t=RADAR.frames[RADAR.idx].time*1000;
+  var hhmm=new Date(t).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  var vorhersage=RADAR.idx>=RADAR.pastCount;
+  radarStatus((vorhersage?'Vorhersage ':'Stand ')+hhmm+' Uhr');
+}
+function radarPlay(){
+  radarStop();
+  RADAR.timer=setInterval(function(){ radarShow(RADAR.idx+1); },700);
+  var pb=document.getElementById('radarPlay'); if(pb) pb.textContent='\u23f8 Pause';
+}
+function radarStop(){
+  if(RADAR.timer){ clearInterval(RADAR.timer); RADAR.timer=null; }
+  var pb=document.getElementById('radarPlay'); if(pb) pb.textContent='\u25b6 Abspielen';
+}
+function radarPlayToggle(){ if(RADAR.timer) radarStop(); else radarPlay(); }
+
 bannerInit();
 </script>
 </body>
