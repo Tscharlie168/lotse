@@ -153,6 +153,11 @@
   .mond-full{margin-top:10px;font-weight:600}
   .mond-brauch{margin-top:10px;line-height:1.5}
   .mond-hinweis{margin-top:10px;font-size:.8rem;color:var(--ink-soft)}
+  .wetter-orte{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .worte-chip{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:10px 14px;font-size:1rem;font-weight:600;color:var(--ink);cursor:pointer;font-family:inherit}
+  .worte-chip.is-active{border-color:var(--sea);background:#eef6f9;color:var(--sea)}
+  .worte-x{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.08);font-size:.85rem;line-height:1}
+  .wetter-merken{margin-top:12px;background:#fff;border:1.5px solid var(--sea);color:var(--sea);border-radius:12px;padding:12px 16px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit}
   /* ---- Wetter-Ansicht ---- */
   .wbtn-here{display:inline-flex;align-items:center;gap:8px;background:#e6f1f4;border:1.5px solid var(--sea);color:var(--sea);font-weight:700;font-size:1.05rem;border-radius:12px;padding:12px 16px;margin:0 0 14px;cursor:pointer;font-family:inherit}
   .wbtn-here:active{background:var(--tap)}
@@ -972,8 +977,9 @@
         <input id="wetterQ" type="text" placeholder="Anderer Ort, z. B. Bregenz" autocomplete="off">
         <button onclick="wetterSuche()">Suchen</button>
       </div>
-      <button class="wbtn-here" onclick="wetterHier()">📍 Mein Standort</button>
+      <div class="wetter-orte" id="wetterOrte"></div>
       <div id="wetterBox"></div>
+      <button class="wetter-merken" id="wetterMerken" onclick="wetterMerken()" style="display:none">⭐ Diesen Ort merken</button>
       <p class="wquelle">Vorhersage über Open-Meteo · amtliche Warnungen vom Deutschen Wetterdienst (DWD)</p>
 
       <h2 style="margin-top:22px;font-size:1.25rem">Regenradar</h2>
@@ -985,6 +991,7 @@
           <button class="radar-play" id="radarPlay" onclick="radarPlayToggle()">⏸ Pause</button>
           <span id="radarStatus"></span>
         </div>
+        <p style="color:var(--ink-soft);font-size:.85rem;margin:8px 0 0">Zeigt den Regen der letzten zwei Stunden und der nächsten halben Stunde. Ist es trocken, bleibt die Karte ohne Farbe.</p>
         <p class="wquelle">Radardaten: <a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer</a> · Karte © OpenStreetMap</p>
       </div>
     </section>
@@ -1194,14 +1201,6 @@
 
       <h2 style="margin-top:22px">Wetter hier</h2>
       <div id="wxHere"></div>
-
-      <h2 style="margin-top:18px">Wetter am Zielort</h2>
-      <p style="color:var(--ink-soft);margin:0 0 10px">Planen Sie einen Ausflug? Ort eintippen.</p>
-      <div class="search-box">
-        <input id="wxQ" type="text" placeholder="z. B. München" enterkeyhint="search">
-        <button onclick="wxTarget()">Zeigen</button>
-      </div>
-      <div id="wxThere"></div>
 
       <h2 style="margin-top:22px;font-size:1.25rem">Mond heute</h2>
       <div class="card-info mond" id="mondBox"></div>
@@ -1911,9 +1910,47 @@ function planRoute(){
 /* ---------- Wetter (eigene Ansicht: Vorhersage, Regen & Schnee, DWD-Warnungen) ---------- */
 function wEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function wKomma(n){ return (Math.round(n*10)/10).toString().replace('.',','); }
+var WETTERORTE=[]; try{ var _wo=localStorage.getItem('lotse-wetterorte'); if(_wo) WETTERORTE=JSON.parse(_wo); }catch(e){}
+var WETTER_CUR=null;
+function wetterOrteSave(){ try{ localStorage.setItem('lotse-wetterorte', JSON.stringify(WETTERORTE)); }catch(e){} }
+function wetterEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function renderWetterOrte(){
+  var el=document.getElementById('wetterOrte'); if(!el) return;
+  var homeActive = WETTER_CUR && WETTER_CUR.home;
+  var h='<button class="worte-chip'+(homeActive?' is-active':'')+'" onclick="wetterHier()">\ud83d\udccd Mein Standort</button>';
+  for(var i=0;i<WETTERORTE.length;i++){
+    var o=WETTERORTE[i];
+    var act=(WETTER_CUR && !WETTER_CUR.home && WETTER_CUR.name===o.name);
+    h+='<button class="worte-chip'+(act?' is-active':'')+'" onclick="wetterOrtZeigen('+i+')">'+wetterEsc(o.name)+'<span class="worte-x" onclick="wetterOrtEntfernen(event,'+i+')">\u2715</span></button>';
+  }
+  el.innerHTML=h;
+}
+function updateMerkenBtn(){
+  var b=document.getElementById('wetterMerken'); if(!b) return;
+  var show = WETTER_CUR && !WETTER_CUR.home && !WETTERORTE.some(function(o){return o.name===WETTER_CUR.name;});
+  b.style.display = show ? 'block' : 'none';
+}
+function wetterMerken(){
+  if(!WETTER_CUR || WETTER_CUR.home) return;
+  if(WETTERORTE.some(function(o){return o.name===WETTER_CUR.name;})) return;
+  WETTERORTE.push({name:WETTER_CUR.name,lat:WETTER_CUR.lat,lon:WETTER_CUR.lon});
+  wetterOrteSave(); renderWetterOrte(); updateMerkenBtn();
+}
+function wetterOrtZeigen(i){
+  var o=WETTERORTE[i]; if(!o) return;
+  WETTER_CUR={name:o.name,lat:o.lat,lon:o.lon,home:false};
+  renderWetter(o.lat,o.lon,o.name);
+  renderWetterOrte(); updateMerkenBtn();
+}
+function wetterOrtEntfernen(ev,i){
+  if(ev&&ev.stopPropagation) ev.stopPropagation();
+  WETTERORTE.splice(i,1); wetterOrteSave(); renderWetterOrte(); updateMerkenBtn();
+}
 function wetterHier(){
   const label = (STATE.ort && STATE.ort!=='Ihr Standort') ? STATE.ort : 'Ihr Standort';
+  WETTER_CUR={name:label,lat:STATE.lat,lon:STATE.lon,home:true};
   renderWetter(STATE.lat, STATE.lon, label);
+  renderWetterOrte(); updateMerkenBtn();
 }
 async function wetterSuche(){
   const q = document.getElementById('wetterQ').value.trim();
@@ -1928,7 +1965,10 @@ async function wetterSuche(){
       return;
     }
     const o = gd.results[0];
-    renderWetter(o.latitude, o.longitude, o.name + (o.admin1 ? ', '+o.admin1 : ''));
+    const nm = o.name + (o.admin1 ? ', '+o.admin1 : '');
+    WETTER_CUR={name:nm,lat:o.latitude,lon:o.longitude,home:false};
+    renderWetter(o.latitude, o.longitude, nm);
+    renderWetterOrte(); updateMerkenBtn();
   }catch(e){
     box.innerHTML = `<div class="status">Die Suche hat gerade nicht geklappt.<br>Bitte erneut versuchen.</div>`;
   }
@@ -2202,7 +2242,7 @@ function renderFoto(){
       const f = pool[doy % pool.length];
       img = f.svg; cap = f.cap || '';
     }
-    const capHtml = cap ? `<div style="font-size:.9rem;color:var(--ink-soft);text-align:center;margin-top:6px;font-style:italic">${cap}</div>` : '';
+    const capHtml = '';
     box.innerHTML = `<div class="foto">${img}</div>${capHtml}`;
   });
 }
@@ -3123,12 +3163,12 @@ function radarBuild(){
     RADAR.pastCount=past.length;
     RADAR.frames=past.concat(nc);
     if(!RADAR.frames.length){ radarStatus('Im Moment liegen keine Radardaten vor.'); return; }
-    var map=L.map('radarMap').setView([STATE.lat,STATE.lon],8);
+    var map=L.map('radarMap',{maxZoom:12,minZoom:6}).setView([STATE.lat,STATE.lon],8);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:12,attribution:'\u00a9 OpenStreetMap'}).addTo(map);
     L.marker([STATE.lat,STATE.lon]).addTo(map);
     RADAR.map=map; RADAR.layers=[];
     RADAR.frames.forEach(function(f){
-      var lyr=L.tileLayer(RADAR.host+f.path+'/256/{z}/{x}/{y}/2/1_1.png',{opacity:0,zIndex:5});
+      var lyr=L.tileLayer(RADAR.host+f.path+'/256/{z}/{x}/{y}/2/1_1.png',{opacity:0,zIndex:5,maxNativeZoom:7,maxZoom:12});
       lyr.addTo(map); RADAR.layers.push(lyr);
     });
     RADAR.built=true;
