@@ -3602,12 +3602,12 @@ function webcamDistanz(m){ return m<1000 ? m+' m' : (m<10000 ? (m/1000).toFixed(
 function renderWebcams(){
   var rows=document.getElementById('webcamRows');
   if(rows){
-    var RADIUS_M=300000;
+    var RADIUS_M=150000;
     var liste=WEBCAMS.map(function(w){ return {w:w, m:dist(w.la,w.lo)}; })
       .filter(function(x){ return x.m<=RADIUS_M; })
       .sort(function(a,b){ return a.m-b.m; });
     if(liste.length===0){
-      rows.innerHTML='<div class="note">Keine Webcams im Umkreis von 300 km gefunden. \u00dcber die Portale unten k\u00f6nnen Sie weitere Cams entdecken.</div>';
+      rows.innerHTML='<div class="note">Keine Webcams im Umkreis von 150 km gefunden. \u00dcber die Portale unten k\u00f6nnen Sie weitere Cams entdecken.</div>';
     } else {
       rows.innerHTML=liste.map(function(x){
         return '<a class="row" href="'+x.w.url+'" target="_blank" rel="noopener"><div class="main"><b>'+x.w.n+'</b><small>'+x.w.o+' \u00b7 '+webcamDistanz(x.m)+' entfernt</small></div><div class="go">Ansehen \u203a</div></a>';
