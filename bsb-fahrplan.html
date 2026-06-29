@@ -129,6 +129,11 @@ select,input,button{font-family:inherit;}
   .lg-controls{flex-wrap:wrap;}
   .lg-star{margin-left:0;width:100%;}
 }
+.lg-tag--xfer{background:#CFE9F2;color:#0A3A4E;}
+.lg-via{margin-top:8px;font-size:13px;color:#A9CBDD;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.lg-via b{color:#fff;font-family:'IBM Plex Mono',monospace;}
+.lg-xfer{margin:9px 0 4px;padding:7px 11px;background:rgba(98,208,232,.16);border-radius:8px;font-size:13px;color:#CDEAF4;}
+.lg-leg-kurs{display:flex;align-items:center;gap:8px;margin:6px 0 4px;}
 </style>
 </head>
 <body>
@@ -156,26 +161,34 @@ select,input,button{font-family:inherit;}
 <script>
 "use strict";
 
-var PORTS = ["Konstanz","Mainau","Meersburg","Hagnau","Immenstaad","Friedrichshafen","Langenargen","Kressbronn","Nonnenhorn","Wasserburg","Lindau","Bregenz"];
+var PORTS = ["Konstanz", "Mainau", "Meersburg", "Hagnau", "Immenstaad", "Friedrichshafen", "Langenargen", "Kressbronn", "Nonnenhorn", "Wasserburg", "Lindau", "Bregenz", "Kreuzlingen", "Gottlieben", "Ermatingen", "Reichenau", "Mannenbach", "Berlingen", "Gaienhofen", "Steckborn", "Hemmenhofen", "Wangen", "Mammern", "Öhningen", "Stein am Rhein", "Diessenhofen/Gailingen", "Büsingen", "Schaffhausen"];
 // ungefähre Hafenkoordinaten [lat,lng] für die Standort-Erkennung
-var COORDS = [[47.659,9.178],[47.705,9.197],[47.694,9.271],[47.685,9.318],[47.677,9.367],[47.651,9.480],[47.598,9.547],[47.586,9.600],[47.583,9.628],[47.560,9.638],[47.545,9.685],[47.504,9.747]];
+var COORDS = [[47.659, 9.178], [47.705, 9.197], [47.694, 9.271], [47.685, 9.318], [47.677, 9.367], [47.651, 9.48], [47.598, 9.547], [47.586, 9.6], [47.583, 9.628], [47.56, 9.638], [47.545, 9.685], [47.504, 9.747], [47.6499, 9.1738], [47.662, 9.133], [47.672, 9.084], [47.6957, 9.0636], [47.687, 9.056], [47.692, 9.001], [47.692, 8.965], [47.666, 8.972], [47.69, 8.93], [47.687, 8.9], [47.65, 8.84], [47.663, 8.887], [47.66, 8.859], [47.69, 8.75], [47.697, 8.687], [47.696, 8.632]];
 function nearestPort(lat,lng){var best=-1,bd=Infinity;for(var i=0;i<COORDS.length;i++){var dlat=lat-COORDS[i][0],dlng=(lng-COORDS[i][1])*Math.cos(lat*Math.PI/180),d=dlat*dlat+dlng*dlng;if(d<bd){bd=d;best=i;}}return {idx:best,far:Math.sqrt(bd)>0.6};}
 function resolvePort(s){if(s==null)return -1;var t=String(s).trim();var num=parseInt(t,10);if(!isNaN(num)&&String(num)===t&&num>=0&&num<PORTS.length)return num;t=t.toLowerCase();for(var i=0;i<PORTS.length;i++){if(PORTS[i].toLowerCase()===t)return i;}return -1;}
 
 // stop = [portIndex, ankunft, abfahrt]
 var COURSES = [
-  {no:141,svc:"restaurant",stops:[[5,"9:10","9:10"],[6,"9:35","9:35"],[7,"9:55","9:55"],[8,"10:05","10:05"],[9,"10:15","10:15"],[10,"10:35","10:35"]]},
-  {no:111,svc:"restaurant",stops:[[0,"9:05","9:05"],[2,"9:35","9:45"],[3,"10:00","10:00"],[4,"10:15","10:15"],[5,"10:45","10:55"],[6,"11:20","11:20"],[7,"11:40","11:40"],[8,"11:50","11:50"],[9,"12:00","12:00"],[10,"12:20","12:25"],[11,"12:47","12:47"]]},
-  {no:143,svc:"restaurant",stops:[[5,"12:30","12:30"],[6,"12:55","12:55"],[7,"13:15","13:15"],[8,"13:25","13:25"],[9,"13:35","13:35"],[10,"13:55","14:00"],[11,"14:22","14:22"]]},
-  {no:125,svc:"snack",stops:[[5,"14:20","14:20"],[6,"14:45","14:45"],[7,"15:05","15:05"],[8,"15:15","15:15"],[9,"15:25","15:25"],[10,"15:45","15:50"],[11,"16:12","16:12"]]},
-  {no:145,svc:"restaurant",stops:[[5,"16:35","16:35"],[6,"17:00","17:00"],[7,"17:20","17:20"],[8,"17:30","17:30"],[9,"17:40","17:40"],[10,"18:00","18:05"],[11,"18:27","18:27"]]},
-  {no:153,svc:"snack",stops:[[0,"15:15","15:15"],[2,"16:15","16:25"],[3,"16:40","16:40"],[4,"16:55","16:55"],[5,"17:25","17:35"],[6,"18:00","18:00"],[7,"18:20","18:20"],[8,"18:30","18:30"],[9,"18:40","18:40"],[10,"19:00","19:05"],[11,"19:27","19:27"]]},
-  {no:150,svc:"snack",stops:[[11,"9:20","9:20"],[10,"9:42","9:50"],[9,"10:10","10:10"],[8,"10:20","10:20"],[7,"10:30","10:30"],[6,"10:50","10:50"],[5,"11:15","11:25"],[4,"11:55","11:55"],[3,"12:10","12:10"],[2,"12:25","12:35"],[1,"13:00","13:00"],[0,"13:30","13:30"]]},
-  {no:142,svc:"restaurant",stops:[[11,"10:25","10:25"],[10,"10:47","10:55"],[9,"11:15","11:15"],[8,"11:25","11:25"],[7,"11:35","11:35"],[6,"11:55","11:55"],[5,"12:20","12:20"]]},
-  {no:124,svc:"snack",stops:[[11,"12:15","12:15"],[10,"12:37","12:50"],[9,"13:10","13:10"],[8,"13:20","13:20"],[7,"13:30","13:30"],[6,"13:50","13:50"],[5,"14:15","14:15"]]},
-  {no:144,svc:"restaurant",stops:[[11,"14:30","14:30"],[10,"14:52","15:00"],[9,"15:20","15:20"],[8,"15:30","15:30"],[7,"15:40","15:40"],[6,"16:00","16:00"],[5,"16:25","16:25"]]},
-  {no:116,svc:"restaurant",stops:[[11,"15:40","15:40"],[10,"16:02","16:10"],[9,"16:30","16:30"],[8,"16:40","16:40"],[7,"16:50","16:50"],[6,"17:10","17:10"],[5,"17:35","17:40"],[4,"18:10","18:10"],[3,"18:25","18:25"],[2,"18:40","18:50"],[0,"19:20","19:20"]]},
-  {no:126,svc:"snack",stops:[[11,"16:25","16:25"],[10,"16:47","16:55"],[9,"17:15","17:15"],[8,"17:25","17:25"],[7,"17:35","17:35"],[6,"17:55","17:55"],[5,"18:20","18:20"]]}
+  {"no":141,"svc":"restaurant","line":"obersee","stops":[[5, "9:10", "9:10"], [6, "9:35", "9:35"], [7, "9:55", "9:55"], [8, "10:05", "10:05"], [9, "10:15", "10:15"], [10, "10:35", "10:35"]]},
+  {"no":111,"svc":"restaurant","line":"obersee","stops":[[0, "9:05", "9:05"], [2, "9:35", "9:45"], [3, "10:00", "10:00"], [4, "10:15", "10:15"], [5, "10:45", "10:55"], [6, "11:20", "11:20"], [7, "11:40", "11:40"], [8, "11:50", "11:50"], [9, "12:00", "12:00"], [10, "12:20", "12:25"], [11, "12:47", "12:47"]]},
+  {"no":143,"svc":"restaurant","line":"obersee","stops":[[5, "12:30", "12:30"], [6, "12:55", "12:55"], [7, "13:15", "13:15"], [8, "13:25", "13:25"], [9, "13:35", "13:35"], [10, "13:55", "14:00"], [11, "14:22", "14:22"]]},
+  {"no":125,"svc":"snack","line":"obersee","stops":[[5, "14:20", "14:20"], [6, "14:45", "14:45"], [7, "15:05", "15:05"], [8, "15:15", "15:15"], [9, "15:25", "15:25"], [10, "15:45", "15:50"], [11, "16:12", "16:12"]]},
+  {"no":145,"svc":"restaurant","line":"obersee","stops":[[5, "16:35", "16:35"], [6, "17:00", "17:00"], [7, "17:20", "17:20"], [8, "17:30", "17:30"], [9, "17:40", "17:40"], [10, "18:00", "18:05"], [11, "18:27", "18:27"]]},
+  {"no":153,"svc":"snack","line":"obersee","stops":[[0, "15:15", "15:15"], [2, "16:15", "16:25"], [3, "16:40", "16:40"], [4, "16:55", "16:55"], [5, "17:25", "17:35"], [6, "18:00", "18:00"], [7, "18:20", "18:20"], [8, "18:30", "18:30"], [9, "18:40", "18:40"], [10, "19:00", "19:05"], [11, "19:27", "19:27"]]},
+  {"no":150,"svc":"snack","line":"obersee","stops":[[11, "9:20", "9:20"], [10, "9:42", "9:50"], [9, "10:10", "10:10"], [8, "10:20", "10:20"], [7, "10:30", "10:30"], [6, "10:50", "10:50"], [5, "11:15", "11:25"], [4, "11:55", "11:55"], [3, "12:10", "12:10"], [2, "12:25", "12:35"], [1, "13:00", "13:00"], [0, "13:30", "13:30"]]},
+  {"no":142,"svc":"restaurant","line":"obersee","stops":[[11, "10:25", "10:25"], [10, "10:47", "10:55"], [9, "11:15", "11:15"], [8, "11:25", "11:25"], [7, "11:35", "11:35"], [6, "11:55", "11:55"], [5, "12:20", "12:20"]]},
+  {"no":124,"svc":"snack","line":"obersee","stops":[[11, "12:15", "12:15"], [10, "12:37", "12:50"], [9, "13:10", "13:10"], [8, "13:20", "13:20"], [7, "13:30", "13:30"], [6, "13:50", "13:50"], [5, "14:15", "14:15"]]},
+  {"no":144,"svc":"restaurant","line":"obersee","stops":[[11, "14:30", "14:30"], [10, "14:52", "15:00"], [9, "15:20", "15:20"], [8, "15:30", "15:30"], [7, "15:40", "15:40"], [6, "16:00", "16:00"], [5, "16:25", "16:25"]]},
+  {"no":116,"svc":"restaurant","line":"obersee","stops":[[11, "15:40", "15:40"], [10, "16:02", "16:10"], [9, "16:30", "16:30"], [8, "16:40", "16:40"], [7, "16:50", "16:50"], [6, "17:10", "17:10"], [5, "17:35", "17:40"], [4, "18:10", "18:10"], [3, "18:25", "18:25"], [2, "18:40", "18:50"], [0, "19:20", "19:20"]]},
+  {"no":126,"svc":"snack","line":"obersee","stops":[[11, "16:25", "16:25"], [10, "16:47", "16:55"], [9, "17:15", "17:15"], [8, "17:25", "17:25"], [7, "17:35", "17:35"], [6, "17:55", "17:55"], [5, "18:20", "18:20"]]},
+  {"no":528,"svc":"restaurant","line":"untersee","stops":[[12, "9:00", "9:00"], [0, "9:12", "9:12"], [13, "9:32", "9:32"], [14, "9:52", "9:52"], [15, "10:06", "10:06"], [16, "10:13", "10:13"], [17, "10:23", "10:23"], [18, "10:33", "10:33"], [19, "10:39", "10:39"], [20, "10:45", "10:45"], [21, "10:57", "10:57"], [22, "11:04", "11:04"], [23, "11:12", "11:12"], [24, "11:25", "11:30"], [25, "12:05", "12:05"], [26, "12:20", "12:20"], [27, "12:45", "12:45"]]},
+  {"no":536,"svc":"restaurant","line":"untersee","stops":[[12, "11:00", "11:00"], [0, "11:12", "11:12"], [13, "11:32", "11:32"], [14, "11:52", "11:52"], [15, "12:06", "12:06"], [16, "12:13", "12:13"], [17, "12:23", "12:23"], [18, "12:33", "12:33"], [19, "12:39", "12:39"], [20, "12:45", "12:45"], [21, "12:57", "12:57"], [22, "13:04", "13:04"], [23, "13:12", "13:12"], [24, "13:25", "13:30"], [25, "14:05", "14:05"], [26, "14:20", "14:20"], [27, "14:45", "14:45"]]},
+  {"no":550,"svc":"restaurant","line":"untersee","stops":[[12, "14:27", "14:27"], [0, "14:39", "14:39"], [13, "14:59", "14:59"], [14, "15:19", "15:19"], [15, "15:33", "15:33"], [16, "15:40", "15:40"], [17, "15:50", "15:50"], [18, "16:00", "16:00"], [19, "16:06", "16:06"], [20, "16:12", "16:12"], [21, "16:24", "16:24"], [22, "16:31", "16:31"], [23, "16:39", "16:39"], [24, "16:52", "16:57"], [25, "17:32", "17:32"], [26, "17:47", "17:47"], [27, "18:15", "18:15"]]},
+  {"no":558,"svc":"restaurant","line":"untersee","stops":[[12, "16:27", "16:27"], [0, "16:39", "16:39"], [13, "16:59", "16:59"], [14, "17:19", "17:19"], [15, "17:33", "17:33"], [16, "17:40", "17:40"], [17, "17:50", "17:50"], [18, "18:00", "18:00"], [19, "18:06", "18:06"], [20, "18:12", "18:12"], [21, "18:24", "18:24"], [22, "18:31", "18:31"], [23, "18:39", "18:39"], [24, "18:52", "18:57"], [25, "19:32", "19:32"], [26, "19:47", "19:47"], [27, "20:15", "20:15"]]},
+  {"no":525,"svc":"restaurant","line":"untersee","stops":[[27, "9:10", "9:10"], [26, "9:38", "9:38"], [25, "10:10", "10:10"], [24, "11:15", "11:15"], [23, "11:32", "11:32"], [22, "11:39", "11:39"], [21, "11:45", "11:45"], [20, "11:57", "11:57"], [19, "12:03", "12:03"], [18, "12:09", "12:09"], [17, "12:18", "12:18"], [16, "12:27", "12:27"], [15, "12:38", "12:38"], [14, "12:50", "12:50"], [13, "13:17", "13:17"], [0, "13:45", "13:45"], [12, "13:55", "13:55"]]},
+  {"no":533,"svc":"restaurant","line":"untersee","stops":[[27, "11:10", "11:10"], [26, "11:38", "11:38"], [25, "12:10", "12:10"], [24, "13:15", "13:15"], [23, "13:32", "13:32"], [22, "13:39", "13:39"], [21, "13:45", "13:45"], [20, "13:57", "13:57"], [19, "14:03", "14:03"], [18, "14:09", "14:09"], [17, "14:18", "14:18"], [16, "14:27", "14:27"], [15, "14:38", "14:38"], [14, "14:50", "14:50"], [13, "15:17", "15:17"], [0, "15:45", "15:45"], [12, "15:55", "15:55"]]},
+  {"no":543,"svc":"restaurant","line":"untersee","stops":[[27, "13:18", "13:18"], [26, "13:46", "13:46"], [25, "14:18", "14:18"], [24, "15:23", "15:23"], [23, "15:40", "15:40"], [22, "15:47", "15:47"], [21, "15:53", "15:53"], [20, "16:05", "16:05"], [19, "16:11", "16:11"], [18, "16:17", "16:17"], [17, "16:26", "16:26"], [16, "16:35", "16:35"], [15, "16:46", "16:46"], [14, "16:58", "16:58"], [13, "17:25", "17:25"], [0, "17:53", "17:53"], [12, "18:05", "18:05"]]},
+  {"no":551,"svc":"restaurant","line":"untersee","stops":[[27, "15:18", "15:18"], [26, "15:46", "15:46"], [25, "16:18", "16:18"], [24, "17:23", "17:23"], [23, "17:40", "17:40"], [22, "17:47", "17:47"], [21, "17:53", "17:53"], [20, "18:05", "18:05"], [19, "18:11", "18:11"], [18, "18:17", "18:17"], [17, "18:26", "18:26"], [16, "18:35", "18:35"], [15, "18:46", "18:46"], [14, "18:58", "18:58"], [13, "19:25", "19:25"], [0, "19:53", "19:53"], [12, "20:05", "20:05"]]}
 ];
 
 var WEEKDAYS = ["So","Mo","Di","Mi","Do","Fr","Sa"];
@@ -220,6 +233,84 @@ function findConnections(fromIdx,toIdx,date){
   return out;
 }
 
+var MIN_UMSTIEG=5, MAX_WAIT=180, KNAPP=10;
+function courseValidOn(c,dObj,dStr){
+  if(c.line==="untersee"){
+    if(dStr<"2026-05-14") return false;
+    if(dStr<="2026-06-26") return true;
+    if(dStr<="2026-09-13"){var w=dObj.getDay();return (w===0||w>=3);}
+    return false;
+  }
+  return true;
+}
+function legOf(c,fromIdx,toIdx){
+  var pf=-1,pt=-1,j;
+  for(j=0;j<c.stops.length;j++){if(pf===-1&&c.stops[j][0]===fromIdx)pf=j;}
+  for(j=0;j<c.stops.length;j++){if(c.stops[j][0]===toIdx)pt=j;}
+  if(pf===-1||pt===-1||pf>=pt) return null;
+  var stops=[];
+  for(var k=pf;k<=pt;k++){stops.push({name:PORTS[c.stops[k][0]],t:(k===pf?c.stops[k][2]:c.stops[k][1])});}
+  return {no:c.no,svc:c.svc,line:c.line,dep:c.stops[pf][2],arr:c.stops[pt][1],stops:stops};
+}
+function planJourneys(fromIdx,toIdx,dStr){
+  if(fromIdx===toIdx) return [];
+  var dObj=new Date(dStr+"T12:00:00");
+  var valid=[],i;
+  for(i=0;i<COURSES.length;i++){ if(courseValidOn(COURSES[i],dObj,dStr)) valid.push(COURSES[i]); }
+  var J=[];
+  for(i=0;i<valid.length;i++){
+    var leg=legOf(valid[i],fromIdx,toIdx);
+    if(!leg) continue;
+    var ex=exception(leg.no,fromIdx,toIdx,dStr);
+    if(ex.removed) continue;
+    J.push({dep:leg.dep,arr:leg.arr,dur:toMin(leg.arr)-toMin(leg.dep),transfers:0,via:null,wait:0,xops:false,legs:[leg],warn:ex.warn});
+  }
+  for(i=0;i<valid.length;i++){
+    var cA=valid[i],pfA=-1,a;
+    for(a=0;a<cA.stops.length;a++){if(cA.stops[a][0]===fromIdx){pfA=a;break;}}
+    if(pfA===-1) continue;
+    for(var m=0;m<valid.length;m++){
+      if(m===i) continue;
+      var cB=valid[m],ptB=-1,b;
+      for(b=0;b<cB.stops.length;b++){if(cB.stops[b][0]===toIdx)ptB=b;}
+      if(ptB===-1) continue;
+      for(var h=pfA+1;h<cA.stops.length;h++){
+        var hub=cA.stops[h][0];
+        if(hub===toIdx) break;
+        if(hub===fromIdx) continue;
+        var phB=-1,b2;
+        for(b2=0;b2<ptB;b2++){if(cB.stops[b2][0]===hub){phB=b2;break;}}
+        if(phB===-1) continue;
+        var wait=toMin(cB.stops[phB][2])-toMin(cA.stops[h][1]);
+        if(wait<MIN_UMSTIEG||wait>MAX_WAIT) continue;
+        var legA=legOf(cA,fromIdx,hub),legB=legOf(cB,hub,toIdx);
+        if(!legA||!legB) continue;
+        var exA=exception(legA.no,fromIdx,hub,dStr),exB=exception(legB.no,hub,toIdx,dStr);
+        if(exA.removed||exB.removed) continue;
+        var warns=[]; if(exA.warn)warns.push(exA.warn); if(exB.warn)warns.push(exB.warn);
+        J.push({dep:legA.dep,arr:legB.arr,dur:toMin(legB.arr)-toMin(legA.dep),transfers:1,via:PORTS[hub],wait:wait,xops:(legA.line!==legB.line),legs:[legA,legB],warn:warns.length?warns.join(" \u00b7 "):null});
+      }
+    }
+  }
+  function dominates(K,Q){var kd=toMin(K.dep),qd=toMin(Q.dep),ka=toMin(K.arr),qa=toMin(Q.arr);
+    if(kd>=qd&&ka<=qa){ if(kd>qd||ka<qa) return true; if(kd===qd&&ka===qa&&K.transfers<Q.transfers) return true; } return false;}
+  var keep=[];
+  for(i=0;i<J.length;i++){ var dom=false; for(var p=0;p<J.length;p++){ if(p!==i&&dominates(J[p],J[i])){dom=true;break;} } if(!dom) keep.push(J[i]); }
+  var byDep={};
+  for(i=0;i<keep.length;i++){
+    var key=keep[i].dep,cur=byDep[key];
+    if(!cur){ byDep[key]=keep[i]; }
+    else{
+      var better=(toMin(keep[i].arr)<toMin(cur.arr))||(toMin(keep[i].arr)===toMin(cur.arr)&&keep[i].transfers<cur.transfers);
+      if(better) byDep[key]=keep[i];
+    }
+  }
+  var out=[],k; for(k in byDep){ if(byDep.hasOwnProperty(k)) out.push(byDep[k]); }
+  out.sort(function(x,y){var dx=toMin(x.dep)-toMin(y.dep); return dx!==0?dx:(toMin(x.arr)-toMin(y.arr));});
+  if(out.length>16) out=out.slice(0,16);
+  return out;
+}
+
 // ---- state ----
 var state={tab:"planer",from:6,to:11,date:defaultDate(),open:null,favs:[],locStatus:null};
 try{var f=localStorage.getItem("lgg-favs");if(f)state.favs=JSON.parse(f);}catch(e){}
@@ -227,30 +318,46 @@ function saveFavs(){try{localStorage.setItem("lgg-favs",JSON.stringify(state.fav
 
 function svcTag(svc){return svc==="restaurant"?'<span class="lg-tag lg-tag--rest">Restaurant</span>':'<span class="lg-tag lg-tag--snack">Snacks</span>';}
 
-function selectOptions(sel){var h="";for(var i=0;i<PORTS.length;i++){h+='<option value="'+i+'"'+(i===sel?" selected":"")+'>'+PORTS[i]+'</option>';}return h;}
+function selectOptions(sel){var groups=[["Obersee & Bregenz",0,11],["Untersee & Rhein",12,27]],h="";for(var g=0;g<groups.length;g++){h+='<optgroup label="'+groups[g][0]+'">';for(var i=groups[g][1];i<=groups[g][2];i++){h+='<option value="'+i+'"'+(i===sel?" selected":"")+'>'+PORTS[i]+'</option>';}h+='</optgroup>';}return h;}
+
+function journeyRow(r,i){
+  var isOpen=(state.open===i);
+  var h='<div class="lg-row'+(isOpen?" is-open":"")+'" data-row="'+i+'">';
+  h+='<div class="lg-row-main"><div class="lg-times"><span class="lg-clock">'+pad(r.dep)+'</span><span class="lg-track"><span class="lg-dot"></span><span class="lg-line"></span><span class="lg-boat">&#9972;</span><span class="lg-line"></span><span class="lg-dot lg-dot--end"></span></span><span class="lg-clock">'+pad(r.arr)+'</span></div>';
+  h+='<div class="lg-meta">';
+  if(r.transfers===0){ h+='<span class="lg-kurs">Kurs '+r.legs[0].no+'</span>'+svcTag(r.legs[0].svc); }
+  else { h+='<span class="lg-tag lg-tag--xfer">1&times; Umstieg</span>'; }
+  h+='<span class="lg-dur">'+fmtDur(r.dur)+'</span></div></div>';
+  if(r.transfers===1){
+    h+='<div class="lg-via">&#8634; &uuml;ber <b>'+esc(r.via)+'</b> &middot; '+r.wait+' min Aufenthalt'+(r.wait<KNAPP?' &middot; knapp, Schiff liegt meist nebenan':'')+(r.xops?' &middot; anderer Anbieter (eigenes Ticket)':'')+'</div>';
+  }
+  if(r.warn) h+='<div class="lg-warn">&#9888; '+esc(r.warn)+'</div>';
+  if(isOpen){
+    h+='<div class="lg-legs">';
+    for(var L=0;L<r.legs.length;L++){
+      var lg=r.legs[L];
+      if(r.transfers===1){ h+='<div class="lg-leg-kurs"><span class="lg-kurs sm">Kurs '+lg.no+'</span>'+svcTag(lg.svc)+'</div>'; }
+      for(var k=0;k<lg.stops.length;k++){ h+='<div class="lg-leg"><span class="lg-leg-t">'+pad(lg.stops[k].t)+'</span><span class="lg-leg-n">'+esc(lg.stops[k].name)+'</span></div>'; }
+      if(r.transfers===1&&L===0){ h+='<div class="lg-xfer">&#8634; Umstieg in '+esc(r.via)+' &middot; '+r.wait+' min Aufenthalt'+(r.xops?' &middot; anderer Anbieter, eigenes Ticket':'')+'</div>'; }
+    }
+    h+='</div>';
+  }
+  h+='<span class="lg-chev">'+(isOpen?"&#9650;":"&#9660;")+'</span></div>';
+  return h;
+}
 
 function boardHTML(rows,emptyKind){
   if(!rows.length){
     if(emptyKind==="past"){
       return '<div class="lg-empty"><div class="lg-empty-mark">&#128338;</div><p>F&uuml;r heute f&auml;hrt auf dieser Strecke kein Schiff mehr.</p><p class="lg-empty-hint">W&auml;hle <strong>morgen</strong> oder einen anderen Tag &mdash; dann erscheinen wieder alle Fahrten.</p></div>';
     }
-    return '<div class="lg-empty"><div class="lg-empty-mark">&#8709;</div><p>Keine direkte Schiffsverbindung an diesem Tag.</p><p class="lg-empty-hint">Tipp: Erst nach <strong>Friedrichshafen</strong> oder <strong>Lindau</strong> fahren und dort umsteigen &mdash; oder ein anderes Datum w&auml;hlen.</p></div>';
+    return '<div class="lg-empty"><div class="lg-empty-mark">&#8709;</div><p>Keine Schiffsverbindung an diesem Tag &mdash; auch nicht mit einmal Umsteigen.</p><p class="lg-empty-hint">Tipp: ein anderes Datum w&auml;hlen, oder einen Start n&auml;her am Ziel (z. B. ab <strong>Meersburg</strong> statt Langenargen). Untersee-Ziele (Gottlieben, Reichenau &hellip;) fahren 27.6.&ndash;13.9. nur Mi&ndash;So.</p></div>';
   }
-  var h="";
-  for(var i=0;i<rows.length;i++){
-    var r=rows[i],isOpen=(state.open===i);
-    h+='<div class="lg-row'+(isOpen?" is-open":"")+'" data-row="'+i+'">';
-    h+='<div class="lg-row-main"><div class="lg-times"><span class="lg-clock">'+pad(r.dep)+'</span><span class="lg-track"><span class="lg-dot"></span><span class="lg-line"></span><span class="lg-boat">&#9972;</span><span class="lg-line"></span><span class="lg-dot lg-dot--end"></span></span><span class="lg-clock">'+pad(r.arr)+'</span></div>';
-    h+='<div class="lg-meta"><span class="lg-kurs">Kurs '+r.no+'</span>'+svcTag(r.svc)+'<span class="lg-dur">'+fmtDur(r.dur)+'</span></div></div>';
-    if(r.warn) h+='<div class="lg-warn">&#9888; '+esc(r.warn)+'</div>';
-    if(isOpen){h+='<div class="lg-legs">';for(var k=0;k<r.legs.length;k++){h+='<div class="lg-leg"><span class="lg-leg-t">'+pad(r.legs[k].t)+'</span><span class="lg-leg-n">'+esc(r.legs[k].name)+'</span></div>';}h+='</div>';}
-    h+='<span class="lg-chev">'+(isOpen?"&#9650;":"&#9660;")+'</span></div>';
-  }
-  return h;
+  var h=""; for(var i=0;i<rows.length;i++){ h+=journeyRow(rows[i],i); } return h;
 }
 
 function planerHTML(){
-  var rows=findConnections(state.from,state.to,state.date);
+  var rows=planJourneys(state.from,state.to,state.date);
   var pastFiltered=false;
   if(state.date===todayISO()){
     var nm=nowMin(), n0=rows.length;
@@ -296,6 +403,7 @@ function schweizHTML(){
 function hinweiseHTML(){
   return '<section class="lg-panel">'+
   '<div class="lg-card"><h3>Wann fahren die Schiffe?</h3><p>In der Hauptsaison (14.5.–13.9.) f&auml;hrt eure Linie Konstanz&harr;Bregenz <strong>t&auml;glich</strong>. Feiertage &auml;ndern daran nichts — anders als auf dem Untersee (Schaffhausen/Stein am Rhein), wo Wochentag/Feiertag den Plan bestimmen.</p></div>'+
+  '<div class="lg-card"><h3>Untersee &amp; Rhein (Gottlieben, Reichenau, Stein am Rhein)</h3><p>Diese Strecke ber&uuml;hrt <strong>Konstanz</strong> &mdash; dort wird umgestiegen. Sie f&auml;hrt <strong>14.5.&ndash;26.6. t&auml;glich</strong> und <strong>27.6.&ndash;13.9. nur Mi&ndash;So</strong>. Eigener Anbieter (URh) mit <strong>eigenen Tickets</strong>; B&uuml;singen ist Halt auf Verlangen. Einzelne Sp&auml;tkurse fahren am 8.8. verk&uuml;rzt. Der Planer rechnet das Datum automatisch mit.</p></div>'+
   '<div class="lg-card lg-card--alert"><h3>Die zwei Sondertage</h3><ul>'+
   '<li><strong>18.7.</strong> — der 12:55-Kurs nach Bregenz (Kurs 143) und der 16:00-Kurs Richtung Friedrichshafen (Kurs 144) <strong>fallen aus</strong>. Durchgehende Fahrten Konstanz&harr;Bregenz nur mit Umstieg in Friedrichshafen.</li>'+
   '<li><strong>8.8.</strong> — der 18:00-Kurs Langenargen&rarr;Bregenz (Kurs 153) f&auml;hrt nur mit <strong>Umstieg in Lindau</strong>.</li></ul>'+
