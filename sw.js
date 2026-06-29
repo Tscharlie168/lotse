@@ -1,4 +1,9 @@
-/* Lotse – Service Worker (v3)
+/* Lotse – Service Worker (v4)
+   Neu gegenüber v3:
+   - Schiffsplaner: Untersee-Ziele (Gottlieben, Reichenau, Stein am Rhein …)
+     sind im Reiter "Verbindung" wählbar.
+   - Der Reiter "Schweiz" ist jetzt ein reines Infoblatt.
+   - Cache-Version erhöht, damit alte gespeicherte Kopien sauber ersetzt werden.
    Neu gegenüber v2:
    - Die BSB-Schiffsfahrplan-Seite (bsb-fahrplan.html) ist jetzt mit im
      Offline-Speicher.
@@ -10,7 +15,7 @@
    Manifest kommen zuerst aus dem Speicher. Fremde Dienste (Karten,
    OpenStreetMap, Wetter) immer aus dem Netz. */
 
-const CACHE = 'lotse-v3';
+const CACHE = 'lotse-v4';
 const SHELL = [
   './',
   './index.html',
