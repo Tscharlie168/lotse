@@ -3517,31 +3517,50 @@ function renderGemeinschaft(){
   }).join('');
 }
 /* ====================== Webcams (standortsortiert) ====================== */
+/* Quellen: foto-webcam.eu (DE/AT) und skylinewebcams.com (Europa) \u2013 gepr\u00fcfte Portale */
 const WEBCAMS = [
-  {n:"Pf\u00e4nder \u00fcber dem Bodensee", o:"Bregenz", la:47.5063, lo:9.7779, url:"https://www.pfaenderbahn.at/service/webcam-wetter/"},
-  {n:"Lindau \u2013 Hafen & Leuchtturm", o:"Lindau", la:47.5430, lo:9.6816, url:"https://www.lindau.de/lindau-informiert/webcam/"},
-  {n:"Zugspitze \u2013 Gipfel", o:"Garmisch-Partenkirchen", la:47.4211, lo:10.9853, url:"https://www.foto-webcam.eu/webcam/zugspitze/"},
-  {n:"Hamburg \u2013 Hafen & Landungsbr\u00fccken", o:"Hamburg", la:53.5459, lo:9.9695, url:"https://www.hamburg.de/tourismus/hamburg-erkunden/webcam"},
-  {n:"Gardasee \u2013 Riva del Garda", o:"Riva del Garda", la:45.8855, lo:10.8403, url:"https://www.gardatrentino.it/de/webcam/"},
-  {n:"Venedig \u2013 Piazza San Marco", o:"Venedig", la:45.4341, lo:12.3388, url:"https://www.venezia.net/webcam/"},
-  {n:"Amalfikueste \u2013 Positano", o:"Positano", la:40.6280, lo:14.4850, url:"https://www.meteolive.it/webcam/"},
-  {n:"Paris \u2013 Eiffelturm", o:"Paris", la:48.8584, lo:2.2945, url:"https://www.toureiffel.paris/de/der-turm/webcam"},
-  {n:"Nizza \u2013 Promenade des Anglais", o:"Nizza", la:43.6956, lo:7.2663, url:"https://www.nicetourisme.com/webcam"},
-  {n:"Dubrovnik \u2013 Altstadt", o:"Dubrovnik", la:42.6507, lo:18.0944, url:"https://www.dubrovnik.hr/webcam"},
-  {n:"Plitvice \u2013 Nationalpark", o:"Plitvice", la:44.8654, lo:15.6219, url:"https://www.np-plitvicka-jezera.hr/de/"},
-  {n:"Bled \u2013 See & Burg", o:"Bled", la:46.3683, lo:14.1095, url:"https://www.bled.si/webcam/"},
-  {n:"Santorini \u2013 Oia", o:"Oia, Santorin", la:36.4618, lo:25.3753, url:"https://www.greeka.com/cyclades/santorini/"},
-  {n:"Akropolis \u2013 Athen", o:"Athen", la:37.9715, lo:23.7267, url:"https://www.ert.gr/webcam/"},
-  {n:"Madrid \u2013 Puerta del Sol", o:"Madrid", la:40.4168, lo:-3.7038, url:"https://www.esmadrid.com/webcam"},
-  {n:"Mallorca \u2013 Palma de Mallorca", o:"Palma", la:39.5696, lo:2.6502, url:"https://www.webcam-mallorca.de/"},
-  {n:"Lissabon \u2013 Praca do Comercio", o:"Lissabon", la:38.7078, lo:-9.1366, url:"https://www.visitlisboa.com/webcam"},
-  {n:"Algarve \u2013 Praia da Rocha", o:"Portimao", la:37.1161, lo:-8.5385, url:"https://www.vivaportimao.pt/webcam"},
-  {n:"Amsterdam \u2013 Kanalblick", o:"Amsterdam", la:52.3676, lo:4.9041, url:"https://www.amsterdam.nl/webcam"},
-  {n:"Prag \u2013 Karlsbr\u00fccke", o:"Prag", la:50.0865, lo:14.4114, url:"https://www.prague.eu/webcam"},
-  {n:"Budapest \u2013 Donauufer & Parlament", o:"Budapest", la:47.5066, lo:19.0534, url:"https://budapest.hu/webcam"},
-  {n:"Kotor \u2013 Bucht von Kotor", o:"Kotor", la:42.4247, lo:18.7712, url:"https://www.kotor.travel/webcam"},
-  {n:"K\u00fchlungsborn \u2013 Strand Ostsee", o:"K\u00fchlungsborn", la:54.1477, lo:11.7387, url:"https://www.kuehlungsborn.de/webcam"},
-  {n:"Sylt \u2013 Strand Westerland", o:"Westerland, Sylt", la:54.9029, lo:8.3124, url:"https://www.sylt.de/webcam"}
+  /* Deutschland \u2013 foto-webcam.eu */
+  {n:"Zugspitze \u2013 Gipfelblick", o:"Garmisch-Partenkirchen", la:47.4211, lo:10.9853, url:"https://www.foto-webcam.eu/webcam/zugspitze/"},
+  {n:"M\u00fcnchen \u2013 Marienplatz", o:"M\u00fcnchen", la:48.1374, lo:11.5755, url:"https://www.foto-webcam.eu/webcam/muenchen/"},
+  {n:"Freiburg \u2013 M\u00fcnsterblick", o:"Freiburg im Breisgau", la:47.9953, lo:7.8494, url:"https://www.foto-webcam.eu/webcam/freiburg/"},
+  {n:"Heidelberg \u2013 Schloss & Altstadt", o:"Heidelberg", la:49.4094, lo:8.6924, url:"https://www.foto-webcam.eu/webcam/heidelberg/"},
+  {n:"K\u00f6ln \u2013 Domblick", o:"K\u00f6ln", la:50.9413, lo:6.9583, url:"https://www.foto-webcam.eu/webcam/koeln-dom/"},
+  {n:"Frankfurt \u2013 Skyline", o:"Frankfurt am Main", la:50.1109, lo:8.6821, url:"https://www.foto-webcam.eu/webcam/frankfurt/"},
+  {n:"Berlin \u2013 Brandenburger Tor", o:"Berlin", la:52.5163, lo:13.3777, url:"https://www.foto-webcam.eu/webcam/berlin/"},
+  {n:"Stuttgart \u2013 Stadtblick", o:"Stuttgart", la:48.7758, lo:9.1829, url:"https://www.foto-webcam.eu/webcam/stuttgart/"},
+  {n:"N\u00fcrnberg \u2013 Burg", o:"N\u00fcrnberg", la:49.4570, lo:11.0783, url:"https://www.foto-webcam.eu/webcam/nuernberg/"},
+  {n:"Hamburg \u2013 Hafen", o:"Hamburg", la:53.5459, lo:9.9695, url:"https://www.foto-webcam.eu/webcam/hamburg-hafen/"},
+  {n:"K\u00fchlungsborn \u2013 Strand Ostsee", o:"K\u00fchlungsborn", la:54.1477, lo:11.7387, url:"https://www.foto-webcam.eu/webcam/kuehlungsborn/"},
+  {n:"Sylt \u2013 Strand Westerland", o:"Westerland, Sylt", la:54.9029, lo:8.3124, url:"https://www.foto-webcam.eu/webcam/sylt/"},
+  /* \u00d6sterreich \u2013 foto-webcam.eu */
+  {n:"Innsbruck \u2013 Stadtblick", o:"Innsbruck", la:47.2682, lo:11.3923, url:"https://www.foto-webcam.eu/webcam/innsbruck/"},
+  {n:"Salzburg \u2013 Festung Hohensalzburg", o:"Salzburg", la:47.7985, lo:13.0387, url:"https://www.foto-webcam.eu/webcam/salzburg/"},
+  {n:"Wien \u2013 Stephansdom", o:"Wien", la:48.2082, lo:16.3738, url:"https://www.foto-webcam.eu/webcam/wien/"},
+  {n:"Bregenz \u2013 Bodensee", o:"Bregenz", la:47.5030, lo:9.7471, url:"https://www.foto-webcam.eu/webcam/bregenz/"},
+  /* Italien \u2013 skylinewebcams.com */
+  {n:"Gardasee \u2013 Riva del Garda", o:"Riva del Garda", la:45.8855, lo:10.8403, url:"https://www.skylinewebcams.com/en/webcam/italia/trentino-alto-adige/trento/riva-del-garda.html"},
+  {n:"Venedig \u2013 Piazza San Marco", o:"Venedig", la:45.4341, lo:12.3388, url:"https://www.skylinewebcams.com/en/webcam/italia/veneto/venezia/piazza-san-marco.html"},
+  {n:"Rom \u2013 Kolosseum", o:"Rom", la:41.8902, lo:12.4922, url:"https://www.skylinewebcams.com/en/webcam/italia/lazio/roma/colosseo.html"},
+  {n:"Florenz \u2013 Ponte Vecchio", o:"Florenz", la:43.7680, lo:11.2558, url:"https://www.skylinewebcams.com/en/webcam/italia/toscana/firenze/ponte-vecchio.html"},
+  {n:"Neapel \u2013 Hafen & Vesuv", o:"Neapel", la:40.8518, lo:14.2681, url:"https://www.skylinewebcams.com/en/webcam/italia/campania/napoli/napoli.html"},
+  /* Frankreich \u2013 skylinewebcams.com */
+  {n:"Paris \u2013 Eiffelturm", o:"Paris", la:48.8584, lo:2.2945, url:"https://www.skylinewebcams.com/en/webcam/france/ile-de-france/paris/eiffel-tower.html"},
+  {n:"Nizza \u2013 Promenade", o:"Nizza", la:43.6956, lo:7.2663, url:"https://www.skylinewebcams.com/en/webcam/france/provence-alpes-cote-d-azur/nice/nice.html"},
+  /* Kroatien \u2013 skylinewebcams.com */
+  {n:"Dubrovnik \u2013 Altstadt", o:"Dubrovnik", la:42.6507, lo:18.0944, url:"https://www.skylinewebcams.com/en/webcam/hrvatska/dubrovacko-neretvanska/dubrovnik/stradun.html"},
+  {n:"Split \u2013 Hafenpromenade", o:"Split", la:43.5081, lo:16.4402, url:"https://www.skylinewebcams.com/en/webcam/hrvatska/splitsko-dalmatinska/split/riva.html"},
+  /* Spanien \u2013 skylinewebcams.com */
+  {n:"Barcelona \u2013 La Rambla", o:"Barcelona", la:41.3825, lo:2.1769, url:"https://www.skylinewebcams.com/en/webcam/espana/cataluna/barcelona/la-rambla.html"},
+  {n:"Mallorca \u2013 Palma", o:"Palma de Mallorca", la:39.5696, lo:2.6502, url:"https://www.skylinewebcams.com/en/webcam/espana/islas-baleares/mallorca/palma.html"},
+  /* Griechenland \u2013 skylinewebcams.com */
+  {n:"Athen \u2013 Akropolis", o:"Athen", la:37.9715, lo:23.7267, url:"https://www.skylinewebcams.com/en/webcam/ellada/attiki/athens/acropolis.html"},
+  {n:"Santorini \u2013 Oia", o:"Santorini", la:36.4618, lo:25.3753, url:"https://www.skylinewebcams.com/en/webcam/ellada/notio-aigaio/santorini/oia.html"},
+  /* Portugal \u2013 skylinewebcams.com */
+  {n:"Lissabon \u2013 Tejo-Ufer", o:"Lissabon", la:38.7078, lo:-9.1366, url:"https://www.skylinewebcams.com/en/webcam/portugal/lisboa/lisboa/terreiro-do-paco.html"},
+  /* Niederlande \u2013 skylinewebcams.com */
+  {n:"Amsterdam \u2013 Grachten", o:"Amsterdam", la:52.3676, lo:4.9041, url:"https://www.skylinewebcams.com/en/webcam/nederland/noord-holland/amsterdam/amsterdam.html"},
+  /* Tschechien \u2013 skylinewebcams.com */
+  {n:"Prag \u2013 Karlsbr\u00fccke", o:"Prag", la:50.0865, lo:14.4114, url:"https://www.skylinewebcams.com/en/webcam/ceska-republika/hlavni-mesto-praha/praha/karluv-most.html"}
 ];
 const WEBCAM_PORTALE_GLOBAL = [
   {b:"Worldcam \u2013 Webcams weltweit", s:"Millionen Cams auf Karte", url:"https://worldcam.eu/"},
@@ -3583,10 +3602,17 @@ function webcamDistanz(m){ return m<1000 ? m+' m' : (m<10000 ? (m/1000).toFixed(
 function renderWebcams(){
   var rows=document.getElementById('webcamRows');
   if(rows){
-    var liste=WEBCAMS.map(function(w){ return {w:w, m:dist(w.la,w.lo)}; }).sort(function(a,b){ return a.m-b.m; });
-    rows.innerHTML=liste.map(function(x){
-      return '<a class="row" href="'+x.w.url+'" target="_blank" rel="noopener"><div class="main"><b>'+x.w.n+'</b><small>'+x.w.o+' \u00b7 '+webcamDistanz(x.m)+' entfernt</small></div><div class="go">Ansehen \u203a</div></a>';
-    }).join('');
+    var RADIUS_M=300000;
+    var liste=WEBCAMS.map(function(w){ return {w:w, m:dist(w.la,w.lo)}; })
+      .filter(function(x){ return x.m<=RADIUS_M; })
+      .sort(function(a,b){ return a.m-b.m; });
+    if(liste.length===0){
+      rows.innerHTML='<div class="note">Keine Webcams im Umkreis von 300 km gefunden. \u00dcber die Portale unten k\u00f6nnen Sie weitere Cams entdecken.</div>';
+    } else {
+      rows.innerHTML=liste.map(function(x){
+        return '<a class="row" href="'+x.w.url+'" target="_blank" rel="noopener"><div class="main"><b>'+x.w.n+'</b><small>'+x.w.o+' \u00b7 '+webcamDistanz(x.m)+' entfernt</small></div><div class="go">Ansehen \u203a</div></a>';
+      }).join('');
+    }
   }
   var por=document.getElementById('webcamPortale');
   if(por){
