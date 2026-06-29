@@ -1263,6 +1263,469 @@ const LAENDER = {
       {label:"ARBÖ Pannennotruf", num:"123", soft:true}
     ],
     panneInfo:{club:"ÖAMTC", url:"https://www.oeamtc.at/nothilfe/"}
+  },
+  IT: {
+    name:"Italien",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"Rettung (Sanitätsnotruf)", num:"118", big:true},
+      {label:"Polizei (Carabinieri)", num:"112", soft:true},
+      {label:"Feuerwehr", num:"115", soft:true}
+    ],
+    fahr:[
+      {b:"Trenitalia – Bahn in Italien", s:"Verbindungen & Tickets", url:"https://www.trenitalia.com"}
+    ],
+    betrug:[
+      {b:"Polizia Postale", s:"Internet- und Telefonbetrug melden (it)", url:"https://www.commissariatodips.it"}
+    ],
+    panne:[
+      {label:"ACI Pannenhilfe", num:"803 116"}
+    ],
+    panneInfo:{club:"ACI", url:"https://www.aci.it/assistenza/pronto-aci.html"}
+  },
+  FR: {
+    name:"Frankreich",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"SAMU (Notarzt)", num:"15", big:true},
+      {label:"Polizei", num:"17", soft:true},
+      {label:"Feuerwehr", num:"18", soft:true}
+    ],
+    fahr:[
+      {b:"SNCF – Bahn in Frankreich", s:"Verbindungen & Tickets", url:"https://www.sncf-connect.com"}
+    ],
+    betrug:[
+      {b:"Signal Conso", s:"Verbraucherbeschwerden melden (fr)", url:"https://signal.conso.gouv.fr"}
+    ],
+    panne:[
+      {label:"Pannenhilfe (0800)", num:"0800 050 247"}
+    ],
+    panneInfo:{club:"AA/AIT", url:"https://www.automobile-club.org"}
+  },
+  NL: {
+    name:"Niederlande",
+    notruf:[
+      {label:"Notruf (Polizei, Rettung, Feuerwehr)", num:"112", big:true},
+      {label:"Polizei (nicht dringend)", num:"0900 8844", soft:true}
+    ],
+    fahr:[
+      {b:"NS – Bahn in den Niederlanden", s:"Verbindungen & Tickets", url:"https://www.ns.nl"}
+    ],
+    betrug:[
+      {b:"Fraudehelpdesk", s:"Betrug melden (nl)", url:"https://www.fraudehelpdesk.nl"}
+    ],
+    panne:[
+      {label:"ANWB Wegenwacht", num:"0800 0888"}
+    ],
+    panneInfo:{club:"ANWB", url:"https://www.anwb.nl/wegenwacht"}
+  },
+  BE: {
+    name:"Belgien",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"Polizei", num:"101", big:true},
+      {label:"Rettung & Feuerwehr", num:"100", soft:true}
+    ],
+    fahr:[
+      {b:"SNCB/NMBS – Bahn in Belgien", s:"Verbindungen & Tickets", url:"https://www.belgiantrain.be"}
+    ],
+    betrug:[
+      {b:"Meldpunt (safeonweb.be)", s:"Verdächtige Mails & Websites melden", url:"https://www.safeonweb.be"}
+    ],
+    panne:[
+      {label:"Touring Mobilis", num:"070 344 777"}
+    ],
+    panneInfo:{club:"Touring", url:"https://www.touring.be/nl/service/pechbijstand"}
+  },
+  LU: {
+    name:"Luxemburg",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"Polizei", num:"113", big:true}
+    ],
+    fahr:[
+      {b:"CFL – Bahn & Bus Luxemburg", s:"Fahrpläne & Verbindungen (gratis!)", url:"https://www.cfl.lu"}
+    ],
+    betrug:[
+      {b:"BEE SECURE", s:"Online-Betrug melden", url:"https://www.bee-secure.lu"}
+    ],
+    panne:[
+      {label:"ACL Pannenhilfe", num:"26 000 1"}
+    ],
+    panneInfo:{club:"ACL", url:"https://www.acl.lu/fr/mobilite/assistance-depannage"}
+  },
+  DK: {
+    name:"Dänemark",
+    notruf:[
+      {label:"Notruf (Polizei, Rettung, Feuerwehr)", num:"112", big:true},
+      {label:"Polizei (nicht dringend)", num:"114", soft:true}
+    ],
+    fahr:[
+      {b:"Rejseplanen – Bahn & Bus Dänemark", s:"Fahrplanauskunft", url:"https://www.rejseplanen.dk"}
+    ],
+    betrug:[
+      {b:"Forbruger Europa", s:"Verbraucherberatung (dk)", url:"https://www.forbrugereuropa.dk"}
+    ],
+    panne:[
+      {label:"FDM Vejhjælp", num:"70 13 30 40"}
+    ],
+    panneInfo:{club:"FDM", url:"https://www.fdm.dk/hjaelp-paa-vejen"}
+  },
+  SE: {
+    name:"Schweden",
+    notruf:[
+      {label:"Notruf (Polizei, Rettung, Feuerwehr)", num:"112", big:true},
+      {label:"Polizei (nicht dringend)", num:"114 14", soft:true}
+    ],
+    fahr:[
+      {b:"SJ – Bahn in Schweden", s:"Verbindungen & Tickets", url:"https://www.sj.se"}
+    ],
+    betrug:[
+      {b:"Hallå Konsument", s:"Verbraucherberatung (sv)", url:"https://www.hallakonsument.se"}
+    ],
+    panne:[
+      {label:"Assistancekåren", num:"020 912 912"}
+    ],
+    panneInfo:{club:"M Sverige", url:"https://www.motoristernas.se"}
+  },
+  FI: {
+    name:"Finnland",
+    notruf:[
+      {label:"Notruf (Polizei, Rettung, Feuerwehr)", num:"112", big:true}
+    ],
+    fahr:[
+      {b:"VR – Bahn in Finnland", s:"Verbindungen & Tickets", url:"https://www.vr.fi"}
+    ],
+    betrug:[
+      {b:"Verkkorikosilmoitus", s:"Online-Betrug melden (fi)", url:"https://www.poliisi.fi"}
+    ],
+    panne:[
+      {label:"Autoliitto Tienpäällyspalvelu", num:"0200 8080"}
+    ],
+    panneInfo:{club:"Autoliitto", url:"https://www.autoliitto.fi/palvelut/tienpallyspalvelu"}
+  },
+  IE: {
+    name:"Irland",
+    notruf:[
+      {label:"Notruf (Polizei, Rettung, Feuerwehr)", num:"112", big:true},
+      {label:"Alternativ", num:"999", soft:true}
+    ],
+    fahr:[
+      {b:"Irish Rail – Bahn in Irland", s:"Verbindungen & Tickets", url:"https://www.irishrail.ie"}
+    ],
+    betrug:[
+      {b:"An Garda Síochána", s:"Betrug melden (en)", url:"https://www.garda.ie"}
+    ],
+    panne:[
+      {label:"AA Ireland Pannenhilfe", num:"0818 227 228"}
+    ],
+    panneInfo:{club:"AA Ireland", url:"https://www.theaa.ie/breakdown"}
+  },
+  PL: {
+    name:"Polen",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"Rettung", num:"999", big:true},
+      {label:"Polizei", num:"997", soft:true},
+      {label:"Feuerwehr", num:"998", soft:true}
+    ],
+    fahr:[
+      {b:"PKP Intercity – Bahn in Polen", s:"Verbindungen & Tickets", url:"https://www.intercity.pl"}
+    ],
+    betrug:[
+      {b:"CERT Polska", s:"Online-Betrug melden", url:"https://incydent.cert.pl"}
+    ],
+    panne:[
+      {label:"PZM Pomoc drogowa", num:"981"}
+    ],
+    panneInfo:{club:"PZM", url:"https://www.pzm.pl"}
+  },
+  CZ: {
+    name:"Tschechien",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"Rettung", num:"155", big:true},
+      {label:"Polizei", num:"158", soft:true},
+      {label:"Feuerwehr", num:"150", soft:true}
+    ],
+    fahr:[
+      {b:"ČD – Bahn in Tschechien", s:"Verbindungen & Tickets", url:"https://www.cd.cz"}
+    ],
+    betrug:[
+      {b:"dTest", s:"Verbraucherberatung (cs)", url:"https://www.dtest.cz"}
+    ],
+    panne:[
+      {label:"ÚAMK Silniční pomoc", num:"1230"},
+      {label:"ABA Silniční pomoc", num:"1240", soft:true}
+    ],
+    panneInfo:{club:"ÚAMK", url:"https://www.uamk.cz"}
+  },
+  SK: {
+    name:"Slowakei",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"Rettung", num:"155", big:true},
+      {label:"Polizei", num:"158", soft:true},
+      {label:"Feuerwehr", num:"150", soft:true}
+    ],
+    fahr:[
+      {b:"ZSSK – Bahn in der Slowakei", s:"Verbindungen & Tickets", url:"https://www.zssk.sk"}
+    ],
+    betrug:[
+      {b:"Polícia SR", s:"Betrug melden (sk)", url:"https://www.minv.sk/?policia"}
+    ],
+    panne:[
+      {label:"SATC Cestná pomoc", num:"18124"},
+      {label:"Autoklub SR", num:"18040", soft:true}
+    ],
+    panneInfo:{club:"SATC", url:"https://www.satc.sk"}
+  },
+  HU: {
+    name:"Ungarn",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"Rettung", num:"104", big:true},
+      {label:"Polizei", num:"107", soft:true},
+      {label:"Feuerwehr", num:"105", soft:true}
+    ],
+    fahr:[
+      {b:"MÁV – Bahn in Ungarn", s:"Verbindungen & Tickets", url:"https://www.mav.hu"}
+    ],
+    betrug:[
+      {b:"Rendőrség", s:"Betrug melden (hu)", url:"https://www.police.hu"}
+    ],
+    panne:[
+      {label:"Magyar Autóklub Segélyszolgálat", num:"188"}
+    ],
+    panneInfo:{club:"Magyar Autóklub", url:"https://www.autoklub.hu"}
+  },
+  SI: {
+    name:"Slowenien",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"Polizei", num:"113", soft:true}
+    ],
+    fahr:[
+      {b:"SŽ – Bahn in Slowenien", s:"Verbindungen & Tickets", url:"https://www.slo-zeleznice.si"}
+    ],
+    betrug:[
+      {b:"Policija", s:"Betrug melden (sl)", url:"https://www.policija.si"}
+    ],
+    panne:[
+      {label:"AMZS Pomoč na cesti", num:"1987"}
+    ],
+    panneInfo:{club:"AMZS", url:"https://www.amzs.si/pomoc-na-cesti"}
+  },
+  HR: {
+    name:"Kroatien",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"Rettung", num:"194", big:true},
+      {label:"Polizei", num:"192", soft:true},
+      {label:"Feuerwehr", num:"193", soft:true}
+    ],
+    fahr:[
+      {b:"HŽ Putnički prijevoz – Bahn Kroatien", s:"Verbindungen & Tickets", url:"https://www.hzpp.hr"}
+    ],
+    betrug:[
+      {b:"Policija (gov.hr)", s:"Betrug melden (hr)", url:"https://policija.gov.hr"}
+    ],
+    panne:[
+      {label:"HAK Vuča vozila", num:"1987"}
+    ],
+    panneInfo:{club:"HAK", url:"https://www.hak.hr/pomoc-na-cesti/"}
+  },
+  ES: {
+    name:"Spanien",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"Polizei (Nacional)", num:"091", soft:true},
+      {label:"Guardia Civil", num:"062", soft:true},
+      {label:"Rettung (Comunidad)", num:"061", soft:true}
+    ],
+    fahr:[
+      {b:"Renfe – Bahn in Spanien", s:"Verbindungen & Tickets", url:"https://www.renfe.com"}
+    ],
+    betrug:[
+      {b:"OSI (Oficina de Seguridad del Internauta)", s:"Online-Betrug melden (es)", url:"https://www.osi.es"}
+    ],
+    panne:[
+      {label:"RACE Asistencia en carretera", num:"900 200 093"}
+    ],
+    panneInfo:{club:"RACE", url:"https://www.race.es/asistencia-en-carretera"}
+  },
+  PT: {
+    name:"Portugal",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true}
+    ],
+    fahr:[
+      {b:"CP – Comboios de Portugal", s:"Bahn in Portugal, Verbindungen & Tickets", url:"https://www.cp.pt"}
+    ],
+    betrug:[
+      {b:"CNCS", s:"Cybersicherheit & Betrug melden (pt)", url:"https://www.cncs.gov.pt"}
+    ],
+    panne:[
+      {label:"ACP Assistência na Estrada", num:"808 222 222"}
+    ],
+    panneInfo:{club:"ACP", url:"https://www.acp.pt"}
+  },
+  GR: {
+    name:"Griechenland",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"Rettung (EKAB)", num:"166", big:true},
+      {label:"Polizei", num:"100", soft:true},
+      {label:"Feuerwehr", num:"199", soft:true}
+    ],
+    fahr:[
+      {b:"Hellenic Train – Bahn Griechenland", s:"Verbindungen & Tickets", url:"https://www.hellenictrain.gr"}
+    ],
+    betrug:[
+      {b:"Δίωξη Ηλεκτρονικού Εγκλήματος", s:"Cyberkriminalität melden (el)", url:"https://www.cyberkrime.gov.gr"}
+    ],
+    panne:[
+      {label:"ELPA Οδική Βοήθεια", num:"10400"}
+    ],
+    panneInfo:{club:"ELPA", url:"https://www.elpa.gr"}
+  },
+  BG: {
+    name:"Bulgarien",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"Polizei", num:"166", soft:true},
+      {label:"Feuerwehr", num:"160", soft:true},
+      {label:"Rettung", num:"150", soft:true}
+    ],
+    fahr:[
+      {b:"БДЖ – Bahn in Bulgarien", s:"Verbindungen & Tickets", url:"https://www.bdz.bg"}
+    ],
+    betrug:[
+      {b:"МВР (Ministerium des Innern)", s:"Betrug melden (bg)", url:"https://www.mvr.bg"}
+    ],
+    panne:[
+      {label:"СБА Пътна помощ", num:"1282"}
+    ],
+    panneInfo:{club:"СБА (SBA)", url:"https://www.sba.bg"}
+  },
+  RO: {
+    name:"Rumänien",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true}
+    ],
+    fahr:[
+      {b:"CFR Călători – Bahn in Rumänien", s:"Verbindungen & Tickets", url:"https://www.cfrcalatori.ro"}
+    ],
+    betrug:[
+      {b:"CERT-RO", s:"Online-Betrug melden", url:"https://www.cert.ro"}
+    ],
+    panne:[
+      {label:"ACR Asistenţă Rutieră", num:"9271"}
+    ],
+    panneInfo:{club:"ACR", url:"https://www.acr.ro"}
+  },
+  EE: {
+    name:"Estland",
+    notruf:[
+      {label:"Notruf (Polizei, Rettung, Feuerwehr)", num:"112", big:true}
+    ],
+    fahr:[
+      {b:"Elron – Bahn in Estland", s:"Verbindungen & Tickets", url:"https://elron.ee"}
+    ],
+    betrug:[
+      {b:"Politsei- ja Piirivalveamet", s:"Betrug melden (et)", url:"https://www.politsei.ee"}
+    ],
+    panne:[
+      {label:"EAA Autoabi", num:"1888"}
+    ],
+    panneInfo:{club:"EAA", url:"https://www.autoklubi.ee"}
+  },
+  LV: {
+    name:"Lettland",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"Polizei", num:"110", soft:true},
+      {label:"Feuerwehr & Rettung", num:"01", soft:true}
+    ],
+    fahr:[
+      {b:"Pasažieru vilciens – Bahn Lettland", s:"Verbindungen & Tickets", url:"https://www.pv.lv"}
+    ],
+    betrug:[
+      {b:"Valsts policija", s:"Betrug melden (lv)", url:"https://www.vp.gov.lv"}
+    ],
+    panne:[
+      {label:"LAMB Ceļu palīdzība", num:"1888"}
+    ],
+    panneInfo:{club:"LAMB", url:"https://www.lamb.lv"}
+  },
+  LT: {
+    name:"Litauen",
+    notruf:[
+      {label:"Notruf (Polizei, Rettung, Feuerwehr)", num:"112", big:true}
+    ],
+    fahr:[
+      {b:"LTG Link – Bahn in Litauen", s:"Verbindungen & Tickets", url:"https://www.ltglink.lt"}
+    ],
+    betrug:[
+      {b:"Lietuvos policija", s:"Betrug melden (lt)", url:"https://www.policija.lt"}
+    ],
+    panne:[
+      {label:"LMA Techninė pagalba kelyje", num:"1888"}
+    ],
+    panneInfo:{club:"LMA", url:"https://www.lma.lt"}
+  },
+  MT: {
+    name:"Malta",
+    notruf:[
+      {label:"Notruf (Polizei, Rettung, Feuerwehr)", num:"112", big:true},
+      {label:"Polizei (nicht dringend)", num:"2122 4001", soft:true}
+    ],
+    fahr:[
+      {b:"Malta Public Transport – Bus", s:"Fahrpläne & Verbindungen", url:"https://www.publictransport.com.mt"}
+    ],
+    betrug:[
+      {b:"Malta Police Cybercrime Unit", s:"Betrug melden (en)", url:"https://pulizija.gov.mt"}
+    ],
+    panne:[
+      {label:"Notrufnummer Polizei / Hilfe", num:"112"}
+    ],
+    panneInfo:{club:"Versicherung / lokale Pannendienste", url:"https://pulizija.gov.mt"}
+  },
+  CY: {
+    name:"Zypern",
+    notruf:[
+      {label:"Notruf (Polizei, Rettung, Feuerwehr)", num:"112", big:true},
+      {label:"Polizei & Feuerwehr (alternativ)", num:"199", soft:true}
+    ],
+    fahr:[
+      {b:"Intercity Buses Zypern", s:"Busverbindungen zwischen Städten", url:"https://www.intercity-buses.com"}
+    ],
+    betrug:[
+      {b:"Cyprus Police", s:"Betrug melden (en)", url:"https://www.police.gov.cy"}
+    ],
+    panne:[
+      {label:"ASCS Pannenhilfe", num:"22 313 233"}
+    ],
+    panneInfo:{club:"ASCS", url:"https://www.ascs.org.cy"}
+  },
+  ME: {
+    name:"Montenegro",
+    notruf:[
+      {label:"Euronotruf", num:"112", big:true},
+      {label:"Polizei", num:"122", soft:true},
+      {label:"Feuerwehr", num:"123", soft:true},
+      {label:"Rettung", num:"124", soft:true}
+    ],
+    fahr:[
+      {b:"ŽPCG – Bahn in Montenegro", s:"Verbindungen (me)", url:"https://www.zcg-prevoz.me"}
+    ],
+    betrug:[
+      {b:"Uprava policije", s:"Betrug melden (me)", url:"https://www.gov.me/uprava-policije"}
+    ],
+    panne:[
+      {label:"AMSCG Pomoć na putu", num:"19807"}
+    ],
+    panneInfo:{club:"AMSCG", url:"https://www.amscg.org"}
   }
 };
 
