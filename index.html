@@ -3134,7 +3134,8 @@ function wgKopieren(){
   } else { window.prompt('Link zum Kopieren:', LOTSE_URL); }
 }
 /* ====================== Regenradar (RainViewer) ====================== */
-var RADAR={built:false,map:null,frames:[],layers:[],idx:0,timer:null,host:'',pastCount:0};
+var RADAR={built:false,map:null,frames:[],layers:[],idx:0,timer:null,host:'',pastCount:0,lat:null,lon:null,marker:null};
+function radarCoords(){ var c=WETTER_CUR&&typeof WETTER_CUR.lat==='number'?WETTER_CUR:{lat:STATE.lat,lon:STATE.lon}; return [c.lat,c.lon]; }
 function radarLoadLeaflet(){
   return new Promise(function(res,rej){
     if(window.L) return res();
@@ -3158,7 +3159,16 @@ function radarToggle(){
   }
   wrap.style.display='block';
   btn.textContent='Regenradar ausblenden';
-  if(RADAR.built){ if(RADAR.map){ RADAR.map.invalidateSize(); } radarPlay(); return; }
+  if(RADAR.built){
+    var rc=radarCoords();
+    if(RADAR.lat!==rc[0]||RADAR.lon!==rc[1]){
+      if(RADAR.map) RADAR.map.setView(rc,8);
+      if(RADAR.marker) RADAR.marker.setLatLng(rc);
+      RADAR.lat=rc[0]; RADAR.lon=rc[1];
+    }
+    if(RADAR.map){ RADAR.map.invalidateSize(); }
+    radarPlay(); return;
+  }
   radarBuild();
 }
 function radarBuild(){
@@ -3172,9 +3182,11 @@ function radarBuild(){
     RADAR.pastCount=past.length;
     RADAR.frames=past.concat(nc);
     if(!RADAR.frames.length){ radarStatus('Im Moment liegen keine Radardaten vor.'); return; }
-    var map=L.map('radarMap',{maxZoom:12,minZoom:6}).setView([STATE.lat,STATE.lon],8);
+    var rc=radarCoords();
+    var map=L.map('radarMap',{maxZoom:12,minZoom:6}).setView(rc,8);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:12,attribution:'\u00a9 OpenStreetMap'}).addTo(map);
-    L.marker([STATE.lat,STATE.lon]).addTo(map);
+    RADAR.marker=L.marker(rc).addTo(map);
+    RADAR.lat=rc[0]; RADAR.lon=rc[1];
     RADAR.map=map; RADAR.layers=[];
     RADAR.frames.forEach(function(f){
       var lyr=L.tileLayer(RADAR.host+f.path+'/256/{z}/{x}/{y}/2/1_1.png',{opacity:0,zIndex:5,maxNativeZoom:7,maxZoom:12});
