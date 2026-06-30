@@ -86,11 +86,6 @@
   .tile.alarm{background:var(--alarm);border-color:var(--alarm-dark);color:#fff}
   .tile.alarm .ic *{stroke:#fff}
   .tile.full{grid-column:1 / -1}
-  .schiff-ziele{grid-column:1 / -1;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;box-shadow:0 1px 0 rgba(15,38,48,.04)}
-  .schiff-ziele-label{font-size:.85rem;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
-  .schiff-ziele-chips{display:flex;flex-wrap:wrap;gap:8px}
-  .schiff-chip{border:1.5px solid #2ba6c9;background:#fff;color:#0e3553;border-radius:999px;padding:7px 16px;font-size:.93rem;font-weight:600;cursor:pointer;transition:.12s;-webkit-tap-highlight-color:transparent}
-  .schiff-chip:active{background:#eaf2f8}
 
   /* --- Unterseiten --- */
   .view{display:none}
@@ -450,10 +445,6 @@
           <span class="lbl">BSB Fahrplan</span>
           <span class="sub">Schiffe auf dem Bodensee</span>
         </button>
-        <div class="schiff-ziele" id="schiffZiele" style="display:none">
-          <div class="schiff-ziele-label">Wohin fahren Sie?</div>
-          <div class="schiff-ziele-chips" id="schiffChips"></div>
-        </div>
 
         <button class="tile" onclick="go('auto')">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l1.6-4.4A2 2 0 0 1 8.5 5h7a2 2 0 0 1 1.9 1.6L19 11"/><path d="M3 11h18v5H3z"/><circle cx="7" cy="16.5" r="1.5"/><circle cx="17" cy="16.5" r="1.5"/></svg></span>
@@ -1789,33 +1780,11 @@ function go(name){
 }
 
 /* ---------- BSB Schiffsfahrplan (eigene Seite, Standort wird übergeben) ---------- */
-var BSB_ZIELE = [
-  'Konstanz','Meersburg','Friedrichshafen','Lindau','Bregenz',
-  'Wasserburg','Mainau','Reichenau',
-  'Romanshorn','Arbon','Rorschach'
-];
-function schiffZieleInit(){
-  var box=document.getElementById('schiffZiele');
-  var chips=document.getElementById('schiffChips');
-  if(!box||!chips) return;
-  chips.innerHTML='';
-  BSB_ZIELE.forEach(function(z){
-    var b=document.createElement('button');
-    b.className='schiff-chip';
-    b.textContent=z;
-    b.onclick=function(e){ e.stopPropagation(); openSchiff(z); };
-    chips.appendChild(b);
-  });
-  box.style.display='block';
-}
-function openSchiff(ziel){
+function openSchiff(){
   var u = 'bsb-fahrplan.html';
-  var params=[];
   if(STATE && typeof STATE.lat==='number' && typeof STATE.lon==='number'){
-    params.push('lat='+STATE.lat,'lng='+STATE.lon);
+    u += '?lat=' + STATE.lat + '&lng=' + STATE.lon;
   }
-  if(ziel) params.push('to='+encodeURIComponent(ziel));
-  if(params.length) u+='?'+params.join('&');
   location.href = u;
 }
 
@@ -3935,7 +3904,6 @@ merkBadge();
 parkBadge();
 snBadge();
 werkzeugeBadgeUpdate();
-schiffZieleInit();
 
 /* ====================== Land-Auswahl Overlay ====================== */
 const LAND_LISTE = [
