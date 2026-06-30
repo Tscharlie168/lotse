@@ -500,9 +500,10 @@
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg>
           <span>Lupe</span>
         </button>
-        <button class="cat" onclick="go('merkzettel')">
+        <button class="cat" id="catMerkzettel" onclick="go('merkzettel')" style="position:relative">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
           <span>Merkzettel</span>
+          <span id="merkBadge" style="display:none;position:absolute;top:6px;right:6px;background:#e53935;color:#fff;font-size:0.7rem;font-weight:700;min-width:18px;height:18px;border-radius:9px;line-height:18px;text-align:center;padding:0 4px"></span>
         </button>
         <button class="cat" onclick="go('kisuche')">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6z"/><path d="M18 14l.7 1.9L20.6 16.6 18.7 17.3 18 19.2 17.3 17.3 15.4 16.6 17.3 15.9z"/></svg>
@@ -3075,8 +3076,15 @@ function lotseEsc(s){ return (s+'').replace(/&/g,'&amp;').replace(/</g,'&lt;').r
 /* --- Merkzettel --- */
 function merkLoad(){ try{ return JSON.parse(localStorage.getItem('lotse_merk'))||[]; }catch(e){ return []; } }
 function merkSave(a){ try{ localStorage.setItem('lotse_merk', JSON.stringify(a)); }catch(e){} }
+function merkBadge(){
+  var a=merkLoad(), n=a.filter(function(x){return !x.d;}).length;
+  var b=document.getElementById('merkBadge'); if(!b) return;
+  if(n>0){ b.textContent=n; b.style.display='inline-block'; }
+  else { b.style.display='none'; }
+}
 function renderMerk(){
   var a=merkLoad(), box=document.getElementById('merkListe');
+  merkBadge();
   if(!a.length){ box.innerHTML='<div class="merk-leer">Noch nichts notiert.</div>'; document.getElementById('merkClear').style.display='none'; return; }
   box.innerHTML=a.map(function(it,i){
     return '<div class="merk-item'+(it.d?' done':'')+'">'+
@@ -3836,6 +3844,7 @@ function radarStop(){
 function radarPlayToggle(){ if(RADAR.timer) radarStop(); else radarPlay(); }
 
 bannerInit();
+merkBadge();
 
 /* ====================== Land-Auswahl Overlay ====================== */
 const LAND_LISTE = [
