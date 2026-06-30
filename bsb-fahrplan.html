@@ -190,7 +190,39 @@ var COURSES = [
   {"no":525,"svc":"restaurant","line":"untersee","stops":[[27, "9:10", "9:10"], [26, "9:38", "9:38"], [25, "10:10", "10:10"], [24, "11:15", "11:15"], [23, "11:32", "11:32"], [22, "11:39", "11:39"], [21, "11:45", "11:45"], [20, "11:57", "11:57"], [19, "12:03", "12:03"], [18, "12:09", "12:09"], [17, "12:18", "12:18"], [16, "12:27", "12:27"], [15, "12:38", "12:38"], [14, "12:50", "12:50"], [13, "13:17", "13:17"], [0, "13:45", "13:45"], [12, "13:55", "13:55"]]},
   {"no":533,"svc":"restaurant","line":"untersee","stops":[[27, "11:10", "11:10"], [26, "11:38", "11:38"], [25, "12:10", "12:10"], [24, "13:15", "13:15"], [23, "13:32", "13:32"], [22, "13:39", "13:39"], [21, "13:45", "13:45"], [20, "13:57", "13:57"], [19, "14:03", "14:03"], [18, "14:09", "14:09"], [17, "14:18", "14:18"], [16, "14:27", "14:27"], [15, "14:38", "14:38"], [14, "14:50", "14:50"], [13, "15:17", "15:17"], [0, "15:45", "15:45"], [12, "15:55", "15:55"]]},
   {"no":543,"svc":"restaurant","line":"untersee","stops":[[27, "13:18", "13:18"], [26, "13:46", "13:46"], [25, "14:18", "14:18"], [24, "15:23", "15:23"], [23, "15:40", "15:40"], [22, "15:47", "15:47"], [21, "15:53", "15:53"], [20, "16:05", "16:05"], [19, "16:11", "16:11"], [18, "16:17", "16:17"], [17, "16:26", "16:26"], [16, "16:35", "16:35"], [15, "16:46", "16:46"], [14, "16:58", "16:58"], [13, "17:25", "17:25"], [0, "17:53", "17:53"], [12, "18:05", "18:05"]]},
-  {"no":551,"svc":"restaurant","line":"untersee","stops":[[27, "15:18", "15:18"], [26, "15:46", "15:46"], [25, "16:18", "16:18"], [24, "17:23", "17:23"], [23, "17:40", "17:40"], [22, "17:47", "17:47"], [21, "17:53", "17:53"], [20, "18:05", "18:05"], [19, "18:11", "18:11"], [18, "18:17", "18:17"], [17, "18:26", "18:26"], [16, "18:35", "18:35"], [15, "18:46", "18:46"], [14, "18:58", "18:58"], [13, "19:25", "19:25"], [0, "19:53", "19:53"], [12, "20:05", "20:05"]]}
+  {"no":551,"svc":"restaurant","line":"untersee","stops":[[27, "15:18", "15:18"], [26, "15:46", "15:46"], [25, "16:18", "16:18"], [24, "17:23", "17:23"], [23, "17:40", "17:40"], [22, "17:47", "17:47"], [21, "17:53", "17:53"], [20, "18:05", "18:05"], [19, "18:11", "18:11"], [18, "18:17", "18:17"], [17, "18:26", "18:26"], [16, "18:35", "18:35"], [15, "18:46", "18:46"], [14, "18:58", "18:58"], [13, "19:25", "19:25"], [0, "19:53", "19:53"], [12, "20:05", "20:05"]]},
+  // === SBS Dreiländereck – Quelle: SBS Fahrplan 2026, täglich Hauptsaison ===
+  // Rorschach → Lindau (via Wasserburg oder Bregenz)
+  {"no":901,"svc":"snack","line":"sbs","stops":[[30,"10:40","10:40"],[10,"11:40","11:40"]]},
+  {"no":902,"svc":"snack","line":"sbs","stops":[[30,"11:25","11:25"],[11,"12:42","12:42"],[10,"13:05","13:05"]]},
+  {"no":903,"svc":"snack","line":"sbs","stops":[[30,"13:05","13:05"],[9,"13:55","13:55"],[10,"14:15","14:15"]]},
+  {"no":904,"svc":"snack","line":"sbs","stops":[[30,"14:20","14:20"],[9,"15:15","15:15"],[10,"15:40","15:40"]]},
+  {"no":905,"svc":"snack","line":"sbs","stops":[[30,"17:05","17:05"],[9,"17:50","17:50"],[10,"18:15","18:15"]]},
+  // Lindau → Rorschach
+  {"no":906,"svc":"snack","line":"sbs","stops":[[10,"11:45","11:45"],[9,"12:05","12:05"],[30,"12:55","12:55"]]},
+  {"no":907,"svc":"snack","line":"sbs","stops":[[10,"13:10","13:10"],[30,"14:06","14:06"]]},
+  {"no":908,"svc":"snack","line":"sbs","stops":[[10,"15:50","15:50"],[30,"16:51","16:51"]]},
+  {"no":909,"svc":"snack","line":"sbs","stops":[[10,"18:20","18:20"],[30,"19:15","19:15"]]},
+  // Romanshorn/Arbon → Rorschach (morgens)
+  {"no":916,"svc":"snack","line":"sbs","stops":[[28,"10:20","10:20"],[29,"10:55","10:55"],[30,"11:20","11:20"]]},
+  // Romanshorn/Arbon → Langenargen
+  {"no":911,"svc":"snack","line":"sbs","stops":[[28,"08:50","08:50"],[29,"09:20","09:23"],[6,"10:05","10:05"]]},
+  {"no":912,"svc":"snack","line":"sbs","stops":[[28,"12:05","12:05"],[29,"12:35","12:38"],[6,"13:20","13:20"]]},
+  {"no":913,"svc":"snack","line":"sbs","stops":[[29,"14:38","14:38"],[6,"15:20","15:20"]]},
+  // Rorschach → Arbon → Romanshorn
+  {"no":914,"svc":"snack","line":"sbs","stops":[[30,"11:02","11:02"],[29,"11:27","11:30"],[28,"12:00","12:00"]]},
+  {"no":915,"svc":"snack","line":"sbs","stops":[[30,"19:18","19:18"],[29,"19:43","19:43"],[28,"20:13","20:13"]]},
+  // Rorschach → Immenstaad → Hagnau → Kreuzlingen (täglich)
+  {"no":917,"svc":"snack","line":"sbs","stops":[[30,"09:30","09:30"],[4,"12:10","12:10"],[3,"12:30","12:30"],[12,"12:25","12:25"]]},
+  // Kreuzlingen → Hagnau → Immenstaad → Rorschach (täglich)
+  {"no":918,"svc":"snack","line":"sbs","stops":[[12,"15:20","15:20"],[3,"15:55","15:55"],[4,"16:05","16:05"],[30,"18:55","18:55"]]},
+  // Freitags 27.06–13.09: Romanshorn → Immenstaad → Hagnau
+  {"no":920,"svc":"snack","line":"sbs-fr","stops":[[28,"13:20","13:20"],[4,"14:00","14:05"],[3,"14:20","14:20"]]},
+  // Freitags: Hagnau/Immenstaad → Romanshorn (Rückfahrten)
+  {"no":921,"svc":"snack","line":"sbs-fr","stops":[[3,"16:00","16:00"],[4,"16:20","16:20"]]},
+  {"no":922,"svc":"snack","line":"sbs-fr","stops":[[3,"17:30","17:30"],[4,"17:50","17:50"]]},
+  {"no":923,"svc":"snack","line":"sbs-fr","stops":[[3,"19:55","19:55"],[4,"20:15","20:15"]]},
+  {"no":924,"svc":"snack","line":"sbs-fr","stops":[[4,"21:10","21:10"],[3,"21:25","21:30"],[28,"22:35","22:35"]]}
 ];
 
 var WEEKDAYS = ["So","Mo","Di","Mi","Do","Fr","Sa"];
@@ -243,7 +275,12 @@ function courseValidOn(c,dObj,dStr){
     if(dStr<="2026-09-13"){var w=dObj.getDay();return (w===0||w>=3);}
     return false;
   }
-  return true;
+  if(c.line==="sbs-fr"){
+    // Freitags 27.06–13.09.2026
+    if(dStr<"2026-06-27"||dStr>"2026-09-13") return false;
+    return dObj.getDay()===5;
+  }
+  return true; // obersee + sbs: täglich Hauptsaison
 }
 function legOf(c,fromIdx,toIdx){
   var pf=-1,pt=-1,j;
@@ -348,7 +385,7 @@ function journeyRow(r,i){
       var lg=r.legs[L];
       if(r.transfers===1){ h+='<div class="lg-leg-kurs"><span class="lg-kurs sm">Kurs '+lg.no+'</span>'+svcTag(lg.svc)+'</div>'; }
       for(var k=0;k<lg.stops.length;k++){ h+='<div class="lg-leg"><span class="lg-leg-t">'+pad(lg.stops[k].t)+'</span><span class="lg-leg-n">'+esc(lg.stops[k].name)+'</span></div>'; }
-      if(r.transfers===1&&L===0){ h+='<div class="lg-xfer">&#8634; Umstieg in '+esc(r.via)+' &middot; '+r.wait+' min Aufenthalt'+(r.xops?' &middot; anderer Anbieter, eigenes Ticket':'')+'</div>'; }
+      if(r.transfers===1&&L===0){ h+='<div class="lg-xfer">&#8634; Umstieg in '+esc(r.via)+' &middot; '+r.wait+' min Aufenthalt'+(r.xops?' &middot; anderer Anbieter (SBS/URh), eigenes Ticket':'')+'</div>'; }
     }
     h+='</div>';
   }
@@ -360,7 +397,8 @@ function boardHTML(rows,emptyKind,fromIdx,toIdx){
   if(!rows.length){
     var isSbs=SBS_PORTS.indexOf(fromIdx)>=0||SBS_PORTS.indexOf(toIdx)>=0;
     if(isSbs){
-      return '<div class="lg-empty"><div class="lg-empty-mark">&#127464;&#127469;</div><p><strong>'+PORTS[toIdx<28?fromIdx:toIdx]+'</strong> wird von der <strong>SBS</strong> (Schweizerische Bodensee-Schiffahrtsgesellschaft) bedient &mdash; nicht von BSB oder URh.</p><p class="lg-empty-hint">Den aktuellen SBS-Fahrplan und Tickets gibt es direkt unter <a href="https://bodensee-schiffe.ch" target="_blank" style="color:#15679e">bodensee-schiffe.ch</a>. Eine Tageskarte der BSB gilt dort nicht.</p></div>';
+      var sbsPort=SBS_PORTS.indexOf(toIdx)>=0?PORTS[toIdx]:PORTS[fromIdx];
+      return '<div class="lg-empty"><div class="lg-empty-mark">&#127464;&#127469;</div><p>Keine direkte Verbindung nach/von <strong>'+esc(sbsPort)+'</strong> an diesem Tag &mdash; oder Route nicht im Plan abgebildet.</p><p class="lg-empty-hint">Vollst&auml;ndiger SBS-Fahrplan: <a href="https://bodensee-schiffe.ch" target="_blank" style="color:#15679e">bodensee-schiffe.ch</a> &middot; BSB-Tageskarte gilt dort nicht.</p></div>';
     }
     if(emptyKind==="past"){
       return '<div class="lg-empty"><div class="lg-empty-mark">&#128338;</div><p>F&uuml;r heute f&auml;hrt auf dieser Strecke kein Schiff mehr.</p><p class="lg-empty-hint">W&auml;hle <strong>morgen</strong> oder einen anderen Tag &mdash; dann erscheinen wieder alle Fahrten.</p></div>';
@@ -408,14 +446,12 @@ var SCHWEIZ_ZIELE = [
   {idx:30, name:"Rorschach"}
 ];
 
+function sbsTag(line){
+  if(line==="sbs"||line==="sbs-fr") return '<span style="font-size:11px;background:#D4EAF7;color:#0A3A4E;padding:2px 7px;border-radius:5px;font-weight:700">SBS</span>';
+  if(line==="untersee") return '<span style="font-size:11px;background:#CFE9F2;color:#0A3A4E;padding:2px 7px;border-radius:5px;font-weight:600">URh</span>';
+  return '';
+}
 function schweizAbfahrtenHTML(destIdx, date){
-  if(SBS_PORTS.indexOf(destIdx)>=0){
-    return '<div class="lg-card" style="margin-top:14px"><h3>'+PORTS[destIdx]+' &mdash; SBS</h3>'+
-      '<p>Dieser Hafen wird von der <strong>SBS</strong> (Schweizerische Bodensee-Schiffahrtsgesellschaft) bedient, nicht von BSB oder URh. Den aktuellen Fahrplan und Tickets gibt es unter:</p>'+
-      '<p style="margin-top:10px"><a href="https://bodensee-schiffe.ch" target="_blank" style="color:#15679e;font-weight:700;font-size:1rem">&#8594; bodensee-schiffe.ch</a></p>'+
-      '<p style="margin-top:8px;font-size:13px;color:var(--muted)">Ausweis mitbringen &middot; Bezahlung in CHF &middot; BSB-Tageskarte gilt nicht</p>'+
-    '</div>';
-  }
   var dObj=new Date(date+"T12:00:00");
   var byPort={};
   for(var i=0;i<COURSES.length;i++){
@@ -462,12 +498,12 @@ function schweizAbfahrtenHTML(destIdx, date){
       h+='<span style="font-family:\'IBM Plex Mono\',monospace;font-weight:600;font-size:18px;color:#0E3553">'+pad(tr.dep)+'</span>';
       h+='<span style="color:var(--muted);font-size:13px">&#8594; an '+pad(tr.arr)+' &middot; '+fmtDur(dur)+'</span>';
       h+=svcTag(tr.svc);
-      if(tr.line==="untersee") h+='<span style="font-size:11px;background:#CFE9F2;color:#0A3A4E;padding:2px 7px;border-radius:5px;font-weight:600">URh</span>';
+      h+=sbsTag(tr.line);
       h+='</div>';
     }
     h+='</div></div>';
   }
-  h+='<div class="lg-note" style="margin-top:4px;font-size:12.5px">Untersee-Ziele fahren 27.6.&ndash;13.9. nur Mi&ndash;So &middot; URh-Ticket erforderlich &middot; Angaben ohne Gew&auml;hr</div>';
+  h+='<div class="lg-note" style="margin-top:4px;font-size:12.5px">SBS/URh: eigenes Ticket erforderlich &middot; Untersee Mi&ndash;So ab 27.6. &middot; SBS-Freitags-Kurs 27.6.&ndash;13.9. &middot; Angaben ohne Gew&auml;hr &middot; <a href="https://bodensee-schiffe.ch" target="_blank" style="color:var(--blue)">bodensee-schiffe.ch</a></div>';
   h+='</div>';
   return h;
 }
