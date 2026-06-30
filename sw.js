@@ -15,7 +15,7 @@
    Manifest kommen zuerst aus dem Speicher. Fremde Dienste (Karten,
    OpenStreetMap, Wetter) immer aus dem Netz. */
 
-const CACHE = 'lotse-v4';
+const CACHE = 'lotse-v5';
 const SHELL = [
   './',
   './index.html',
