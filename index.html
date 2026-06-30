@@ -408,10 +408,11 @@
       </button>
 
       <div class="grid">
-        <button class="tile" onclick="go('werkzeuge')">
+        <button class="tile" id="tileWerkzeuge" onclick="go('werkzeuge')" style="position:relative">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
           <span class="lbl">Praktische Helfer</span>
           <span class="sub">Lupe, Stoppuhr, Rechner u. a.</span>
+          <span id="werkzeugeBadge" style="display:none;position:absolute;top:10px;right:10px;width:12px;height:12px;border-radius:6px;background:#43a047"></span>
         </button>
 
         <button class="tile" onclick="go('kochen')">
@@ -3088,10 +3089,24 @@ function merkBadge(){
   var b=document.getElementById('merkBadge'); if(!b) return;
   if(n>0){ b.textContent=n; b.style.display='inline-block'; }
   else { b.style.display='none'; }
+  werkzeugeBadgeUpdate();
 }
 function parkBadge(){
   var b=document.getElementById('parkBadgeEl'); if(!b) return;
   b.style.display=parkLoad() ? 'inline-block' : 'none';
+  werkzeugeBadgeUpdate();
+}
+function werkzeugeBadgeUpdate(){
+  var b=document.getElementById('werkzeugeBadge'); if(!b) return;
+  var merkHat=merkLoad().filter(function(x){return !x.d;}).length>0;
+  var parkHat=!!parkLoad();
+  if(merkHat||parkHat){ b.style.display='inline-block'; return; }
+  // Sprachnotiz async prüfen
+  snDbOpen().then(function(db){
+    var req=db.transaction('notizen','readonly').objectStore('notizen').count();
+    req.onsuccess=function(){ b.style.display=req.result>0?'inline-block':'none'; };
+    req.onerror=function(){ b.style.display='none'; };
+  }).catch(function(){ b.style.display='none'; });
 }
 function snBadge(){
   var b=document.getElementById('snBadgeEl'); if(!b) return;
@@ -3209,7 +3224,7 @@ function snSave(){
   var blob=new Blob(snChunks, {type:typ});
   snChunks=[];
   snDbPut({ id:Date.now(), t:Date.now(), dauer:dauer, typ:typ, blob:blob })
-    .then(function(){ snStatus('Notiz gespeichert.'); renderSprachnotizen(); snBadge(); })
+    .then(function(){ snStatus('Notiz gespeichert.'); renderSprachnotizen(); snBadge(); werkzeugeBadgeUpdate(); })
     .catch(function(){ snStatus('Speichern nicht m\u00f6glich \u2013 evtl. ist der Speicher voll.'); });
 }
 function renderSprachnotizen(){
@@ -3241,7 +3256,7 @@ function snPlay(id){
 }
 function snDel(id){
   if(!confirm('Diese Sprachnotiz l\u00f6schen?')) return;
-  snDbDel(id).then(function(){ renderSprachnotizen(); snBadge(); });
+  snDbDel(id).then(function(){ renderSprachnotizen(); snBadge(); werkzeugeBadgeUpdate(); });
 }
 function snLeave(){
   if(snRec && snRec.state==='recording'){ snRec.onstop=null; try{ snRec.stop(); }catch(e){} snAufraeumen(); snChunks=[]; }
@@ -3887,6 +3902,7 @@ neuigkeitenInit();
 merkBadge();
 parkBadge();
 snBadge();
+werkzeugeBadgeUpdate();
 
 /* ====================== Land-Auswahl Overlay ====================== */
 const LAND_LISTE = [
