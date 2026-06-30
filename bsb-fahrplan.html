@@ -314,7 +314,7 @@ function planJourneys(fromIdx,toIdx,dStr){
 }
 
 // ---- state ----
-var state={tab:"planer",from:6,to:11,date:defaultDate(),open:null,favs:[],locStatus:null};
+var state={tab:"planer",from:6,to:11,date:defaultDate(),open:null,favs:[],locStatus:null,schweizDest:null};
 try{var f=localStorage.getItem("lgg-favs");if(f)state.favs=JSON.parse(f);}catch(e){}
 function saveFavs(){try{localStorage.setItem("lgg-favs",JSON.stringify(state.favs));}catch(e){}}
 
@@ -398,20 +398,106 @@ function planerHTML(){
   return h;
 }
 
+var SCHWEIZ_ZIELE = [
+  {idx:13, name:"Gottlieben"},
+  {idx:15, name:"Reichenau"},
+  {idx:24, name:"Stein am Rhein"},
+  {idx:27, name:"Schaffhausen"},
+  {idx:28, name:"Romanshorn"},
+  {idx:29, name:"Arbon"},
+  {idx:30, name:"Rorschach"}
+];
+
+function schweizAbfahrtenHTML(destIdx, date){
+  if(SBS_PORTS.indexOf(destIdx)>=0){
+    return '<div class="lg-card" style="margin-top:14px"><h3>'+PORTS[destIdx]+' &mdash; SBS</h3>'+
+      '<p>Dieser Hafen wird von der <strong>SBS</strong> (Schweizerische Bodensee-Schiffahrtsgesellschaft) bedient, nicht von BSB oder URh. Den aktuellen Fahrplan und Tickets gibt es unter:</p>'+
+      '<p style="margin-top:10px"><a href="https://bodensee-schiffe.ch" target="_blank" style="color:#15679e;font-weight:700;font-size:1rem">&#8594; bodensee-schiffe.ch</a></p>'+
+      '<p style="margin-top:8px;font-size:13px;color:var(--muted)">Ausweis mitbringen &middot; Bezahlung in CHF &middot; BSB-Tageskarte gilt nicht</p>'+
+    '</div>';
+  }
+  var dObj=new Date(date+"T12:00:00");
+  var byPort={};
+  for(var i=0;i<COURSES.length;i++){
+    var c=COURSES[i];
+    if(!courseValidOn(c,dObj,date)) continue;
+    var ptDest=-1,j;
+    for(j=0;j<c.stops.length;j++){if(c.stops[j][0]===destIdx){ptDest=j;break;}}
+    if(ptDest===-1) continue;
+    for(var k=0;k<ptDest;k++){
+      var fp=c.stops[k][0];
+      if(!byPort[fp]) byPort[fp]=[];
+      byPort[fp].push({dep:c.stops[k][2],arr:c.stops[ptDest][1],no:c.no,svc:c.svc,line:c.line});
+    }
+  }
+  var portKeys=Object.keys(byPort);
+  if(!portKeys.length){
+    var w=dObj.getDay();
+    var noDay=(date>"2026-06-26"&&date<="2026-09-13"&&w!==0&&w<3);
+    return '<div class="lg-empty" style="margin-top:14px"><div class="lg-empty-mark">&#9785;</div>'+
+      '<p>Kein Schiff nach <strong>'+PORTS[destIdx]+'</strong> an diesem Tag.</p>'+
+      (noDay?'<p class="lg-empty-hint">Die Untersee-Linie f&auml;hrt ab 27.6. nur <strong>Mi&ndash;So</strong>.</p>':'')+
+    '</div>';
+  }
+  var d=new Date(date+"T12:00:00");
+  var h='<div style="margin-top:16px">';
+  h+='<div class="lg-result-head"><span class="lg-result-route">Nach <em>'+esc(PORTS[destIdx])+'</em></span>';
+  h+='<span class="lg-result-day">'+WEEKDAYS[d.getDay()]+", "+d.getDate()+"."+(d.getMonth()+1)+"."+'</span></div>';
+  // Sort port keys by earliest departure
+  portKeys.sort(function(a,b){
+    var ad=byPort[a].reduce(function(m,x){return Math.min(m,toMin(x.dep));},9999);
+    var bd=byPort[b].reduce(function(m,x){return Math.min(m,toMin(x.dep));},9999);
+    return ad-bd;
+  });
+  for(var pi=0;pi<portKeys.length;pi++){
+    var pIdx=+portKeys[pi];
+    var trips=byPort[pIdx].slice().sort(function(a,b){return toMin(a.dep)-toMin(b.dep);});
+    h+='<div class="lg-mini" style="margin-bottom:10px">';
+    h+='<div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;font-size:17px;color:var(--navy);margin-bottom:8px">Ab '+esc(PORTS[pIdx])+'</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:6px">';
+    for(var ti=0;ti<trips.length;ti++){
+      var tr=trips[ti];
+      var dur=toMin(tr.arr)-toMin(tr.dep);
+      h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 11px;background:var(--sky);border-radius:8px;flex-wrap:wrap">';
+      h+='<span style="font-family:\'IBM Plex Mono\',monospace;font-weight:600;font-size:18px;color:#0E3553">'+pad(tr.dep)+'</span>';
+      h+='<span style="color:var(--muted);font-size:13px">&#8594; an '+pad(tr.arr)+' &middot; '+fmtDur(dur)+'</span>';
+      h+=svcTag(tr.svc);
+      if(tr.line==="untersee") h+='<span style="font-size:11px;background:#CFE9F2;color:#0A3A4E;padding:2px 7px;border-radius:5px;font-weight:600">URh</span>';
+      h+='</div>';
+    }
+    h+='</div></div>';
+  }
+  h+='<div class="lg-note" style="margin-top:4px;font-size:12.5px">Untersee-Ziele fahren 27.6.&ndash;13.9. nur Mi&ndash;So &middot; URh-Ticket erforderlich &middot; Angaben ohne Gew&auml;hr</div>';
+  h+='</div>';
+  return h;
+}
+
 function schweizHTML(){
-  return '<section class="lg-panel">'+
-  '<p class="lg-lead">Schiffe in die Schweiz &mdash; drei Wege, je nach Ziel. Den richtigen Anbieter kennen spart Umwege am Steg.</p>'+
-  '<div class="lg-card"><h3>&#127464;&#127469; Romanshorn, Arbon, Rorschach &mdash; SBS</h3><p>Diese drei Schweizer H&auml;fen sind jetzt im Planer w&auml;hlbar. Der BSB und die URh fahren dort jedoch <strong>nicht</strong> &mdash; zust&auml;ndig ist die <strong>SBS</strong> (Schweizerische Bodensee-Schiffahrtsgesellschaft). Im Planer erscheint bei diesen Zielen ein direkter Hinweis mit dem Link zum SBS-Fahrplan.</p><p style="margin-top:8px">&#8594; <a href="https://bodensee-schiffe.ch" target="_blank" style="color:#15679e;font-weight:600">bodensee-schiffe.ch</a> &mdash; aktueller Fahrplan &amp; Tickets</p></div>'+
-  '<div class="lg-card"><h3>Untersee &amp; Rhein &mdash; URh</h3><p>Gottlieben, Reichenau und Stein am Rhein sind im Planer w&auml;hlbar &mdash; Umstieg in <strong>Konstanz</strong>. Fahrtage: <strong>14.5.&ndash;26.6. t&auml;glich</strong>, <strong>27.6.&ndash;13.9. nur Mi&ndash;So</strong>. Anbieter ist die URh mit eigenen Tickets.</p></div>'+
-  '<div class="lg-card"><h3>Praktisch beim Schweiz-Ausflug</h3><ul>'+
-  '<li><strong>Ausweis mitnehmen</strong> &mdash; es ist eine Grenze, auch wenn meist nicht kontrolliert wird.</li>'+
-  '<li><strong>Geld:</strong> in der Schweiz gilt der Franken (CHF). Viele Schiffe nehmen auch Euro, geben aber in Franken heraus.</li>'+
-  '<li><strong>Tickets sind anbietergebunden:</strong> eine BSB-Tageskarte gilt <strong>nicht</strong> bei URh oder SBS &mdash; im Zweifel am Schalter fragen.</li>'+
-  '<li><strong>Hin- und R&uuml;ckweg getrennt pr&uuml;fen:</strong> manchmal ist ein anderer Heimathafen die bessere Wahl.</li>'+
-  '<li><strong>Fahrrad &amp; Rollstuhl:</strong> auf Schweizer Strecken ist die Fahrradmitnahme eingeschr&auml;nkt.</li>'+
-  '</ul></div>'+
-  '<div class="lg-note">Zeiten und Preise &auml;ndern sich je Saison &mdash; im Zweifel kurz beim Anbieter pr&uuml;fen. Alle Angaben ohne Gew&auml;hr.</div>'+
-  '</section>';
+  var dest=state.schweizDest;
+  var h='<section class="lg-panel">';
+  h+='<p class="lg-lead">Ziel w&auml;hlen &mdash; alle Abfahrtsorte und -zeiten f&uuml;r diesen Tag werden angezeigt.</p>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
+  for(var i=0;i<SCHWEIZ_ZIELE.length;i++){
+    var z=SCHWEIZ_ZIELE[i];
+    var on=(dest===z.idx);
+    h+='<button class="lg-fav" data-sdest="'+z.idx+'" style="'+(on?'background:var(--blue);color:#fff;border-color:var(--blue);font-weight:700;':'')+'">';
+    h+=esc(z.name)+'</button>';
+  }
+  h+='</div>';
+  if(dest!==null){
+    h+='<label class="lg-field lg-field--date" style="display:flex;flex-direction:column;gap:5px;max-width:200px"><span style="font-family:\'Barlow Condensed\',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:12px;font-weight:600;color:var(--muted)">Tag</span>';
+    h+='<input type="date" id="lg-szwdate" min="2026-05-14" max="2026-09-13" value="'+state.date+'"></label>';
+    h+=schweizAbfahrtenHTML(dest,state.date);
+  }
+  h+='<div class="lg-card" style="margin-top:18px"><h3>Praktisch beim Schweiz-Ausflug</h3><ul>'+
+    '<li><strong>Ausweis mitnehmen</strong> &mdash; es ist eine Grenze.</li>'+
+    '<li><strong>Geld:</strong> Schweizer Franken (CHF) &mdash; viele Schiffe nehmen auch Euro.</li>'+
+    '<li><strong>Tickets anbietergebunden:</strong> BSB-Tageskarte gilt nicht bei URh oder SBS.</li>'+
+    '<li><strong>R&uuml;ckweg extra pr&uuml;fen</strong> &mdash; l&auml;uft oft nicht spiegelbildlich.</li>'+
+    '</ul></div>';
+  h+='<div class="lg-note">Alle Angaben ohne Gew&auml;hr &mdash; im Zweifel beim Anbieter pr&uuml;fen.</div>';
+  h+='</section>';
+  return h;
 }
 
 function hinweiseHTML(){
@@ -438,6 +524,15 @@ function render(){
 }
 
 function bind(){
+  // Schweiz-Reiter: Ziel-Chips und Datum
+  document.querySelectorAll("[data-sdest]").forEach(function(b){
+    b.addEventListener("click",function(){
+      state.schweizDest=+this.getAttribute("data-sdest");render();
+    });
+  });
+  var szwDate=document.getElementById("lg-szwdate");
+  if(szwDate) szwDate.addEventListener("change",function(){if(this.value){state.date=this.value;render();}});
+
   if(state.tab!=="planer") return;
   var from=document.getElementById("lg-from"),to=document.getElementById("lg-to"),date=document.getElementById("lg-date");
   from.addEventListener("change",function(){state.from=+this.value;state.open=null;render();});
