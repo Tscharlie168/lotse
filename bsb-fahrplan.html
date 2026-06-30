@@ -161,9 +161,11 @@ select,input,button{font-family:inherit;}
 <script>
 "use strict";
 
-var PORTS = ["Konstanz", "Mainau", "Meersburg", "Hagnau", "Immenstaad", "Friedrichshafen", "Langenargen", "Kressbronn", "Nonnenhorn", "Wasserburg", "Lindau", "Bregenz", "Kreuzlingen", "Gottlieben", "Ermatingen", "Reichenau", "Mannenbach", "Berlingen", "Gaienhofen", "Steckborn", "Hemmenhofen", "Wangen", "Mammern", "Öhningen", "Stein am Rhein", "Diessenhofen/Gailingen", "Büsingen", "Schaffhausen"];
+var PORTS = ["Konstanz", "Mainau", "Meersburg", "Hagnau", "Immenstaad", "Friedrichshafen", "Langenargen", "Kressbronn", "Nonnenhorn", "Wasserburg", "Lindau", "Bregenz", "Kreuzlingen", "Gottlieben", "Ermatingen", "Reichenau", "Mannenbach", "Berlingen", "Gaienhofen", "Steckborn", "Hemmenhofen", "Wangen", "Mammern", "Öhningen", "Stein am Rhein", "Diessenhofen/Gailingen", "Büsingen", "Schaffhausen", "Romanshorn", "Arbon", "Rorschach"];
+// Indizes 28–30 sind Schweizer SBS-Häfen (kein BSB/URh-Betrieb)
+var SBS_PORTS = [28, 29, 30];
 // ungefähre Hafenkoordinaten [lat,lng] für die Standort-Erkennung
-var COORDS = [[47.659, 9.178], [47.705, 9.197], [47.694, 9.271], [47.685, 9.318], [47.677, 9.367], [47.651, 9.48], [47.598, 9.547], [47.586, 9.6], [47.583, 9.628], [47.56, 9.638], [47.545, 9.685], [47.504, 9.747], [47.6499, 9.1738], [47.662, 9.133], [47.672, 9.084], [47.6957, 9.0636], [47.687, 9.056], [47.692, 9.001], [47.692, 8.965], [47.666, 8.972], [47.69, 8.93], [47.687, 8.9], [47.65, 8.84], [47.663, 8.887], [47.66, 8.859], [47.69, 8.75], [47.697, 8.687], [47.696, 8.632]];
+var COORDS = [[47.659, 9.178], [47.705, 9.197], [47.694, 9.271], [47.685, 9.318], [47.677, 9.367], [47.651, 9.48], [47.598, 9.547], [47.586, 9.6], [47.583, 9.628], [47.56, 9.638], [47.545, 9.685], [47.504, 9.747], [47.6499, 9.1738], [47.662, 9.133], [47.672, 9.084], [47.6957, 9.0636], [47.687, 9.056], [47.692, 9.001], [47.692, 8.965], [47.666, 8.972], [47.69, 8.93], [47.687, 8.9], [47.65, 8.84], [47.663, 8.887], [47.66, 8.859], [47.69, 8.75], [47.697, 8.687], [47.696, 8.632], [47.565, 9.360], [47.514, 9.431], [47.478, 9.491]];
 function nearestPort(lat,lng){var best=-1,bd=Infinity;for(var i=0;i<COORDS.length;i++){var dlat=lat-COORDS[i][0],dlng=(lng-COORDS[i][1])*Math.cos(lat*Math.PI/180),d=dlat*dlat+dlng*dlng;if(d<bd){bd=d;best=i;}}return {idx:best,far:Math.sqrt(bd)>0.6};}
 function resolvePort(s){if(s==null)return -1;var t=String(s).trim();var num=parseInt(t,10);if(!isNaN(num)&&String(num)===t&&num>=0&&num<PORTS.length)return num;t=t.toLowerCase();for(var i=0;i<PORTS.length;i++){if(PORTS[i].toLowerCase()===t)return i;}return -1;}
 
@@ -318,7 +320,7 @@ function saveFavs(){try{localStorage.setItem("lgg-favs",JSON.stringify(state.fav
 
 function svcTag(svc){return svc==="restaurant"?'<span class="lg-tag lg-tag--rest">Restaurant</span>':'<span class="lg-tag lg-tag--snack">Snacks</span>';}
 
-function selectOptions(sel){var groups=[["Obersee & Bregenz",0,11],["Untersee & Rhein",12,27]],h="";for(var g=0;g<groups.length;g++){h+='<optgroup label="'+groups[g][0]+'">';for(var i=groups[g][1];i<=groups[g][2];i++){h+='<option value="'+i+'"'+(i===sel?" selected":"")+'>'+PORTS[i]+'</option>';}h+='</optgroup>';}return h;}
+function selectOptions(sel){var groups=[["Obersee & Bregenz",0,11],["Untersee & Rhein",12,27],["Schweizer Ufer (SBS)",28,30]],h="";for(var g=0;g<groups.length;g++){h+='<optgroup label="'+groups[g][0]+'">';for(var i=groups[g][1];i<=groups[g][2];i++){h+='<option value="'+i+'"'+(i===sel?" selected":"")+'>'+PORTS[i]+'</option>';}h+='</optgroup>';}return h;}
 
 function journeyRow(r,i){
   var isOpen=(state.open===i);
@@ -346,8 +348,12 @@ function journeyRow(r,i){
   return h;
 }
 
-function boardHTML(rows,emptyKind){
+function boardHTML(rows,emptyKind,fromIdx,toIdx){
   if(!rows.length){
+    var isSbs=SBS_PORTS.indexOf(fromIdx)>=0||SBS_PORTS.indexOf(toIdx)>=0;
+    if(isSbs){
+      return '<div class="lg-empty"><div class="lg-empty-mark">&#127464;&#127469;</div><p><strong>'+PORTS[toIdx<28?fromIdx:toIdx]+'</strong> wird von der <strong>SBS</strong> (Schweizerische Bodensee-Schiffahrtsgesellschaft) bedient &mdash; nicht von BSB oder URh.</p><p class="lg-empty-hint">Den aktuellen SBS-Fahrplan und Tickets gibt es direkt unter <a href="https://bodensee-schiffe.ch" target="_blank" style="color:#15679e">bodensee-schiffe.ch</a>. Eine Tageskarte der BSB gilt dort nicht.</p></div>';
+    }
     if(emptyKind==="past"){
       return '<div class="lg-empty"><div class="lg-empty-mark">&#128338;</div><p>F&uuml;r heute f&auml;hrt auf dieser Strecke kein Schiff mehr.</p><p class="lg-empty-hint">W&auml;hle <strong>morgen</strong> oder einen anderen Tag &mdash; dann erscheinen wieder alle Fahrten.</p></div>';
     }
@@ -380,21 +386,21 @@ function planerHTML(){
   if(state.favs.length){h+='<div class="lg-favs">';for(var i=0;i<state.favs.length;i++){h+='<button class="lg-fav" data-fav="'+i+'">'+PORTS[state.favs[i].f]+' &rarr; '+PORTS[state.favs[i].t]+'</button>';}h+='</div>';}
   h+='<div class="lg-result-head"><span class="lg-result-route">'+PORTS[state.from]+' <em>&rarr;</em> '+PORTS[state.to]+'</span><span class="lg-result-day">'+dateLabel+'</span></div>';
   if(pastFiltered&&rows.length) h+='<div class="lg-loc-status">Vergangene Abfahrten f&uuml;r heute sind ausgeblendet.</div>';
-  h+='<div class="lg-board">'+boardHTML(rows,pastFiltered?"past":null)+'</div></section>';
+  h+='<div class="lg-board">'+boardHTML(rows,pastFiltered?"past":null,state.from,state.to)+'</div></section>';
   return h;
 }
 
 function schweizHTML(){
   return '<section class="lg-panel">'+
-  '<p class="lg-lead">Schiffe in die Schweiz &mdash; das Wichtigste, bevor du planst. Die Untersee-Strecke steckt im Planer; das Schweizer Ufer fahren nur wenige und sp&auml;te Schiffe.</p>'+
-  '<div class="lg-card"><h3>Untersee &amp; Rhein &mdash; im Planer</h3><p>Gottlieben, Ermatingen, Reichenau, Stein am Rhein bis Schaffhausen erreichst du &uuml;ber <strong>Konstanz</strong> (dort umsteigen). W&auml;hle sie einfach im Reiter &bdquo;Verbindung&ldquo;. Fahrtage: <strong>14.5.&ndash;26.6. t&auml;glich</strong>, <strong>27.6.&ndash;13.9. nur Mi&ndash;So</strong>. Anbieter ist die URh mit eigenen Tickets.</p></div>'+
-  '<div class="lg-card"><h3>Schweizer Ufer &mdash; bewusst nicht im Planer</h3><p>Nach Rorschach, Romanshorn oder Arbon fahren zwar Schiffe (SBS), aber <strong>selten und sp&auml;t</strong>. Eine Tagesfahrt ab dem deutschen Ufer startet meist zu sp&auml;t, um den Tag dr&uuml;ben wirklich zu nutzen &mdash; deshalb f&uuml;hren wir sie hier nicht als Tagesplanung. Wer trotzdem hin&uuml;ber m&ouml;chte, schaut am besten direkt in den SBS-Fahrplan (bodensee-schiffe.ch).</p></div>'+
+  '<p class="lg-lead">Schiffe in die Schweiz &mdash; drei Wege, je nach Ziel. Den richtigen Anbieter kennen spart Umwege am Steg.</p>'+
+  '<div class="lg-card"><h3>&#127464;&#127469; Romanshorn, Arbon, Rorschach &mdash; SBS</h3><p>Diese drei Schweizer H&auml;fen sind jetzt im Planer w&auml;hlbar. Der BSB und die URh fahren dort jedoch <strong>nicht</strong> &mdash; zust&auml;ndig ist die <strong>SBS</strong> (Schweizerische Bodensee-Schiffahrtsgesellschaft). Im Planer erscheint bei diesen Zielen ein direkter Hinweis mit dem Link zum SBS-Fahrplan.</p><p style="margin-top:8px">&#8594; <a href="https://bodensee-schiffe.ch" target="_blank" style="color:#15679e;font-weight:600">bodensee-schiffe.ch</a> &mdash; aktueller Fahrplan &amp; Tickets</p></div>'+
+  '<div class="lg-card"><h3>Untersee &amp; Rhein &mdash; URh, im Planer</h3><p>Gottlieben, Ermatingen, Reichenau, Stein am Rhein bis Schaffhausen erreichst du &uuml;ber <strong>Konstanz</strong> (dort umsteigen). Einfach im Reiter &bdquo;Verbindung&ldquo; w&auml;hlen. Fahrtage: <strong>14.5.&ndash;26.6. t&auml;glich</strong>, <strong>27.6.&ndash;13.9. nur Mi&ndash;So</strong>. Anbieter ist die URh mit eigenen Tickets.</p></div>'+
   '<div class="lg-card"><h3>Praktisch beim Schweiz-Ausflug</h3><ul>'+
   '<li><strong>Ausweis mitnehmen</strong> &mdash; es ist eine Grenze, auch wenn meist nicht kontrolliert wird.</li>'+
   '<li><strong>Geld:</strong> in der Schweiz gilt der Franken (CHF). Viele Schiffe nehmen auch Euro, geben aber in Franken heraus.</li>'+
-  '<li><strong>Tickets sind anbietergebunden:</strong> eine Bodensee-Tageskarte (BSB) gilt <strong>nicht</strong> automatisch bei URh oder SBS &mdash; im Zweifel am Schalter fragen.</li>'+
-  '<li><strong>Hin- und R&uuml;ckweg getrennt pr&uuml;fen:</strong> der R&uuml;ckweg l&auml;uft oft nicht spiegelbildlich &mdash; manchmal ist ein anderer Heimathafen die bessere Wahl.</li>'+
-  '<li><strong>Fahrrad &amp; Rollstuhl:</strong> auf Schweizer Strecken ist die Fahrradmitnahme eingeschr&auml;nkt und nicht rollstuhlg&auml;ngig.</li>'+
+  '<li><strong>Tickets sind anbietergebunden:</strong> eine BSB-Tageskarte gilt <strong>nicht</strong> bei URh oder SBS &mdash; im Zweifel am Schalter fragen.</li>'+
+  '<li><strong>Hin- und R&uuml;ckweg getrennt pr&uuml;fen:</strong> manchmal ist ein anderer Heimathafen die bessere Wahl.</li>'+
+  '<li><strong>Fahrrad &amp; Rollstuhl:</strong> auf Schweizer Strecken ist die Fahrradmitnahme eingeschr&auml;nkt.</li>'+
   '</ul></div>'+
   '<div class="lg-note">Zeiten und Preise &auml;ndern sich je Saison &mdash; im Zweifel kurz beim Anbieter pr&uuml;fen. Alle Angaben ohne Gew&auml;hr.</div>'+
   '</section>';
