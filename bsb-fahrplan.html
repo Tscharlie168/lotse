@@ -451,6 +451,9 @@ function sbsTag(line){
   if(line==="untersee") return '<span style="font-size:11px;background:#CFE9F2;color:#0A3A4E;padding:2px 7px;border-radius:5px;font-weight:600">URh</span>';
   return '';
 }
+// Kleine Zwischenstopps am Untersee/Rhein, die nicht als Abfahrtsort erscheinen sollen
+var SCHWEIZ_HIDE_PORTS = [14,16,17,18,19,20,21,22,23,25,26]; // Ermatingen, Mannenbach–Öhningen, Diessenhofen, Büsingen
+
 function schweizAbfahrtenHTML(destIdx, date){
   var dObj=new Date(date+"T12:00:00");
   var byPort={};
@@ -462,6 +465,7 @@ function schweizAbfahrtenHTML(destIdx, date){
     if(ptDest===-1) continue;
     for(var k=0;k<ptDest;k++){
       var fp=c.stops[k][0];
+      if(SCHWEIZ_HIDE_PORTS.indexOf(fp)!==-1) continue;
       if(!byPort[fp]) byPort[fp]=[];
       byPort[fp].push({dep:c.stops[k][2],arr:c.stops[ptDest][1],no:c.no,svc:c.svc,line:c.line});
     }
@@ -528,7 +532,7 @@ function schweizHTML(){
   h+='<div class="lg-card" style="margin-top:18px"><h3>Praktisch beim Schweiz-Ausflug</h3><ul>'+
     '<li><strong>Ausweis mitnehmen</strong> &mdash; es ist eine Grenze.</li>'+
     '<li><strong>Geld:</strong> Schweizer Franken (CHF) &mdash; viele Schiffe nehmen auch Euro.</li>'+
-    '<li><strong>Tickets anbietergebunden:</strong> BSB-Tageskarte gilt nicht bei URh oder SBS.</li>'+
+    '<li><strong>VSU Saison-Card:</strong> gilt auf allen Linienschiffen von BSB, SBS, URh und VL &mdash; nur die Autof&auml;hre Konstanz&ndash;Meersburg hat einen eigenen Tarif.</li>'+
     '<li><strong>R&uuml;ckweg extra pr&uuml;fen</strong> &mdash; l&auml;uft oft nicht spiegelbildlich.</li>'+
     '</ul></div>';
   h+='<div class="lg-note">Alle Angaben ohne Gew&auml;hr &mdash; im Zweifel beim Anbieter pr&uuml;fen.</div>';
