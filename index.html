@@ -394,6 +394,11 @@
         <button class="ib-btn" onclick="bannerAction()">Zeigen</button>
         <button class="ib-x" onclick="bannerDismiss()" aria-label="Schließen">×</button>
       </div>
+      <div id="neuigkeitenBanner" style="display:none;background:#fff8e1;border:1.5px solid #ffe082;border-radius:14px;padding:14px 16px;margin-bottom:14px;position:relative">
+        <div style="font-weight:700;font-size:1rem;margin-bottom:4px">✨ Neu in Lotse</div>
+        <div id="neuigkeitenText" style="font-size:0.97rem;line-height:1.5;color:#444"></div>
+        <button onclick="neuigkeitenSchliessen()" aria-label="Schließen" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.4rem;color:#888;cursor:pointer;line-height:1">×</button>
+      </div>
       <h2 class="foto-h">Foto des Tages</h2>
       <div id="fotoTag"></div>
 
@@ -3857,7 +3862,28 @@ function radarStop(){
 }
 function radarPlayToggle(){ if(RADAR.timer) radarStop(); else radarPlay(); }
 
+/* ====================== Neuigkeiten-Banner ====================== */
+/* Zum Posten einer Neuigkeit: NEUIGKEIT.v auf ein neues Datum setzen und Text anpassen.
+   Das Banner erscheint einmalig – nach dem Schließen nicht mehr, bis v sich ändert. */
+var NEUIGKEIT = {
+  v: '2026-06-30',
+  text: 'Der Lotse ist kostenlos und zeigt keine Werbung. Infos zum Datenschutz finden Sie am Ende dieser Seite unter Rechtliches & Kontakt.'
+};
+function neuigkeitenInit(){
+  var b=document.getElementById('neuigkeitenBanner');
+  var t=document.getElementById('neuigkeitenText');
+  if(!b||!t) return;
+  var gesehen=''; try{ gesehen=localStorage.getItem('lotse_neuigkeit_v')||''; }catch(e){}
+  if(gesehen===NEUIGKEIT.v){ b.style.display='none'; return; }
+  t.textContent=NEUIGKEIT.text;
+  b.style.display='block';
+}
+function neuigkeitenSchliessen(){
+  var b=document.getElementById('neuigkeitenBanner'); if(b) b.style.display='none';
+  try{ localStorage.setItem('lotse_neuigkeit_v', NEUIGKEIT.v); }catch(e){}
+}
 bannerInit();
+neuigkeitenInit();
 merkBadge();
 parkBadge();
 snBadge();
