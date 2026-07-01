@@ -2041,6 +2041,50 @@ function tagDesJahres(d){
   const start = new Date(d.getFullYear(),0,0);
   return Math.floor((d - start) / 86400000);
 }
+/* Jahreszeitliche Sprüche – werden zur passenden Zeit zusätzlich zu den
+   ganzjährigen SPRUECHE eingespielt, damit der Spruch des Tages saisonal wirkt. */
+const SPRUECHE_SAISON = {
+  winter:[
+    "Die stille Winterzeit lädt ein, es sich drinnen gemütlich zu machen.",
+    "Auch im Winter gibt es Licht – man muss es nur suchen.",
+    "Ein warmer Tee und ein gutes Buch – das ist Winterglück.",
+    "Jede Schneeflocke ist einzigartig, so wie dieser Tag.",
+    "Im Winter ruht die Natur – gönnen auch Sie sich Ruhe.",
+    "Die kürzeren Tage schenken uns Zeit für schöne Gedanken.",
+    "Nach jedem Winter kommt wieder der Frühling – ganz gewiss.",
+    "Wärme kommt von innen – ein freundliches Wort genügt."
+  ],
+  fruehling:[
+    "Der Frühling zeigt: Ein Neuanfang ist immer möglich.",
+    "Jede Knospe erinnert daran, dass Gutes wächst.",
+    "Die ersten Sonnenstrahlen wärmen Herz und Gemüt.",
+    "Frühling im Herzen macht jeden Tag heller.",
+    "Was im Frühling blüht, hat den Winter überstanden – so wie wir.",
+    "Öffnen Sie das Fenster und lassen Sie den Frühling herein.",
+    "Die Vögel singen wieder – hören Sie ihnen einen Moment zu.",
+    "Frische Luft und frisches Grün tun heute besonders gut."
+  ],
+  sommer:[
+    "Der Sommer schenkt uns lange, helle Tage – genießen Sie sie.",
+    "Ein Platz im Schatten und etwas Kühles – mehr braucht es nicht.",
+    "Die Sonne wärmt heute Haut und Seele.",
+    "Sommerzeit ist Zeit für kleine Freuden im Freien.",
+    "Lassen Sie sich heute von der Leichtigkeit des Sommers tragen.",
+    "Ein Gang ans Wasser erfrischt an einem Sommertag.",
+    "Reife Früchte und bunte Blumen – der Sommer ist großzügig.",
+    "Genießen Sie den lauen Abend, solange er hell ist."
+  ],
+  herbst:[
+    "Der Herbst malt die Welt in warmen Farben.",
+    "Buntes Laub erinnert daran, wie schön auch das Vergehen sein kann.",
+    "Eine warme Jacke und ein Spaziergang – Herbstglück pur.",
+    "Der Herbst lädt ein, dankbar auf das Jahr zu blicken.",
+    "Nach der Ernte darf man ausruhen und genießen.",
+    "Ein Spaziergang im Laub weckt Erinnerungen an früher.",
+    "Die goldene Jahreszeit hat ihren ganz eigenen Zauber.",
+    "Wird es draußen kühler, wird es drinnen umso gemütlicher."
+  ]
+};
 const GESUNDHEIT = {
   winter:[
     "Lüften Sie morgens kurz durch – frische Luft vertreibt Müdigkeit.",
@@ -2347,29 +2391,57 @@ const HORO_IMPULS = [
   "Heute ist ein Tag zum Genießen, nicht zum Hetzen.",
   "Ein gutes Wort von Ihnen wirkt heute Wunder."
 ];
-const HORO_TIPP = [
-  "Gönnen Sie sich ein paar Stunden am See, im Schatten unter einem Baum.",
-  "Ein Spaziergang an der frischen Luft tut heute besonders gut.",
-  "Rufen Sie einen Menschen an, den Sie lange nicht gehört haben.",
-  "Trinken Sie in Ruhe eine Tasse Kaffee oder Tee – und tun Sie nichts dabei.",
-  "Ein gutes Gespräch ist heute mehr wert als jede Eile.",
-  "Schauen Sie nach, was im Garten oder auf dem Markt gerade blüht.",
-  "Lesen Sie ein paar Seiten in einem Buch, das Ihnen Freude macht.",
-  "Bereiten Sie sich etwas zu, das Ihnen wirklich schmeckt.",
-  "Setzen Sie sich kurz in die Sonne und schließen Sie die Augen.",
-  "Erledigen Sie eine kleine Sache, die Sie schon länger vorhaben.",
-  "Hören Sie ein Lied, das Sie gerne mögen.",
-  "Machen Sie heute jemandem ein ehrliches Kompliment.",
-  "Ein kurzer Mittagsschlaf darf heute sein.",
-  "Merken Sie sich am Abend drei Dinge, die heute schön waren.",
-  "Atmen Sie ein paar Mal tief durch, bevor der Tag richtig beginnt.",
-  "Bummeln Sie ohne Ziel durch Ihre Umgebung und schauen Sie sich um."
-];
+/* Konkreter Tagestipp im Horoskop – nach Jahreszeit getrennt, damit der
+   Vorschlag immer zur aktuellen Zeit passt. Die neutralen Impulse (HORO_IMPULS)
+   und die Sternzeichen-Eigenschaften bleiben ganzjährig. */
+const HORO_TIPP_SAISON = {
+  winter:[
+    "Machen Sie es sich mit einer warmen Decke und einem Tee gemütlich.",
+    "Ein kurzer Gang an die frische Winterluft macht den Kopf klar.",
+    "Rufen Sie einen lieben Menschen an – das wärmt an kalten Tagen.",
+    "Zünden Sie eine Kerze an und genießen Sie die stille Stunde.",
+    "Kochen Sie sich etwas Warmes, das Ihnen richtig schmeckt.",
+    "Blättern Sie in alten Fotos und schwelgen Sie in Erinnerungen.",
+    "Lesen Sie ein paar Seiten in einem Buch, das Ihnen Freude macht.",
+    "Merken Sie sich am Abend drei Dinge, die heute schön waren."
+  ],
+  fruehling:[
+    "Schauen Sie nach, was im Garten oder auf dem Balkon schon sprießt.",
+    "Ein Spaziergang in der Frühlingssonne tut heute besonders gut.",
+    "Öffnen Sie das Fenster weit und lassen Sie frische Luft herein.",
+    "Gönnen Sie sich ein paar frische Blumen für den Tisch.",
+    "Hören Sie den Vögeln zu – der Frühling hat viel zu erzählen.",
+    "Erledigen Sie eine kleine Sache, die Sie sich fürs Frühjahr vorgenommen haben.",
+    "Rufen Sie einen Menschen an, den Sie lange nicht gehört haben.",
+    "Machen Sie heute jemandem ein ehrliches Kompliment."
+  ],
+  sommer:[
+    "Gönnen Sie sich ein paar Stunden im Schatten unter einem Baum.",
+    "Ein Platz am Wasser erfrischt an einem warmen Tag.",
+    "Trinken Sie in Ruhe etwas Kühles – und tun Sie nichts dabei.",
+    "Genießen Sie den lauen Abend draußen, solange es hell ist.",
+    "Bereiten Sie sich etwas Leichtes zu – Obst oder einen Salat.",
+    "Ein kurzer Bummel am frühen Morgen, bevor es heiß wird, tut gut.",
+    "Setzen Sie sich einen Moment in den Schatten und schließen Sie die Augen.",
+    "Hören Sie ein Lied, das Sie gerne mögen."
+  ],
+  herbst:[
+    "Ein Spaziergang durch das bunte Laub hebt die Stimmung.",
+    "Kochen Sie sich eine wärmende Suppe nach altem Rezept.",
+    "Sammeln Sie Kastanien oder buntes Laub wie in Kindertagen.",
+    "Machen Sie es sich am Nachmittag mit einem guten Buch gemütlich.",
+    "Ein warmer Tee und ein Blick aus dem Fenster genügen heute.",
+    "Denken Sie an drei schöne Dinge, die das Jahr gebracht hat.",
+    "Bereiten Sie sich etwas zu, das Ihnen wirklich schmeckt.",
+    "Ein gutes Gespräch ist heute mehr wert als jede Eile."
+  ]
+};
 function horoText(idx, doy){
   const s = SIGNS[idx];
   const trait = s.t[doy % s.t.length];
   const imp = HORO_IMPULS[(doy*3 + idx) % HORO_IMPULS.length];
-  const tip = HORO_TIPP[(doy*7 + idx*2) % HORO_TIPP.length];
+  const tips = HORO_TIPP_SAISON[jahreszeit(new Date().getMonth())];
+  const tip = tips[(doy*7 + idx*2) % tips.length];
   return trait + " " + imp + " " + tip;
 }
 let signMem = null;
@@ -2401,7 +2473,8 @@ function renderHeute(){
   document.getElementById('dayHead').innerHTML =
     `<div class="dat">${dat}</div><div class="moon">${mp.emoji} Mond: ${mp.name}</div>`;
   renderHoro();
-  document.getElementById('spruch').textContent = SPRUECHE[tagDesJahres(now) % SPRUECHE.length];
+  const spruchPool = SPRUECHE_SAISON[jahreszeit(now.getMonth())].concat(SPRUECHE);
+  document.getElementById('spruch').textContent = spruchPool[tagDesJahres(now) % spruchPool.length];
   document.getElementById('tip').textContent = tagesTipp();
   document.getElementById('brain').textContent = GEHIRN[tagDesJahres(now) % GEHIRN.length];
   renderWx(document.getElementById('wxHere'), STATE.lat, STATE.lon, STATE.ort && STATE.ort!=="Ihr Standort" ? STATE.ort : "Ihr Standort", true);
@@ -2730,10 +2803,31 @@ const ALLE_SAISON = ['winter','fruehling','frühling','sommer','herbst'];
 const MONATE = {januar:0,februar:1,maerz:2,'märz':2,april:3,mai:4,juni:5,juli:6,august:7,september:8,oktober:9,november:10,dezember:11};
 const MONATSNAME = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 const SAISONNAME = {winter:'Winter',fruehling:'Frühling',sommer:'Sommer',herbst:'Herbst'};
+/* Zuordnung bereits vorhandener Fotos zu einer Jahreszeit, OHNE die Dateien
+   umzubenennen. Greift nur, wenn der Dateiname selbst keinen Saison- oder
+   Monatshinweis enthält. Neue Fotos werden künftig mit Jahreszeit im Namen
+   hochgeladen und brauchen hier keinen Eintrag. Fotos ohne Eintrag und ohne
+   Namenshinweis bleiben ganzjährig. Schlüssel: Dateiname in Kleinbuchstaben. */
+const FOTO_SAISON = {
+  'wald.jpg':'herbst',
+  'img_6841.jpg':'herbst',
+  'tulpen.jpg':'fruehling',
+  'sonnenblume.jpg':'sommer',
+  'himbeeren.jpg':'sommer',
+  'hotensie.jpg':'sommer',
+  'segeln.jpg':'sommer',
+  'tirol.jpg':'sommer',
+  'pilgerkapelle.jpg':'sommer',
+  'hintergrund klee.jpg':'sommer',
+  '963411a3-f09b-4e84-ab4a-5994559fb69e.jpg':'sommer',
+  'herzlich-willkomen.jpg':'sommer'
+};
 /* Aus dem Dateinamen herauslesen: Monat (z. B. "juli") und/oder Jahreszeit.
-   Monat ist genauer und hat Vorrang; ohne Hinweis (oder "ganzjahr") ganzjährig. */
+   Monat ist genauer und hat Vorrang; ohne Hinweis (oder "ganzjahr") ganzjährig.
+   Ohne Namenshinweis greift zusätzlich die Zuordnungstabelle FOTO_SAISON. */
 function fotoMeta(u){
   const n = decodeURIComponent(String(u)).toLowerCase();
+  const base = n.split('/').pop();
   if(n.includes('ganzjahr')) return {mon:null, sea:null, ganz:true};
   let mon=null;
   for(const k in MONATE){ if(n.includes(k)){ mon=MONATE[k]; break; } }
@@ -2742,21 +2836,17 @@ function fotoMeta(u){
   else if(n.includes('fruehling')||n.includes('frühling')) sea='fruehling';
   else if(n.includes('sommer')) sea='sommer';
   else if(n.includes('herbst')) sea='herbst';
+  if(sea===null && mon===null && FOTO_SAISON[base]) sea=FOTO_SAISON[base];
   if(sea===null && mon!==null) sea=jahreszeit(mon);
   return {mon, sea, ganz:(mon===null && sea===null)};
 }
-/* Heute passende Fotos: erst exakter Monat, sonst Jahreszeit, immer plus ganzjährige. */
+/* Heute passende Fotos: exakter Monat ODER passende Jahreszeit ODER ganzjährig –
+   alle zusammengeführt, damit sich Monat und Jahreszeit nicht mehr ausschließen. */
 function fotoWahl(list){
   const d=new Date(), cm=d.getMonth(), cs=jahreszeit(cm);
   const meta=list.map(u=>({u, m:fotoMeta(u)}));
-  const exact = meta.filter(x=>x.m.mon===cm);
-  const season = meta.filter(x=>x.m.sea===cs);
-  const ganz = meta.filter(x=>x.m.ganz);
-  let pool;
-  if(exact.length) pool = exact.concat(ganz);
-  else if(season.length) pool = season.concat(ganz);
-  else if(ganz.length) pool = ganz;
-  else pool = meta;
+  const passend = meta.filter(x=>x.m.mon===cm || x.m.sea===cs || x.m.ganz);
+  const pool = passend.length ? passend : meta;
   return pool.map(x=>x.u);
 }
 function fotoCaption(u){
