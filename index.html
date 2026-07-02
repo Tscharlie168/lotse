@@ -1294,7 +1294,6 @@ try{
       <div class="card-info"><h3>📖 Namenstag heute</h3><p id="namenstag"></p><p style="margin:6px 0 0;font-size:.85rem;color:var(--ink-soft)">Nach altem Kalenderbrauch &ndash; regional teils verschieden.</p></div>
       <div class="horo" id="horo"></div>
       <div class="card-info quote"><h3>✨ Spruch des Tages</h3><p id="spruch"></p></div>
-      <div class="card-info"><h3>📜 Gedicht des Tages</h3><div id="gedicht"></div></div>
       <div class="card-info tip"><h3>🌿 Gesundheitstipp des Tages</h3><p id="tip"></p></div>
       <div class="card-info brain"><h3>🧠 Kleine Gehirnjogging-Übung</h3><p id="brain"></p></div>
 
@@ -1303,6 +1302,9 @@ try{
 
       <h2 style="margin-top:22px;font-size:1.25rem">Mond heute</h2>
       <div class="card-info mond" id="mondBox"></div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Zum Ausklang</h2>
+      <div class="card-info"><h3>📜 Gedicht des Tages</h3><div id="gedicht"></div></div>
     </section>
   </main>
 </div>
@@ -2578,7 +2580,24 @@ const GEDICHTE = [
 {t:"Das ästhetische Wiesel",a:"Christian Morgenstern (1871–1914)",v:"Ein Wiesel\nsaß auf einem Kiesel\ninmitten Bachgeriesel.\n\nWißt ihr,\nweshalb?\n\nDas Mondkalb\nverriet es mir\nim stillen:\n\nDas raffinier-\nte Tier\ntat's um des Reimes willen."},
 {t:"Bumerang",a:"Joachim Ringelnatz (1883–1934)",v:"War einmal ein Bumerang;\nWar ein Weniges zu lang.\nBumerang flog ein Stück,\nAber kam nicht mehr zurück.\nPublikum – noch stundenlang –\nWartete auf Bumerang."},
 {t:"Kluge Vögel",a:"Wilhelm Busch (1832–1908)",v:"Wenn einer, der mit Mühe kaum\nGekrochen ist auf einen Baum,\nSchon meint, daß er ein Vogel wär,\nSo irrt sich der."},
-{t:"Trost (aus „Die fromme Helene“)",a:"Wilhelm Busch (1832–1908)",v:"Es ist ein Brauch von alters her:\nWer Sorgen hat, hat auch Likör!"}
+{t:"Trost (aus „Die fromme Helene“)",a:"Wilhelm Busch (1832–1908)",v:"Es ist ein Brauch von alters her:\nWer Sorgen hat, hat auch Likör!"},
+{t:"Erinnerung",a:"Johann Wolfgang von Goethe (1749–1832)",v:"Willst du immer weiter schweifen?\nSieh, das Gute liegt so nah.\nLerne nur das Glück ergreifen,\nDenn das Glück ist immer da."},
+{t:"Mailied (Auszug)",a:"Johann Wolfgang von Goethe (1749–1832)",jz:"fruehling",v:"Wie herrlich leuchtet\nMir die Natur!\nWie glänzt die Sonne!\nWie lacht die Flur!\n\nEs dringen Blüten\nAus jedem Zweig\nUnd tausend Stimmen\nAus dem Gesträuch."},
+{t:"Wandrers Nachtlied I",a:"Johann Wolfgang von Goethe (1749–1832)",v:"Der du von dem Himmel bist,\nAlles Leid und Schmerzen stillest,\nDen, der doppelt elend ist,\nDoppelt mit Erquickung füllest,\nAch, ich bin des Treibens müde!\nWas soll all der Schmerz und Lust?\nSüßer Friede,\nKomm, ach komm in meine Brust!"},
+{t:"Der frohe Wandersmann (1. Strophe)",a:"Joseph von Eichendorff (1788–1857)",v:"Wem Gott will rechte Gunst erweisen,\nDen schickt er in die weite Welt,\nDem will er seine Wunder weisen\nIn Berg und Wald und Strom und Feld."},
+{t:"Die Ameisen",a:"Joachim Ringelnatz (1883–1934)",v:"In Hamburg lebten zwei Ameisen,\nDie wollten nach Australien reisen.\nBei Altona auf der Chaussee\nDa taten ihnen die Beine weh,\nUnd da verzichteten sie weise\nDann auf den letzten Teil der Reise."},
+{t:"Das Nasobēm",a:"Christian Morgenstern (1871–1914)",v:"Auf seinen Nasen schreitet\neinher das Nasobēm,\nvon seinem Kind begleitet.\nEs steht noch nicht im Brehm.\n\nEs steht noch nicht im Meyer.\nUnd auch im Brockhaus nicht.\nEs trat aus meiner Leier\nzum ersten Mal ans Licht."},
+{t:"Der Seufzer",a:"Christian Morgenstern (1871–1914)",jz:"winter",v:"Ein Seufzer lief Schlittschuh auf nächtlichem Eis\nund träumte von Liebe und Freude.\nEs war an dem Stadtwall, und schneeweiß\nglänzten die Stadtwallgebäude.\n\nDer Seufzer dacht' an ein Maidelein\nund blieb erglühend stehen.\nDa schmolz die Eisbahn unter ihm ein –\nund er sank – und ward nimmer gesehen."},
+{t:"Juli",a:"Theodor Storm (1817–1888)",jz:"sommer",v:"Klingt im Wind ein Wiegenlied,\nSonne warm herniedersieht,\nSeine Ähren senkt das Korn,\nRote Beere schwillt am Dorn,\nSchwer von Segen ist die Flur –\nJunge Frau, was sinnst du nur?"},
+{t:"Guter Rat (1. Strophe)",a:"Theodor Fontane (1819–1898)",jz:"sommer",v:"An einem Sommermorgen\nDa nimm den Wanderstab,\nEs fallen deine Sorgen\nWie Nebel von dir ab."},
+{t:"Geh aus, mein Herz (1. Strophe)",a:"Paul Gerhardt (1607–1676)",jz:"sommer",v:"Geh aus, mein Herz, und suche Freud\nIn dieser lieben Sommerzeit\nAn deines Gottes Gaben;\nSchau an der schönen Gärten Zier\nUnd siehe, wie sie mir und dir\nSich ausgeschmücket haben."},
+{t:"Gebet (Auszug)",a:"Eduard Mörike (1804–1875)",v:"Herr! schicke, was du willt,\nEin Liebes oder Leides;\nIch bin vergnügt, daß beides\nAus Deinen Händen quillt."},
+{t:"Täglich zu singen (1. Strophe)",a:"Matthias Claudius (1740–1815)",v:"Ich danke Gott und freue mich\nWie's Kind zur Weihnachtsgabe,\nDaß ich bin, bin! Und daß ich dich,\nSchön menschlich Antlitz! habe."},
+{t:"Der Kuckuck und der Esel (1. Strophe)",a:"Hoffmann von Fallersleben (1798–1874)",jz:"fruehling",v:"Der Kuckuck und der Esel,\nDie hatten großen Streit,\nWer wohl am besten sänge\nZur schönen Maienzeit."},
+{t:"Winter ade",a:"Hoffmann von Fallersleben (1798–1874)",jz:"winter",v:"Winter, ade!\nScheiden tut weh.\nAber dein Scheiden macht,\nDaß mir das Herze lacht.\nWinter, ade!\nScheiden tut weh."},
+{t:"Hoffnung (1. Strophe)",a:"Emanuel Geibel (1815–1884)",jz:"winter",v:"Und dräut der Winter noch so sehr\nMit trotzigen Gebärden,\nUnd streut er Eis und Schnee umher,\nEs muß doch Frühling werden."},
+{t:"Dunkel war's, der Mond schien helle (Auszug)",a:"Verfasser unbekannt (Volksgut, 19. Jh.)",v:"Dunkel war's, der Mond schien helle,\nSchneebedeckt die grüne Flur,\nAls ein Wagen blitzeschnelle\nLangsam um die Ecke fuhr.\n\nDrinnen saßen stehend Leute,\nSchweigend ins Gespräch vertieft,\nAls ein totgeschossner Hase\nAuf der Sandbank Schlittschuh lief."},
+{t:"Die Selbstkritik (Auszug)",a:"Wilhelm Busch (1832–1908)",v:"Die Selbstkritik hat viel für sich.\nGesetzt den Fall, ich tadle mich,\nSo hab ich erstens den Gewinn,\nDaß ich so hübsch bescheiden bin."}
 ];
 function renderGedicht(){
   const box=document.getElementById('gedicht'); if(!box) return;
@@ -4250,8 +4269,8 @@ function radarPlayToggle(){ if(RADAR.timer) radarStop(); else radarPlay(); }
 /* Zum Posten einer Neuigkeit: NEUIGKEIT.v auf ein neues Datum setzen und Text anpassen.
    Das Banner erscheint einmalig – nach dem Schließen nicht mehr, bis v sich ändert. */
 var NEUIGKEIT = {
-  v: '2026-06-30',
-  text: 'Der Lotse ist kostenlos und zeigt keine Werbung. Infos zum Datenschutz finden Sie am Ende dieser Seite unter Rechtliches & Kontakt.'
+  v: '2026-07-02',
+  text: 'Der Notfallzettel (unter Notruf & Erste Hilfe) hat jetzt Platz für die Organspende-Angabe und einen zweiten Notfallkontakt. Und unter „Mein Tag" wartet neu das Gedicht des Tages auf Sie – zum Ausklang ganz unten.'
 };
 function neuigkeitenInit(){
   var b=document.getElementById('neuigkeitenBanner');
