@@ -34,11 +34,24 @@
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
     background:var(--surface);
     color:var(--ink);
-    font-size:19px;
+    font-size:1.1875rem; /* 19px bei Normalgröße – wächst mit dem Textgröße-Schalter mit */
     line-height:1.4;
     -webkit-font-smoothing:antialiased;
     padding-bottom:32px;
   }
+
+  /* --- Textgröße-Schalter (A / A+ / A++) --- */
+  .textgr{display:flex;align-items:center;justify-content:center;gap:10px;margin:22px 0 4px}
+  .textgr span{color:var(--ink-soft);font-size:.95rem;font-weight:600}
+  .textgr button{
+    min-width:52px;min-height:48px;padding:8px 12px;cursor:pointer;
+    background:#fff;color:var(--sea);border:1.5px solid var(--sea);border-radius:12px;
+    font-family:inherit;font-weight:800;
+  }
+  .textgr button:nth-child(2){font-size:1rem}
+  .textgr button:nth-child(3){font-size:1.15rem}
+  .textgr button:nth-child(4){font-size:1.3rem}
+  .textgr button.aktiv{background:var(--sea);color:#fff}
   .wrap{max-width:560px;margin:0 auto}
 
   /* --- Instrumenten-Leiste: wo bin ich, welches Land --- */
@@ -374,6 +387,13 @@
   .betrug-tipps ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
   .betrug-tipps li{font-size:1.02rem}
 </style>
+<script>
+/* Gespeicherte Textgröße sofort anwenden, damit die Seite nicht "springt" */
+try{
+  var _tg=+localStorage.getItem('lotse_textgr')||0;
+  if(_tg>0) document.documentElement.style.fontSize=['100%','112.5%','125%'][_tg]||'100%';
+}catch(e){}
+</script>
 <script data-goatcounter="https://lotse.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
@@ -443,7 +463,7 @@
         <button class="tile" onclick="openSchiff()">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13h16l-1.6 4.4a2 2 0 0 1-1.9 1.3H7.5a2 2 0 0 1-1.9-1.3L4 13z"/><path d="M6 13V8a1 1 0 0 1 1-1h7l3 6"/><path d="M10 7V4h3"/><path d="M3 21c1.2-1 2-1 3.2 0 1.2 1 2 1 3.2 0 1.2-1 2-1 3.2 0 1.2 1 2 1 3.2 0"/></svg></span>
           <span class="lbl">BSB Fahrplan</span>
-          <span class="sub">Schiffe auf dem Bodensee</span>
+          <span class="sub">Schiffe auf dem Bodensee &middot; Saison 2026</span>
         </button>
 
         <button class="tile" onclick="go('auto')">
@@ -488,6 +508,13 @@
         </button>
       </div>
 
+      <div class="textgr" role="group" aria-label="Textgröße wählen">
+        <span>Textgröße:</span>
+        <button id="tg0" onclick="setTextgroesse(0)" aria-label="Normale Schrift">A</button>
+        <button id="tg1" onclick="setTextgroesse(1)" aria-label="Größere Schrift">A+</button>
+        <button id="tg2" onclick="setTextgroesse(2)" aria-label="Größte Schrift">A++</button>
+      </div>
+
       <div class="foot">
         <button class="flink" onclick="go('weitergeben')">Lotse weitergeben</button>
         <button class="flink" onclick="go('recht')">Rechtliches &amp; Kontakt</button>
@@ -496,7 +523,7 @@
 
     <!-- WERKZEUGE -->
     <section class="view" id="v-werkzeuge">
-      <button class="back" onclick="go('home')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Praktische Helfer</h2>
       <div class="cats">
         <button class="cat" onclick="go('countdown')">
@@ -552,12 +579,12 @@
         </button>
       </div>
       <div class="note">Tippen Sie auf einen Helfer.</div>
-      <button class="back" onclick="go('home')" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
     </section>
 
     <!-- LUPE -->
     <section class="view" id="v-lupe">
-      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Lupe</h2>
       <div class="lupe-stage" id="lupeStage">
         <video id="lupeVideo" playsinline autoplay muted></video>
@@ -575,7 +602,7 @@
 
     <!-- STOPPUHR -->
     <section class="view" id="v-stoppuhr">
-      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Stoppuhr</h2>
       <div class="uhr-zeit" id="uhrZeit">00:00,0</div>
       <div class="btn-reihe">
@@ -587,7 +614,7 @@
 
     <!-- COUNTDOWN -->
     <section class="view" id="v-countdown">
-      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Countdown</h2>
       <div class="uhr-zeit" id="cdZeit">00:00</div>
       <div class="cd-row">
@@ -611,7 +638,7 @@
 
     <!-- RECHNER -->
     <section class="view" id="v-rechner">
-      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Rechner</h2>
       <div class="rechner-anzeige" id="rechnerAnzeige">0</div>
       <div class="rechner-grid">
@@ -639,7 +666,7 @@
 
     <!-- MIT GOOGLE-KI SUCHEN -->
     <section class="view" id="v-kisuche">
-      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Mit Google-KI suchen</h2>
       <div class="search-box">
         <input id="kiQ" type="text" placeholder="Frage eingeben &hellip;" enterkeyhint="search" onkeydown="if(event.key==='Enter')kiSuche()">
@@ -650,7 +677,7 @@
 
     <!-- MERKZETTEL -->
     <section class="view" id="v-merkzettel">
-      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Merkzettel</h2>
       <div class="search-box">
         <input id="merkInput" type="text" placeholder="Was m&ouml;chten Sie notieren?" enterkeyhint="done" onkeydown="if(event.key==='Enter')merkAdd()">
@@ -658,11 +685,12 @@
       </div>
       <div id="merkListe" class="merk-liste"></div>
       <button class="flink" id="merkClear" onclick="merkClearDone()" style="display:none">Erledigte entfernen</button>
+      <button class="flink" id="merkTeilen" onclick="merkTeilen()" style="display:none">Liste teilen oder kopieren</button>
     </section>
 
     <!-- SPRACHNOTIZ -->
     <section class="view" id="v-sprachnotiz">
-      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Sprachnotiz</h2>
       <p style="color:var(--ink-soft);margin:0 0 14px">Sprechen Sie eine kurze Notiz auf &ndash; zum Beispiel einen Einkauf oder eine Erinnerung &ndash; und h&ouml;ren Sie sie sp&auml;ter wieder ab. Die Notizen bleiben nur auf diesem Ger&auml;t.</p>
       <button class="big-btn" id="snRecBtn" onclick="snToggle()">&#127908; Aufnehmen</button>
@@ -672,7 +700,7 @@
 
     <!-- UNTERHALTUNG -->
     <section class="view" id="v-unterhaltung">
-      <button class="back" onclick="go('home')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Unterhaltung</h2>
 
       <h2 style="margin-top:6px;font-size:1.25rem">Witz des Tages</h2>
@@ -703,12 +731,12 @@
         </div>
       </div>
       <button class="big-btn" id="muStartBtn" onclick="musikRunde()">Spiel starten</button>
-      <button class="back" onclick="go('home')" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
     </section>
 
     <!-- PRODUKT SCANNEN (Barcode) -->
     <section class="view" id="v-barcode">
-      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Produkt scannen</h2>
       <p style="color:var(--ink-soft);margin:0 0 12px">Halten Sie den Strichcode (Barcode) einer Lebensmittel-Packung vor die Kamera. Sie sehen dann Name, Zutaten, Allergene und den Nutri-Score. Daf&uuml;r ist eine Internet-Verbindung n&ouml;tig.</p>
       <button class="big-btn" id="bcStartBtn" onclick="bcToggleScan()">Scan starten</button>
@@ -723,7 +751,7 @@
 
     <!-- VORLESEN -->
     <section class="view" id="v-vorlesen">
-      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Text vorlesen lassen</h2>
       <p style="color:var(--ink-soft);margin:0 0 12px">Halten Sie die Handy-Kamera über das Kleingedruckte – Ihr Handy kann den Text erkennen, vergrößern und vorlesen. So geht's:</p>
       <div class="btn-reihe">
@@ -736,7 +764,7 @@
 
     <!-- WO GEPARKT -->
     <section class="view" id="v-parken">
-      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Wo habe ich geparkt?</h2>
       <div id="parkInfo" class="park-info"></div>
       <button class="big-btn" onclick="parkSave()">Standort jetzt merken</button>
@@ -751,14 +779,14 @@
 
     <!-- TASCHENLAMPE -->
     <section class="view" id="v-taschenlampe">
-      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Taschenlampe</h2>
       <div id="lampMain"></div>
     </section>
 
     <!-- SO GEHT'S -->
     <section class="view" id="v-hilfe">
-      <button class="back" onclick="go('werkzeuge')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>So geht's auf Ihrem Handy</h2>
       <div class="hilfe-switch">Anleitung f&uuml;r:
         <button id="hilfeIos" onclick="hilfeSet('ios')">iPhone</button>
@@ -769,7 +797,7 @@
 
     <!-- IST DAS ECHT -->
     <section class="view" id="v-betrug">
-      <button class="back" onclick="go('home')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Ist das echt?</h2>
       <div class="betrug-regel">F&uuml;r einen echten Gewinn zahlt man <u>nie</u> etwas.<br>Kein Geld, keine Daten, kein Anruf unter Druck.</div>
 
@@ -802,12 +830,12 @@
 
       <h3 class="betrug-h3">Seri&ouml;se Pr&uuml;fstellen</h3>
       <div id="betrugStellen" class="rows"></div>
-      <button class="back" onclick="go('home')" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
     </section>
 
     <!-- LOTSE WEITERGEBEN -->
     <section class="view" id="v-weitergeben">
-      <button class="back" onclick="go('home')">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Lotse weitergeben</h2>
       <p class="wg-intro">Halten Sie diesen Code vor die Kamera des anderen Handys &ndash; dann &ouml;ffnet sich Lotse dort von selbst.</p>
       <div class="wg-qr"><svg viewBox="0 0 33 33" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-label="QR-Code zu Lotse"><rect width="33" height="33" fill="#fff"/><path d="M4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM14 4h1v1h-1zM18 4h1v1h-1zM19 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM25 4h1v1h-1zM26 4h1v1h-1zM27 4h1v1h-1zM28 4h1v1h-1zM4 5h1v1h-1zM10 5h1v1h-1zM18 5h1v1h-1zM19 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM28 5h1v1h-1zM4 6h1v1h-1zM6 6h1v1h-1zM7 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM15 6h1v1h-1zM19 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM25 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM14 7h1v1h-1zM16 7h1v1h-1zM18 7h1v1h-1zM22 7h1v1h-1zM24 7h1v1h-1zM25 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM13 8h1v1h-1zM15 8h1v1h-1zM17 8h1v1h-1zM18 8h1v1h-1zM19 8h1v1h-1zM22 8h1v1h-1zM24 8h1v1h-1zM25 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM12 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM17 9h1v1h-1zM19 9h1v1h-1zM20 9h1v1h-1zM22 9h1v1h-1zM28 9h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM23 10h1v1h-1zM24 10h1v1h-1zM25 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM28 10h1v1h-1zM13 11h1v1h-1zM18 11h1v1h-1zM19 11h1v1h-1zM4 12h1v1h-1zM7 12h1v1h-1zM9 12h1v1h-1zM10 12h1v1h-1zM12 12h1v1h-1zM17 12h1v1h-1zM20 12h1v1h-1zM21 12h1v1h-1zM23 12h1v1h-1zM4 13h1v1h-1zM5 13h1v1h-1zM6 13h1v1h-1zM7 13h1v1h-1zM8 13h1v1h-1zM12 13h1v1h-1zM16 13h1v1h-1zM20 13h1v1h-1zM21 13h1v1h-1zM22 13h1v1h-1zM28 13h1v1h-1zM4 14h1v1h-1zM6 14h1v1h-1zM7 14h1v1h-1zM8 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM12 14h1v1h-1zM14 14h1v1h-1zM16 14h1v1h-1zM20 14h1v1h-1zM22 14h1v1h-1zM24 14h1v1h-1zM27 14h1v1h-1zM28 14h1v1h-1zM6 15h1v1h-1zM7 15h1v1h-1zM12 15h1v1h-1zM15 15h1v1h-1zM16 15h1v1h-1zM17 15h1v1h-1zM21 15h1v1h-1zM23 15h1v1h-1zM24 15h1v1h-1zM5 16h1v1h-1zM9 16h1v1h-1zM10 16h1v1h-1zM11 16h1v1h-1zM13 16h1v1h-1zM18 16h1v1h-1zM22 16h1v1h-1zM23 16h1v1h-1zM25 16h1v1h-1zM27 16h1v1h-1zM28 16h1v1h-1zM8 17h1v1h-1zM11 17h1v1h-1zM13 17h1v1h-1zM15 17h1v1h-1zM17 17h1v1h-1zM21 17h1v1h-1zM22 17h1v1h-1zM25 17h1v1h-1zM26 17h1v1h-1zM28 17h1v1h-1zM4 18h1v1h-1zM6 18h1v1h-1zM7 18h1v1h-1zM10 18h1v1h-1zM13 18h1v1h-1zM14 18h1v1h-1zM15 18h1v1h-1zM17 18h1v1h-1zM18 18h1v1h-1zM20 18h1v1h-1zM23 18h1v1h-1zM24 18h1v1h-1zM26 18h1v1h-1zM28 18h1v1h-1zM5 19h1v1h-1zM7 19h1v1h-1zM12 19h1v1h-1zM15 19h1v1h-1zM19 19h1v1h-1zM20 19h1v1h-1zM24 19h1v1h-1zM27 19h1v1h-1zM4 20h1v1h-1zM5 20h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM20 20h1v1h-1zM21 20h1v1h-1zM22 20h1v1h-1zM23 20h1v1h-1zM24 20h1v1h-1zM25 20h1v1h-1zM26 20h1v1h-1zM12 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM16 21h1v1h-1zM17 21h1v1h-1zM18 21h1v1h-1zM20 21h1v1h-1zM24 21h1v1h-1zM25 21h1v1h-1zM28 21h1v1h-1zM4 22h1v1h-1zM5 22h1v1h-1zM6 22h1v1h-1zM7 22h1v1h-1zM8 22h1v1h-1zM9 22h1v1h-1zM10 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM18 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM22 22h1v1h-1zM24 22h1v1h-1zM25 22h1v1h-1zM27 22h1v1h-1zM28 22h1v1h-1zM4 23h1v1h-1zM10 23h1v1h-1zM12 23h1v1h-1zM14 23h1v1h-1zM16 23h1v1h-1zM18 23h1v1h-1zM20 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM26 23h1v1h-1zM27 23h1v1h-1zM4 24h1v1h-1zM6 24h1v1h-1zM7 24h1v1h-1zM8 24h1v1h-1zM10 24h1v1h-1zM14 24h1v1h-1zM20 24h1v1h-1zM21 24h1v1h-1zM22 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM25 24h1v1h-1zM28 24h1v1h-1zM4 25h1v1h-1zM6 25h1v1h-1zM7 25h1v1h-1zM8 25h1v1h-1zM10 25h1v1h-1zM12 25h1v1h-1zM14 25h1v1h-1zM15 25h1v1h-1zM18 25h1v1h-1zM20 25h1v1h-1zM23 25h1v1h-1zM24 25h1v1h-1zM25 25h1v1h-1zM26 25h1v1h-1zM4 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM10 26h1v1h-1zM14 26h1v1h-1zM19 26h1v1h-1zM20 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h1v1h-1zM4 27h1v1h-1zM10 27h1v1h-1zM18 27h1v1h-1zM19 27h1v1h-1zM20 27h1v1h-1zM21 27h1v1h-1zM22 27h1v1h-1zM25 27h1v1h-1zM4 28h1v1h-1zM5 28h1v1h-1zM6 28h1v1h-1zM7 28h1v1h-1zM8 28h1v1h-1zM9 28h1v1h-1zM10 28h1v1h-1zM12 28h1v1h-1zM13 28h1v1h-1zM16 28h1v1h-1zM19 28h1v1h-1zM20 28h1v1h-1zM22 28h1v1h-1zM23 28h1v1h-1zM27 28h1v1h-1zM28 28h1v1h-1z" fill="#0d2f3f"/></svg></div>
@@ -822,7 +850,7 @@
 
     <!-- NOTRUF -->
     <section class="view" id="v-notruf">
-      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
       <h2>Notruf & Erste Hilfe</h2>
       <div class="rows" id="notrufNums"></div>
       <div class="note">Im Zweifel immer den <b>Notruf 112</b> wählen. Lieber einmal zu viel anrufen als zu wenig – und die Person nie allein lassen.</div>
@@ -964,7 +992,7 @@
 
     <!-- IN DER NÄHE -->
     <section class="view" id="v-nearby">
-      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
       <h2>In der Nähe</h2>
       <div class="cats">
         <button class="cat" onclick="findNear('pharmacy')"><span style="font-size:1.7rem">💊</span>Apotheke</button>
@@ -980,19 +1008,19 @@
         <button class="cat" onclick="findNear('water')"><span style="font-size:1.7rem">🚰</span>Trinkwasser</button>
         <button class="cat" onclick="findNear('automat')"><span style="font-size:1.7rem">🧺</span>Verkaufsautomat</button>
       </div>
-      <button class="back" onclick="go('home')" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
     </section>
 
     <!-- ERGEBNISSE -->
     <section class="view" id="v-results">
-      <button class="back" onclick="goResBack()">‹ Zurück</button>
+      <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
       <h2 id="resTitle">In der Nähe</h2>
       <div id="resBody"></div>
     </section>
 
     <!-- FAHRPLAN -->
     <section class="view" id="v-wetter">
-      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
       <h2>Wetter</h2>
       <div class="search-box">
         <input id="wetterQ" type="text" placeholder="Anderer Ort, z. B. Bregenz" autocomplete="off">
@@ -1015,19 +1043,19 @@
         <p style="color:var(--ink-soft);font-size:.85rem;margin:8px 0 0">Zeigt den Regen der letzten zwei Stunden und der nächsten halben Stunde. Ist es trocken, bleibt die Karte ohne Farbe.</p>
         <p class="wquelle">Radardaten: <a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer</a> · Karte © OpenStreetMap</p>
       </div>
-      <button class="back" onclick="go('home')" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
     </section>
 
     <section class="view" id="v-fahrplan">
-      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
       <h2>Fahrplan & Bus</h2>
       <div class="rows" id="fahrRows"></div>
-      <button class="back" onclick="go('home')" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
     </section>
 
     <!-- AUTO & UNTERWEGS -->
     <section class="view" id="v-auto">
-      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
       <h2>Auto &amp; unterwegs</h2>
 
       <h2 style="margin-top:6px;font-size:1.25rem">Pannenhilfe rufen</h2>
@@ -1068,12 +1096,12 @@
           </ol>
         </div>
       </details>
-      <button class="back" onclick="go('home')" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
     </section>
 
     <!-- GEMEINSCHAFT ERLEBEN -->
     <section class="view" id="v-gemeinschaft">
-      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
       <h2>Gemeinschaft erleben</h2>
       <p style="color:var(--ink-soft);margin:0 0 14px">Mitmachen, andere treffen, dabei sein – hier finden Sie Anschluss in Ihrer Nähe.</p>
 
@@ -1095,12 +1123,12 @@
       <h2 style="margin-top:22px;font-size:1.25rem">Anschluss finden</h2>
       <div class="rows" id="gemeinschaftRows"></div>
       <div class="note">Vereine, Kirche und Volkshochschule haben oft besondere Angebote für ältere Menschen – Treffs, Ausflüge, Kurse.</div>
-      <button class="back" onclick="go('home')" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
     </section>
 
     <!-- WEBCAMS -->
     <section class="view" id="v-webcams">
-      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
       <h2>Webcams</h2>
       <p style="color:var(--ink-soft);margin:0 0 12px">Live-Bilder aus der Region – die nächstgelegene zuerst. Tippen öffnet die Seite des Betreibers.</p>
       <div class="rows" id="webcamRows"></div>
@@ -1110,12 +1138,12 @@
 
       <div class="note" style="margin-top:14px">Eine Webcam oder einen Ort vermisst? Sagen Sie uns Bescheid – wir nehmen sie gern mit auf.</div>
       <button class="big-btn" style="margin-top:10px" onclick="webcamVorschlag()">Webcam vorschlagen</button>
-      <button class="back" onclick="go('home')" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
     </section>
 
     <!-- SUCHEN -->
     <section class="view" id="v-suchen">
-      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
       <h2>Suchen</h2>
       <div class="search-box">
         <input id="q" type="text" placeholder="z. B. Bäckerei, Arzt, Edeka" enterkeyhint="search">
@@ -1134,12 +1162,12 @@
         <span class="chip" onclick="quick('Supermarkt')">Supermarkt</span>
       </div>
       <div class="note">Öffnet die Karte mit Adresse, Öffnungszeiten und Weg.</div>
-      <button class="back" onclick="go('home')" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
     </section>
 
     <!-- WAS KOCHE ICH HEUTE -->
     <section class="view" id="v-kochen">
-      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
       <h2>Was koche ich heute?</h2>
       <div class="btn-reihe" id="portionWahl" style="margin-bottom:14px">
         <button onclick="setPortionen(1)">1 Person</button>
@@ -1161,12 +1189,12 @@
       </div>
       <div class="note" style="margin-top:16px"><b>Ans Trinken denken.</b> Über den Tag verteilt etwa 1,5 Liter – Wasser, ungesüßter Tee oder Schorle. Ein gefülltes Glas in Sichtweite erinnert von selbst.</div>
       <div class="note">Die Vorschläge sind allgemeine Anregungen, kein Diät- oder Krankenkostplan. Bei Allergien, Unverträglichkeiten oder einer ärztlichen Diät bitte anpassen oder im Zweifel den Arzt fragen.</div>
-      <button class="back" onclick="go('home')" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
+      <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
     </section>
 
     <!-- RECHTLICHES & KONTAKT -->
     <section class="view" id="v-recht">
-      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
       <h2>Rechtliches & Kontakt</h2>
 
       <div class="card-info">
@@ -1219,9 +1247,10 @@
       </details>
     </section>
     <section class="view" id="v-heute">
-      <button class="back" onclick="go('home')">‹ Zurück</button>
+      <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
       <h2>Mein Tag</h2>
       <div class="day-head" id="dayHead"></div>
+      <div class="card-info"><h3>📖 Namenstag heute</h3><p id="namenstag"></p><p style="margin:6px 0 0;font-size:.85rem;color:var(--ink-soft)">Nach altem Kalenderbrauch &ndash; regional teils verschieden.</p></div>
       <div class="horo" id="horo"></div>
       <div class="card-info quote"><h3>✨ Spruch des Tages</h3><p id="spruch"></p></div>
       <div class="card-info tip"><h3>🌿 Gesundheitstipp des Tages</h3><p id="tip"></p></div>
@@ -1751,7 +1780,8 @@ const LAENDER = {
 let STATE = { lat:47.5996, lon:9.5566, ort:"Langenargen", land:"DE", located:false, tempC:null };
 
 /* ---------- Navigation ---------- */
-function go(name){
+/* Ansicht anzeigen (ohne den Verlauf anzufassen) */
+function zeigeView(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('v-'+name).classList.add('active');
   if(typeof stopLupe==='function') stopLupe();
@@ -1778,6 +1808,21 @@ function go(name){
   if(name==='weitergeben') renderInstall();
   window.scrollTo(0,0);
 }
+
+/* Navigieren: Ansicht zeigen UND im Verlauf vermerken. So führt die
+   Zurück-Taste des Handys eine Ansicht zurück, statt die App zu schließen. */
+function go(name){
+  zeigeView(name);
+  if(!history.state || history.state.v!==name){
+    try{ history.pushState({v:name}, ''); }catch(e){}
+  }
+}
+/* Für alle „Zurück"-Knöpfe: eine Ansicht zurück – wie die Handy-Taste */
+function lotseZurueck(){ history.back(); }
+window.addEventListener('popstate', function(e){
+  zeigeView((e.state && e.state.v) || 'home');
+});
+try{ history.replaceState({v:'home'}, ''); }catch(e){}
 
 /* ---------- BSB Schiffsfahrplan (eigene Seite, Standort wird übergeben) ---------- */
 function openSchiff(){
@@ -1874,17 +1919,14 @@ const CAT = {
   bakery:{q:'["shop"="bakery"]', t:"Bäckereien in der Nähe", n:"Bäckerei", steps:[1500,5000,12000]},
   lebensmittel:{q:['["shop"="supermarket"]','["shop"="convenience"]'], t:"Lebensmittel in der Nähe", n:"Lebensmittelgeschäft", steps:[1500,5000,12000]}
 };
-let resBack = 'nearby';
-function goResBack(){ go(resBack); }
 function dist(la,lo){
   const R=6371000,r=Math.PI/180;
   const dLa=(la-STATE.lat)*r, dLo=(lo-STATE.lon)*r;
   const a=Math.sin(dLa/2)**2+Math.cos(STATE.lat*r)*Math.cos(la*r)*Math.sin(dLo/2)**2;
   return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
 }
-async function findNear(cat, back){
+async function findNear(cat){
   const c = CAT[cat];
-  resBack = back || 'nearby';
   go('results');
   document.getElementById('resTitle').textContent = c.t;
   document.getElementById('resBody').innerHTML = `<div class="status"><div class="spin"></div>Suche in Ihrer Umgebung…</div>`;
@@ -2466,12 +2508,37 @@ function renderHoro(){
     <button class="change" onclick="clearSign()">Anderes Sternzeichen wählen</button>
   </div>`;
 }
+/* ---------- Namenstage (traditioneller deutscher Kalender) ----------
+   Schlüssel "Monat-Tag" (1-basiert). Vollständig offline, keine fremden
+   Dienste. Namenstage sind regional verschieden – dies ist die verbreitete
+   Auswahl aus dem alten (katholischen) Kalenderbrauch. */
+const NAMENSTAGE = {
+"1-1":"Wilhelm","1-2":"Basilius, Gregor","1-3":"Genoveva, Odilo","1-4":"Angela","1-5":"Emilie","1-6":"Kaspar, Melchior, Balthasar","1-7":"Raimund, Valentin","1-8":"Erhard","1-9":"Julian, Adrian","1-10":"Paul, Gregor","1-11":"Theodosius","1-12":"Tatjana, Ernst","1-13":"Hilarius","1-14":"Felix","1-15":"Arnold, Maurus","1-16":"Marcel","1-17":"Anton","1-18":"Priska","1-19":"Marius","1-20":"Fabian, Sebastian","1-21":"Agnes, Meinrad","1-22":"Vinzenz","1-23":"Emerentiana, Heinrich","1-24":"Franz von Sales","1-25":"Paulus (Bekehrung)","1-26":"Timotheus, Titus","1-27":"Angela Merici","1-28":"Thomas von Aquin","1-29":"Valerius","1-30":"Martina","1-31":"Johannes Bosco",
+"2-1":"Brigitta","2-2":"Maria Lichtmess","2-3":"Blasius, Ansgar","2-4":"Veronika","2-5":"Agatha","2-6":"Dorothea","2-7":"Richard","2-8":"Elfriede","2-9":"Apollonia","2-10":"Scholastika","2-11":"Theodor","2-12":"Benedikt","2-13":"Gerlinde, Jordan","2-14":"Valentin","2-15":"Siegfried","2-16":"Juliana","2-17":"Donatus","2-18":"Simon","2-19":"Irmgard","2-20":"Falko","2-21":"Petrus Damiani","2-22":"Isabella, Petrus","2-23":"Polykarp, Romana","2-24":"Matthias","2-25":"Walburga","2-26":"Alexander","2-27":"Gabriel","2-28":"Roman","2-29":"Oswald",
+"3-1":"Albin, David","3-2":"Karl","3-3":"Kunigunde","3-4":"Kasimir","3-5":"Olivia","3-6":"Fridolin","3-7":"Perpetua, Felizitas","3-8":"Johannes von Gott","3-9":"Franziska","3-10":"Emil","3-11":"Rosina","3-12":"Gregor","3-13":"Judith","3-14":"Mathilde","3-15":"Klemens","3-16":"Herbert","3-17":"Patrick, Gertrud","3-18":"Cyrill","3-19":"Josef","3-20":"Claudia, Wolfram","3-21":"Alexandra","3-22":"Lea","3-23":"Rebekka","3-24":"Katharina von Schweden","3-25":"Mari&auml; Verk&uuml;ndigung","3-26":"Emanuel","3-27":"Frowin","3-28":"Guntram","3-29":"Berthold, Helmut","3-30":"Amadeus","3-31":"Cornelia",
+"4-1":"Hugo","4-2":"Franz von Paola","4-3":"Richard","4-4":"Isidor","4-5":"Vinzenz Ferrer","4-6":"Notker","4-7":"Johann Baptist","4-8":"Walter","4-9":"Waltraud","4-10":"Engelbert","4-11":"Stanislaus","4-12":"Julius","4-13":"Martin","4-14":"Ernestine","4-15":"Damian","4-16":"Bernadette","4-17":"Rudolf","4-18":"Werner","4-19":"Emma","4-20":"Hildegund","4-21":"Anselm","4-22":"Wolfhelm","4-23":"Georg, Adalbert","4-24":"Fidelis","4-25":"Markus","4-26":"Trudpert","4-27":"Zita","4-28":"Ludwig","4-29":"Katharina von Siena","4-30":"Pius",
+"5-1":"Josef der Arbeiter","5-2":"Athanasius, Boris","5-3":"Philipp, Jakob","5-4":"Florian","5-5":"Gotthard","5-6":"Antonia","5-7":"Gisela","5-8":"Ida","5-9":"Volkmar","5-10":"Gordian","5-11":"Gangolf","5-12":"Pankratius","5-13":"Servatius","5-14":"Bonifatius","5-15":"Sophie","5-16":"Johannes Nepomuk","5-17":"Pascal","5-18":"Erich","5-19":"Ivo","5-20":"Bernhardin","5-21":"Hermann","5-22":"Rita, Julia","5-23":"Renate","5-24":"Dagmar, Esther","5-25":"Beda, Gregor","5-26":"Philipp Neri","5-27":"Augustin","5-28":"Wilhelm","5-29":"Maximin","5-30":"Johanna","5-31":"Petronilla",
+"6-1":"Justin","6-2":"Blandina","6-3":"Klothilde, Karl","6-4":"Christa","6-5":"Bonifatius","6-6":"Norbert","6-7":"Robert","6-8":"Medard","6-9":"Diana, Ephr&auml;m","6-10":"Heinrich","6-11":"Barnabas","6-12":"Leo","6-13":"Antonius von Padua","6-14":"Gottschalk","6-15":"Veit","6-16":"Benno","6-17":"Rainer","6-18":"Elisabeth","6-19":"Romuald","6-20":"Adalbert","6-21":"Aloisius","6-22":"Thomas Morus","6-23":"Edeltraud","6-24":"Johannes der T&auml;ufer","6-25":"Dorothea","6-26":"Vigilius","6-27":"Hemma","6-28":"Iren&auml;us","6-29":"Peter und Paul","6-30":"Otto",
+"7-1":"Theobald","7-2":"Mari&auml; Heimsuchung","7-3":"Thomas","7-4":"Ulrich, Elisabeth","7-5":"Antonius","7-6":"Maria Goretti","7-7":"Willibald","7-8":"Kilian","7-9":"Veronika","7-10":"Knud","7-11":"Benedikt","7-12":"Sigisbert","7-13":"Heinrich","7-14":"Kamillus","7-15":"Bonaventura","7-16":"Carmen","7-17":"Alexius","7-18":"Friedrich","7-19":"Bernulf","7-20":"Margareta","7-21":"Daniel","7-22":"Maria Magdalena","7-23":"Birgitta","7-24":"Christophorus","7-25":"Jakobus","7-26":"Anna, Joachim","7-27":"Natalie","7-28":"Innozenz","7-29":"Martha","7-30":"Ingeborg","7-31":"Ignatius",
+"8-1":"Alfons","8-2":"Eusebius","8-3":"Lydia","8-4":"Johannes Vianney","8-5":"Oswald","8-6":"Gilbert","8-7":"Afra, Albert","8-8":"Dominikus","8-9":"Edith","8-10":"Laurentius","8-11":"Klara","8-12":"Johanna Franziska","8-13":"Hippolyt","8-14":"Maximilian","8-15":"Mari&auml; Himmelfahrt","8-16":"Stephan","8-17":"Hyazinth","8-18":"Helena","8-19":"Sebald","8-20":"Bernhard","8-21":"Pius","8-22":"Maria K&ouml;nigin","8-23":"Rosa","8-24":"Bartholom&auml;us","8-25":"Ludwig","8-26":"Patricia","8-27":"Monika","8-28":"Augustinus","8-29":"Sabine","8-30":"Felix","8-31":"Raimund",
+"9-1":"Verena, &Auml;gidius","9-2":"Ingrid","9-3":"Gregor","9-4":"Rosalia, Ida","9-5":"Mutter Teresa","9-6":"Magnus","9-7":"Regina","9-8":"Mari&auml; Geburt","9-9":"Petrus Claver","9-10":"Nikolaus von Tolentino","9-11":"Helga","9-12":"Mari&auml; Namen","9-13":"Johannes Chrysostomus","9-14":"Notburga","9-15":"Roland","9-16":"Kornelius, Cyprian","9-17":"Hildegard","9-18":"Lambert","9-19":"Januarius","9-20":"Eustachius","9-21":"Matth&auml;us","9-22":"Moritz","9-23":"Thekla, Pio","9-24":"Rupert","9-25":"Nikolaus von Fl&uuml;e","9-26":"Kosmas, Damian","9-27":"Vinzenz von Paul","9-28":"Wenzel, Lioba","9-29":"Michael, Gabriel, Raphael","9-30":"Hieronymus",
+"10-1":"Therese","10-2":"Leodegar (Schutzengelfest)","10-3":"Ewald","10-4":"Franz von Assisi","10-5":"Meinolf, Placidus","10-6":"Bruno","10-7":"Markus (Rosenkranzfest)","10-8":"Simeon","10-9":"Dionysius","10-10":"Viktor","10-11":"Johannes","10-12":"Maximilian","10-13":"Eduard","10-14":"Burkhard","10-15":"Theresia von &Aacute;vila","10-16":"Hedwig, Gallus","10-17":"Ignatius von Antiochien","10-18":"Lukas","10-19":"Frieda, Paul","10-20":"Wendelin","10-21":"Ursula","10-22":"Kordula","10-23":"Severin","10-24":"Anton Maria","10-25":"Krispin","10-26":"Amandus","10-27":"Wolfhard","10-28":"Simon, Judas Thadd&auml;us","10-29":"Ermelinde","10-30":"Dietger","10-31":"Wolfgang",
+"11-1":"Allerheiligen","11-2":"Allerseelen","11-3":"Hubert","11-4":"Karl Borrom&auml;us","11-5":"Emmerich","11-6":"Leonhard","11-7":"Willibrord","11-8":"Gottfried","11-9":"Theodor","11-10":"Leo","11-11":"Martin","11-12":"Kunibert","11-13":"Briktius","11-14":"Alberich","11-15":"Leopold, Albert","11-16":"Othmar, Margareta","11-17":"Gertrud","11-18":"Odo","11-19":"Elisabeth","11-20":"Edmund, Korbinian","11-21":"Mari&auml; Opferung","11-22":"C&auml;cilia","11-23":"Klemens, Kolumban","11-24":"Flora","11-25":"Katharina","11-26":"Konrad","11-27":"Virgil","11-28":"Gunther","11-29":"Saturnin","11-30":"Andreas",
+"12-1":"Blanka","12-2":"Bibiana","12-3":"Franz Xaver","12-4":"Barbara","12-5":"Anno","12-6":"Nikolaus","12-7":"Ambrosius","12-8":"Mari&auml; Empf&auml;ngnis","12-9":"Valerie","12-10":"Angelina","12-11":"Damasus","12-12":"Hartmann","12-13":"Luzia","12-14":"Johannes vom Kreuz","12-15":"Christiana","12-16":"Adelheid","12-17":"Lazarus","12-18":"Wunibald","12-19":"Urban","12-20":"Eugen","12-21":"Thomas, Petrus Canisius","12-22":"Jutta","12-23":"Viktoria","12-24":"Adam und Eva","12-25":"Anastasia (Weihnachten)","12-26":"Stephanus","12-27":"Johannes (Evangelist)","12-28":"Unschuldige Kinder","12-29":"David","12-30":"Hermine","12-31":"Silvester"
+};
+function namenstagHeute(d){
+  const t = NAMENSTAGE[(d.getMonth()+1)+"-"+d.getDate()];
+  const el = document.createElement('span'); el.innerHTML = t || '&ndash;';
+  return el.textContent;
+}
+
 function renderHeute(){
   const now = new Date();
   const dat = now.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const mp = moonPhase(now);
   document.getElementById('dayHead').innerHTML =
     `<div class="dat">${dat}</div><div class="moon">${mp.emoji} Mond: ${mp.name}</div>`;
+  document.getElementById('namenstag').textContent = namenstagHeute(now);
   renderHoro();
   const spruchPool = SPRUECHE_SAISON[jahreszeit(now.getMonth())].concat(SPRUECHE);
   document.getElementById('spruch').textContent = spruchPool[tagDesJahres(now) % spruchPool.length];
@@ -2895,6 +2962,9 @@ function renderFoto(){
 function fotoRepo(){
   try{
     const h = location.hostname;            // z. B. tscharlie168.github.io
+    /* Eigene Domain: das Repo lässt sich nicht aus der Adresse ablesen,
+       darum steht es hier fest – sonst blieben die /fotos unsichtbar. */
+    if(h==='1a-lotse.de' || h==='www.1a-lotse.de') return 'Tscharlie168/lotse';
     if(!h.endsWith('.github.io')) return null;
     const owner = h.split('.')[0];
     const repo = location.pathname.split('/').filter(Boolean)[0];
@@ -2924,6 +2994,22 @@ function fotoListe(){
     })
     .catch(() => zuUrl(fotoCache()));
 }
+
+/* ---------- Textgröße (A / A+ / A++) ---------- */
+const TEXTGR_STUFEN = ['100%','112.5%','125%'];
+function setTextgroesse(i){
+  i = (i>=0 && i<TEXTGR_STUFEN.length) ? i : 0;
+  document.documentElement.style.fontSize = TEXTGR_STUFEN[i];
+  try{ localStorage.setItem('lotse_textgr', i); }catch(e){}
+  markiereTextgroesse(i);
+}
+function markiereTextgroesse(i){
+  for(let k=0;k<TEXTGR_STUFEN.length;k++){
+    const b=document.getElementById('tg'+k);
+    if(b) b.classList.toggle('aktiv', k===i);
+  }
+}
+markiereTextgroesse((()=>{ try{ return +localStorage.getItem('lotse_textgr')||0; }catch(e){ return 0; } })());
 
 /* ---------- Start ---------- */
 paintLand();
@@ -3210,7 +3296,7 @@ function snBadge(){
 function renderMerk(){
   var a=merkLoad(), box=document.getElementById('merkListe');
   merkBadge();
-  if(!a.length){ box.innerHTML='<div class="merk-leer">Noch nichts notiert.</div>'; document.getElementById('merkClear').style.display='none'; return; }
+  if(!a.length){ box.innerHTML='<div class="merk-leer">Noch nichts notiert.</div>'; document.getElementById('merkClear').style.display='none'; document.getElementById('merkTeilen').style.display='none'; return; }
   box.innerHTML=a.map(function(it,i){
     return '<div class="merk-item'+(it.d?' done':'')+'">'+
       '<button class="chk" onclick="merkToggle('+i+')" aria-label="Erledigt">'+(it.d?'\u2713':'')+'</button>'+
@@ -3218,6 +3304,19 @@ function renderMerk(){
       '<button class="del" onclick="merkDel('+i+')" aria-label="Loeschen">\u00d7</button></div>';
   }).join('');
   document.getElementById('merkClear').style.display = a.some(function(x){return x.d;}) ? 'block' : 'none';
+  document.getElementById('merkTeilen').style.display = 'block';
+}
+/* Merkzettel als Text weitergeben – über das Teilen-Menü des Handys,
+   sonst in die Zwischenablage (z. B. zum Einfügen in eine Nachricht). */
+function merkText(){
+  return 'Mein Merkzettel:\n' + merkLoad().map(function(x){ return (x.d?'✓ ':'– ') + x.t; }).join('\n');
+}
+function merkTeilen(){
+  var t = merkText();
+  if(navigator.share){ navigator.share({title:'Merkzettel', text:t}).catch(function(){}); }
+  else if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){ alert('Merkzettel kopiert – Sie können ihn jetzt z. B. in eine Nachricht einfügen.'); }, function(){ window.prompt('Zum Kopieren markieren:', t); });
+  } else { window.prompt('Zum Kopieren markieren:', t); }
 }
 function merkAdd(){
   var inp=document.getElementById('merkInput'), t=(inp.value||'').trim();

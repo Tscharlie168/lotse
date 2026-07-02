@@ -1,7 +1,7 @@
 {
   "name": "Lotse",
   "short_name": "Lotse",
-  "description": "Die Anlaufstelle für alles – Notruf, Erste Hilfe, Orte in der Nähe und Fahrplan.",
+  "description": "Die Anlaufstelle für alles – Notruf & Erste Hilfe, Wetter, Fahrpläne, Merkzettel, praktische Helfer und Unterhaltung. Ruhig und gut lesbar gestaltet.",
   "lang": "de",
   "start_url": "./",
   "scope": "./",
