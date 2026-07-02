@@ -1,4 +1,7 @@
-/* Lotse – Service Worker (v7)
+/* Lotse – Service Worker (v8)
+   Neu gegenüber v7:
+   - Notruf: "Wo bin ich?" (Adresse groß anzeigen) und Notfallzettel.
+   - In der Nähe: Verweis auf den Apotheken-Notdienst (aponet.de).
    Neu gegenüber v6:
    - Foto des Tages lädt die Bilderliste jetzt auch auf 1a-lotse.de.
    - Zurück-Taste des Handys führt eine Ansicht zurück statt die App zu
@@ -12,7 +15,7 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v7';
+const CACHE = 'lotse-v8';
 const SHELL = [
   './',
   './index.html',
