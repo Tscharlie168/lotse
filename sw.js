@@ -2,6 +2,8 @@
    Neu gegenüber v9:
    - Ortswahl: Standort-Kasten oben ist antippbar, Ort von Hand wählbar
      (für Geräte, deren Ortung nicht funktioniert, z. B. iPhone-Web-Apps).
+   - Der "Land"-Knopf entfällt: Das Land ergibt sich automatisch aus dem
+     georteten oder gewählten Ort (auch für Notrufnummern und Portale).
    Neu gegenüber v8:
    - Hinweis bei Knöpfen, die fremde Seiten öffnen (Cookies/Datenschutz).
    - Namenstage: an Festtagen steht jetzt ein Name voran.

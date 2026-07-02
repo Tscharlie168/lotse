@@ -375,10 +375,6 @@
   .land-overlay{position:fixed;inset:0;background:rgba(10,30,40,.55);z-index:999;display:flex;align-items:flex-end;justify-content:center;padding:0 0 env(safe-area-inset-bottom)}
   .land-sheet{background:var(--surface);border-radius:22px 22px 0 0;width:100%;max-width:560px;max-height:82vh;overflow-y:auto;padding:18px 16px 28px;-webkit-overflow-scrolling:touch}
   .land-sheet h3{margin:0 0 14px;font-size:1.2rem;font-weight:800;text-align:center;color:var(--ink)}
-  .land-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .land-btn{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px 10px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;text-align:left;display:flex;align-items:center;gap:8px;color:var(--ink)}
-  .land-btn:active,.land-btn.aktiv{background:#eef5f7;border-color:var(--sea);color:var(--sea)}
-  .land-btn .flag{font-size:1.4rem;line-height:1}
   .land-close{width:100%;background:var(--sea);color:#fff;border:0;border-radius:14px;padding:16px;font-size:1.1rem;font-weight:800;cursor:pointer;font-family:inherit;margin-top:14px}
   /* --- Ortswahl (Standort von Hand) --- */
   .ort-liste{display:flex;flex-direction:column;gap:8px;margin-top:12px}
@@ -421,7 +417,6 @@ try{
     <div class="where" id="where">
       <span class="dot off" id="dot"></span>
       <div class="txt" onclick="standortMenue()" role="button" style="cursor:pointer" title="Ort wählen"><small id="land">Standort wird gesucht…</small><strong id="ort">Einen Moment</strong></div>
-      <button id="locBtn" onclick="toggleLand()">Land</button>
     </div>
   </header>
 
@@ -1915,11 +1910,6 @@ function paintLand(){
       <span class="ic-right"><svg viewBox="0 0 28 24" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="3" width="16" height="14" rx="4" fill="#1d6e8c"/><rect x="8.5" y="6" width="11" height="4.5" rx="1" fill="#ffffff"/><circle cx="11" cy="13.5" r="1.4" fill="#ffffff"/><circle cx="17" cy="13.5" r="1.4" fill="#ffffff"/><path d="M9.5 18l-2 4M18.5 18l2 4" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round"/></svg></span>
     </a>`).join('');
 }
-function toggleLand(){
-  STATE.land = STATE.land==='DE' ? 'AT' : 'DE';
-  paintLand();
-}
-
 /* ---------- Standort holen ---------- */
 function locate(){
   if(STATE.manuell){ paintLand(); aktualisiereTempKontext(); return; } // Wunsch-Ort gewählt: Ortung ruht
@@ -4220,63 +4210,7 @@ snBadge();
 werkzeugeBadgeUpdate();
 
 /* ====================== Land-Auswahl Overlay ====================== */
-const LAND_LISTE = [
-  {cc:"DE", flag:"🇩🇪", name:"Deutschland"},
-  {cc:"AT", flag:"🇦🇹", name:"Österreich"},
-  {cc:"IT", flag:"🇮🇹", name:"Italien"},
-  {cc:"FR", flag:"🇫🇷", name:"Frankreich"},
-  {cc:"NL", flag:"🇳🇱", name:"Niederlande"},
-  {cc:"BE", flag:"🇧🇪", name:"Belgien"},
-  {cc:"LU", flag:"🇱🇺", name:"Luxemburg"},
-  {cc:"DK", flag:"🇩🇰", name:"Dänemark"},
-  {cc:"SE", flag:"🇸🇪", name:"Schweden"},
-  {cc:"FI", flag:"🇫🇮", name:"Finnland"},
-  {cc:"IE", flag:"🇮🇪", name:"Irland"},
-  {cc:"PL", flag:"🇵🇱", name:"Polen"},
-  {cc:"CZ", flag:"🇨🇿", name:"Tschechien"},
-  {cc:"SK", flag:"🇸🇰", name:"Slowakei"},
-  {cc:"HU", flag:"🇭🇺", name:"Ungarn"},
-  {cc:"SI", flag:"🇸🇮", name:"Slowenien"},
-  {cc:"HR", flag:"🇭🇷", name:"Kroatien"},
-  {cc:"ES", flag:"🇪🇸", name:"Spanien"},
-  {cc:"PT", flag:"🇵🇹", name:"Portugal"},
-  {cc:"GR", flag:"🇬🇷", name:"Griechenland"},
-  {cc:"BG", flag:"🇧🇬", name:"Bulgarien"},
-  {cc:"RO", flag:"🇷🇴", name:"Rumänien"},
-  {cc:"EE", flag:"🇪🇪", name:"Estland"},
-  {cc:"LV", flag:"🇱🇻", name:"Lettland"},
-  {cc:"LT", flag:"🇱🇹", name:"Litauen"},
-  {cc:"MT", flag:"🇲🇹", name:"Malta"},
-  {cc:"CY", flag:"🇨🇾", name:"Zypern"},
-  {cc:"ME", flag:"🇲🇪", name:"Montenegro"}
-];
-function toggleLand(){
-  var overlay=document.getElementById('landOverlay');
-  if(!overlay){
-    overlay=document.createElement('div');
-    overlay.id='landOverlay';
-    overlay.className='land-overlay';
-    overlay.onclick=function(e){ if(e.target===overlay) landOverlayClose(); };
-    var sheet=document.createElement('div');
-    sheet.className='land-sheet';
-    sheet.innerHTML='<h3>Land wählen</h3><div class="land-grid" id="landGrid"></div><button class="land-close" onclick="landOverlayClose()">Schließen</button>';
-    overlay.appendChild(sheet);
-    document.body.appendChild(overlay);
-  }
-  var grid=document.getElementById('landGrid');
-  grid.innerHTML=LAND_LISTE.map(function(l){
-    var aktiv=l.cc===STATE.land?' aktiv':'';
-    return '<button class="land-btn'+aktiv+'" onclick="landWaehlen(\''+l.cc+'\')"><span class="flag">'+l.flag+'</span>'+l.name+'</button>';
-  }).join('');
-  overlay.style.display='flex';
-}
-function landOverlayClose(){
-  var o=document.getElementById('landOverlay'); if(o) o.style.display='none';
-}
-function landWaehlen(cc){
-  if(LAENDER[cc]){ STATE.land=cc; STATE.located=false; paintLand(); }
-  landOverlayClose();
-}
+
 
 /* ---------- Ortswahl: Standort antippen und Ort von Hand wählen ----------
    Für Geräte, bei denen die automatische Ortung nicht erlaubt ist oder
