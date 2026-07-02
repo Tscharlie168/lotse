@@ -362,6 +362,7 @@
   .vertraut-set{display:flex;flex-direction:column;gap:10px}
   .vertraut-set input{border:1px solid var(--line);border-radius:12px;padding:14px;font-size:1.1rem;font-family:inherit;box-sizing:border-box}
   .vertraut-set textarea{border:1px solid var(--line);border-radius:12px;padding:14px;font-size:1.1rem;font-family:inherit;box-sizing:border-box;resize:vertical}
+  .vertraut-set select{border:1px solid var(--line);border-radius:12px;padding:14px;font-size:1.1rem;font-family:inherit;box-sizing:border-box;background:#fff;color:var(--ink)}
   /* Notfallzettel: große, klare Anzeige zum Vorzeigen */
   .nz{background:var(--card);border:2px solid var(--sea);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px}
   .nz .nz-t{font-size:.82rem;text-transform:uppercase;letter-spacing:.6px;color:var(--ink-soft);font-weight:700}
@@ -3843,16 +3844,23 @@ function notfallForm(){
     '<textarea id="nzKrank" rows="2" placeholder="Krankheiten (z. B. Diabetes, Herzschrittmacher)">'+lotseEsc(v.krank||'')+'</textarea>'+
     '<textarea id="nzMedi" rows="2" placeholder="Medikamente (z. B. Blutverdünner)">'+lotseEsc(v.medi||'')+'</textarea>'+
     '<input id="nzAllerg" type="text" placeholder="Allergien (z. B. Penicillin)" value="'+lotseEsc(v.allerg||'')+'">'+
-    '<input id="nzKontakt" type="text" placeholder="Notfallkontakt – Name (z. B. Tochter Anna)" value="'+lotseEsc(v.kontakt||'')+'">'+
-    '<input id="nzKTel" type="tel" placeholder="Notfallkontakt – Telefonnummer" value="'+lotseEsc(v.ktel||'')+'">'+
+    '<select id="nzOrgan">'+
+      '<option value=""'+(!v.organ?' selected':'')+'>Organspender? – keine Angabe</option>'+
+      '<option value="Ja"'+(v.organ==='Ja'?' selected':'')+'>Organspender: Ja</option>'+
+      '<option value="Nein"'+(v.organ==='Nein'?' selected':'')+'>Organspender: Nein</option>'+
+    '</select>'+
+    '<input id="nzKontakt" type="text" placeholder="1. Notfallkontakt – Name (z. B. Tochter Anna)" value="'+lotseEsc(v.kontakt||'')+'">'+
+    '<input id="nzKTel" type="tel" placeholder="1. Notfallkontakt – Telefonnummer" value="'+lotseEsc(v.ktel||'')+'">'+
+    '<input id="nzKontakt2" type="text" placeholder="2. Notfallkontakt – Name" value="'+lotseEsc(v.kontakt2||'')+'">'+
+    '<input id="nzKTel2" type="tel" placeholder="2. Notfallkontakt – Telefonnummer" value="'+lotseEsc(v.ktel2||'')+'">'+
     '<button class="big-btn" onclick="notfallSave()">Speichern</button>'+
     (notfallLoad()?'<button class="flink" onclick="renderNotfall()">Abbrechen</button>':'')+
     '</div>';
 }
 function notfallSave(){
   var w=function(id){ return (document.getElementById(id).value||'').trim(); };
-  var v={name:w('nzName'),geb:w('nzGeb'),krank:w('nzKrank'),medi:w('nzMedi'),allerg:w('nzAllerg'),kontakt:w('nzKontakt'),ktel:w('nzKTel')};
-  if(!v.name&&!v.geb&&!v.krank&&!v.medi&&!v.allerg&&!v.kontakt&&!v.ktel){ alert('Bitte mindestens ein Feld ausfüllen.'); return; }
+  var v={name:w('nzName'),geb:w('nzGeb'),krank:w('nzKrank'),medi:w('nzMedi'),allerg:w('nzAllerg'),organ:w('nzOrgan'),kontakt:w('nzKontakt'),ktel:w('nzKTel'),kontakt2:w('nzKontakt2'),ktel2:w('nzKTel2')};
+  if(!v.name&&!v.geb&&!v.krank&&!v.medi&&!v.allerg&&!v.organ&&!v.kontakt&&!v.ktel&&!v.kontakt2&&!v.ktel2){ alert('Bitte mindestens ein Feld ausfüllen.'); return; }
   try{ localStorage.setItem('lotse_notfall', JSON.stringify(v)); }catch(e){}
   renderNotfall();
 }
@@ -3861,18 +3869,27 @@ function renderNotfall(){
   if(!box) return;
   if(!v){ notfallForm(); return; }
   var zeile=function(t,w){ return w?'<div><div class="nz-t">'+t+'</div><div class="nz-w">'+lotseEsc(w)+'</div></div>':''; };
+  var anrufe='';
+  if(v.ktel) anrufe+='<button onclick="notfallAnruf(1)">'+lotseEsc(v.kontakt||'Notfallkontakt')+' anrufen</button>';
+  if(v.ktel2) anrufe+='<button onclick="notfallAnruf(2)">'+lotseEsc(v.kontakt2||'2. Kontakt')+' anrufen</button>';
   box.innerHTML='<div class="nz">'+
     zeile('Name',v.name)+
     zeile('Geburtsjahr',v.geb)+
     zeile('Krankheiten',v.krank)+
     zeile('Medikamente',v.medi)+
     zeile('Allergien',v.allerg)+
-    zeile('Notfallkontakt',(v.kontakt||'')+(v.kontakt&&v.ktel?' · ':'')+(v.ktel||''))+
+    zeile('Organspender',v.organ)+
+    zeile('1. Notfallkontakt',(v.kontakt||'')+(v.kontakt&&v.ktel?' · ':'')+(v.ktel||''))+
+    zeile('2. Notfallkontakt',(v.kontakt2||'')+(v.kontakt2&&v.ktel2?' · ':'')+(v.ktel2||''))+
     '</div>'+
-    (v.ktel?'<div class="btn-reihe"><button onclick="notfallAnruf()">Notfallkontakt anrufen</button></div>':'')+
+    (anrufe?'<div class="btn-reihe">'+anrufe+'</div>':'')+
     '<button class="flink" onclick="notfallForm()">Notfallzettel ändern</button>';
 }
-function notfallAnruf(){ var v=notfallLoad(); if(v&&v.ktel) location.href='tel:'+v.ktel.replace(/\s/g,''); }
+function notfallAnruf(n){
+  var v=notfallLoad(); if(!v) return;
+  var t=(n===2?v.ktel2:v.ktel);
+  if(t) location.href='tel:'+t.replace(/\s/g,'');
+}
 /* ---------- Pannenhilfe: Mitgliedsnummer (nur lokal) ---------- */
 function mitgliedLoad(){ try{ return JSON.parse(localStorage.getItem('lotse_mitglied')); }catch(e){ return null; } }
 function mitgliedForm(){

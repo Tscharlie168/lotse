@@ -1,4 +1,6 @@
-/* Lotse – Service Worker (v10)
+/* Lotse – Service Worker (v11)
+   Neu gegenüber v10:
+   - Notfallzettel: Organspender (Ja/Nein) und 2. Notfallkontakt.
    Neu gegenüber v9:
    - Ortswahl: Standort-Kasten oben ist antippbar, Ort von Hand wählbar
      (für Geräte, deren Ortung nicht funktioniert, z. B. iPhone-Web-Apps).
@@ -23,7 +25,7 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v10';
+const CACHE = 'lotse-v11';
 const SHELL = [
   './',
   './index.html',
