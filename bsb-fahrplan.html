@@ -351,7 +351,7 @@ function planJourneys(fromIdx,toIdx,dStr){
 }
 
 // ---- state ----
-var state={tab:"planer",from:6,to:11,date:defaultDate(),open:null,favs:[],locStatus:null,schweizDest:null};
+var state={tab:"planer",from:6,to:11,date:defaultDate(),open:null,favs:[],locStatus:null,schweizDest:null,schweizRet:null};
 try{var f=localStorage.getItem("lgg-favs");if(f)state.favs=JSON.parse(f);}catch(e){}
 function saveFavs(){try{localStorage.setItem("lgg-favs",JSON.stringify(state.favs));}catch(e){}}
 
@@ -512,6 +512,64 @@ function schweizAbfahrtenHTML(destIdx, date){
   return h;
 }
 
+function schweizRueckfahrtHTML(destIdx, date){
+  var dObj=new Date(date+"T12:00:00");
+  var byPort={};
+  for(var i=0;i<COURSES.length;i++){
+    var c=COURSES[i];
+    if(!courseValidOn(c,dObj,date)) continue;
+    var ptDep=-1,j;
+    for(j=0;j<c.stops.length;j++){if(c.stops[j][0]===destIdx){ptDep=j;break;}}
+    if(ptDep===-1) continue;
+    for(var k=ptDep+1;k<c.stops.length;k++){
+      var tp=c.stops[k][0];
+      if(SCHWEIZ_HIDE_PORTS.indexOf(tp)!==-1) continue;
+      if(!byPort[tp]) byPort[tp]=[];
+      byPort[tp].push({dep:c.stops[ptDep][2],arr:c.stops[k][1],no:c.no,svc:c.svc,line:c.line});
+    }
+  }
+  var portKeys=Object.keys(byPort);
+  if(!portKeys.length){
+    var w=dObj.getDay();
+    var noDay=(date>"2026-06-26"&&date<="2026-09-13"&&w!==0&&w<3);
+    return '<div class="lg-empty" style="margin-top:14px"><div class="lg-empty-mark">&#9785;</div>'+
+      '<p>Keine R&uuml;ckfahrt ab <strong>'+PORTS[destIdx]+'</strong> an diesem Tag.</p>'+
+      (noDay?'<p class="lg-empty-hint">Die Untersee-Linie f&auml;hrt ab 27.6. nur <strong>Mi&ndash;So</strong>.</p>':'')+
+    '</div>';
+  }
+  var d=new Date(date+"T12:00:00");
+  var h='<div style="margin-top:16px">';
+  h+='<div class="lg-result-head"><span class="lg-result-route">Ab <em>'+esc(PORTS[destIdx])+'</em></span>';
+  h+='<span class="lg-result-day">'+WEEKDAYS[d.getDay()]+", "+d.getDate()+"."+(d.getMonth()+1)+"."+'</span></div>';
+  // Sort arrival ports by earliest departure
+  portKeys.sort(function(a,b){
+    var ad=byPort[a].reduce(function(m,x){return Math.min(m,toMin(x.dep));},9999);
+    var bd=byPort[b].reduce(function(m,x){return Math.min(m,toMin(x.dep));},9999);
+    return ad-bd;
+  });
+  for(var pi=0;pi<portKeys.length;pi++){
+    var pIdx=+portKeys[pi];
+    var trips=byPort[pIdx].slice().sort(function(a,b){return toMin(a.dep)-toMin(b.dep);});
+    h+='<div class="lg-mini" style="margin-bottom:10px">';
+    h+='<div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;font-size:17px;color:var(--navy);margin-bottom:8px">Nach '+esc(PORTS[pIdx])+'</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:6px">';
+    for(var ti=0;ti<trips.length;ti++){
+      var tr=trips[ti];
+      var dur=toMin(tr.arr)-toMin(tr.dep);
+      h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 11px;background:var(--sky);border-radius:8px;flex-wrap:wrap">';
+      h+='<span style="font-family:\'IBM Plex Mono\',monospace;font-weight:600;font-size:18px;color:#0E3553">'+pad(tr.dep)+'</span>';
+      h+='<span style="color:var(--muted);font-size:13px">&#8594; an '+pad(tr.arr)+' &middot; '+fmtDur(dur)+'</span>';
+      h+=svcTag(tr.svc);
+      h+=sbsTag(tr.line);
+      h+='</div>';
+    }
+    h+='</div></div>';
+  }
+  h+='<div class="lg-note" style="margin-top:4px;font-size:12.5px">SBS/URh: eigenes Ticket erforderlich &middot; Untersee Mi&ndash;So ab 27.6. &middot; SBS-Freitags-Kurs 27.6.&ndash;13.9. &middot; Angaben ohne Gew&auml;hr &middot; <a href="https://bodensee-schiffe.ch" target="_blank" style="color:var(--blue)">bodensee-schiffe.ch</a></div>';
+  h+='</div>';
+  return h;
+}
+
 function schweizHTML(){
   var dest=state.schweizDest;
   var h='<section class="lg-panel">';
@@ -525,9 +583,19 @@ function schweizHTML(){
   }
   h+='</div>';
   if(dest!==null){
-    h+='<label class="lg-field lg-field--date" style="display:flex;flex-direction:column;gap:5px;max-width:200px"><span style="font-family:\'Barlow Condensed\',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:12px;font-weight:600;color:var(--muted)">Tag</span>';
+    var hd='font-family:\'Barlow Condensed\',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:21px;font-weight:700;color:var(--navy);margin:8px 0 10px';
+    var lbl='font-family:\'Barlow Condensed\',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:12px;font-weight:600;color:var(--muted)';
+    // Hinfahrt
+    h+='<div style="'+hd+'">Hinfahrt &mdash; nach '+esc(PORTS[dest])+'</div>';
+    h+='<label class="lg-field lg-field--date" style="display:flex;flex-direction:column;gap:5px;max-width:200px"><span style="'+lbl+'">Tag der Hinfahrt</span>';
     h+='<input type="date" id="lg-szwdate" min="2026-05-14" max="2026-09-13" value="'+state.date+'"></label>';
     h+=schweizAbfahrtenHTML(dest,state.date);
+    // Rückfahrt
+    var retDate=state.schweizRet||state.date;
+    h+='<div style="'+hd+';margin-top:26px;padding-top:18px;border-top:2px solid var(--sky)">R&uuml;ckfahrt &mdash; ab '+esc(PORTS[dest])+'</div>';
+    h+='<label class="lg-field lg-field--date" style="display:flex;flex-direction:column;gap:5px;max-width:200px"><span style="'+lbl+'">Tag der R&uuml;ckfahrt</span>';
+    h+='<input type="date" id="lg-szwretdate" min="2026-05-14" max="2026-09-13" value="'+retDate+'"></label>';
+    h+=schweizRueckfahrtHTML(dest,retDate);
   }
   h+='<div class="lg-card" style="margin-top:18px"><h3>Praktisch beim Schweiz-Ausflug</h3><ul>'+
     '<li><strong>Ausweis mitnehmen</strong> &mdash; es ist eine Grenze.</li>'+
@@ -572,6 +640,8 @@ function bind(){
   });
   var szwDate=document.getElementById("lg-szwdate");
   if(szwDate) szwDate.addEventListener("change",function(){if(this.value){state.date=this.value;render();}});
+  var szwRet=document.getElementById("lg-szwretdate");
+  if(szwRet) szwRet.addEventListener("change",function(){if(this.value){state.schweizRet=this.value;render();}});
 
   if(state.tab!=="planer") return;
   var from=document.getElementById("lg-from"),to=document.getElementById("lg-to"),date=document.getElementById("lg-date");
