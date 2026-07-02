@@ -357,6 +357,10 @@
   .betrug-liste li{position:relative;padding:13px 14px 13px 44px;background:var(--card);border:1px solid var(--line);border-radius:12px;font-size:1.05rem;line-height:1.45}
   .betrug-liste li::before{content:'!';position:absolute;left:14px;top:13px;width:20px;height:20px;background:var(--alarm);color:#fff;border-radius:50%;text-align:center;font-weight:900;font-size:.85rem;line-height:20px}
   .betrug-merk{margin-top:12px;background:#fdeaea;border:1px solid #f0b8b8;border-radius:12px;padding:14px;font-weight:700;color:#8a2b2b;line-height:1.45}
+  /* Gedicht des Tages */
+  .gedicht-titel{font-weight:800;font-size:1.08rem;margin:0 0 8px}
+  .gedicht-text{white-space:pre-line;line-height:1.65;margin:0}
+  .gedicht-autor{color:var(--ink-soft);font-size:.92rem;margin:10px 0 0}
   /* Hinweis bei Knöpfen, die fremde Internetseiten öffnen */
   .ext-note{display:flex;gap:8px;align-items:flex-start;color:var(--ink-soft);font-size:.92rem;line-height:1.45;margin:16px 2px 0;padding:0 2px}
   .vertraut-set{display:flex;flex-direction:column;gap:10px}
@@ -1290,6 +1294,7 @@ try{
       <div class="card-info"><h3>📖 Namenstag heute</h3><p id="namenstag"></p><p style="margin:6px 0 0;font-size:.85rem;color:var(--ink-soft)">Nach altem Kalenderbrauch &ndash; regional teils verschieden.</p></div>
       <div class="horo" id="horo"></div>
       <div class="card-info quote"><h3>✨ Spruch des Tages</h3><p id="spruch"></p></div>
+      <div class="card-info"><h3>📜 Gedicht des Tages</h3><div id="gedicht"></div></div>
       <div class="card-info tip"><h3>🌿 Gesundheitstipp des Tages</h3><p id="tip"></p></div>
       <div class="card-info brain"><h3>🧠 Kleine Gehirnjogging-Übung</h3><p id="brain"></p></div>
 
@@ -2544,6 +2549,47 @@ function renderHoro(){
     <button class="change" onclick="clearSign()">Anderes Sternzeichen wählen</button>
   </div>`;
 }
+/* ---------- Gedicht des Tages ----------
+   Nur gemeinfreie Dichter (mehr als 70 Jahre verstorben) – Heinz Erhardt
+   u. Ä. sind bis 2050 geschützt und dürfen NICHT aufgenommen werden.
+   jz: Jahreszeit (optional), sonst ganzjährig. "(Auszug)" kennzeichnet
+   gekürzte Gedichte. Zeilenumbrüche mit \n, Strophen mit \n\n. */
+const GEDICHTE = [
+{t:"Er ist's",a:"Eduard Mörike (1804–1875)",jz:"fruehling",v:"Frühling läßt sein blaues Band\nWieder flattern durch die Lüfte;\nSüße, wohlbekannte Düfte\nStreifen ahnungsvoll das Land.\nVeilchen träumen schon,\nWollen balde kommen.\n– Horch, von fern ein leiser Harfenton!\nFrühling, ja du bist's!\nDich hab ich vernommen!"},
+{t:"Gefunden",a:"Johann Wolfgang von Goethe (1749–1832)",jz:"fruehling",v:"Ich ging im Walde\nSo für mich hin,\nUnd nichts zu suchen,\nDas war mein Sinn.\n\nIm Schatten sah ich\nEin Blümchen stehn,\nWie Sterne leuchtend,\nWie Äuglein schön.\n\nIch wollt es brechen,\nDa sagt es fein:\nSoll ich zum Welken\nGebrochen sein?\n\nIch grub's mit allen\nDen Würzlein aus,\nZum Garten trug ich's\nAm hübschen Haus.\n\nUnd pflanzt es wieder\nAm stillen Ort;\nNun zweigt es immer\nUnd blüht so fort."},
+{t:"Alle Vögel sind schon da (1. Strophe)",a:"Hoffmann von Fallersleben (1798–1874)",jz:"fruehling",v:"Alle Vögel sind schon da,\nalle Vögel, alle!\nWelch ein Singen, Musiziern,\nPfeifen, Zwitschern, Tiriliern!\nFrühling will nun einmarschiern,\nkommt mit Sang und Schalle."},
+{t:"Frühlingsglaube (1. Strophe)",a:"Ludwig Uhland (1787–1862)",jz:"fruehling",v:"Die linden Lüfte sind erwacht,\nSie säuseln und weben Tag und Nacht,\nSie schaffen an allen Enden.\nO frischer Duft, o neuer Klang!\nNun, armes Herze, sei nicht bang!\nNun muß sich alles, alles wenden."},
+{t:"Frühlingslied",a:"Heinrich Heine (1797–1856)",jz:"fruehling",v:"Leise zieht durch mein Gemüt\nLiebliches Geläute.\nKlinge, kleines Frühlingslied,\nKling hinaus ins Weite.\n\nKling hinaus, bis an das Haus,\nWo die Blumen sprießen.\nWenn du eine Rose schaust,\nSag, ich lass sie grüßen."},
+{t:"Osterspaziergang (Auszug)",a:"Johann Wolfgang von Goethe (1749–1832)",jz:"fruehling",v:"Vom Eise befreit sind Strom und Bäche\nDurch des Frühlings holden, belebenden Blick;\nIm Tale grünet Hoffnungsglück;\nDer alte Winter, in seiner Schwäche,\nZog sich in rauhe Berge zurück."},
+{t:"Der Mai ist gekommen (1. Strophe)",a:"Emanuel Geibel (1815–1884)",jz:"fruehling",v:"Der Mai ist gekommen, die Bäume schlagen aus,\nDa bleibe, wer Lust hat, mit Sorgen zu Haus;\nWie die Wolken dort wandern am himmlischen Zelt,\nSo steht auch mir der Sinn in die weite, weite Welt."},
+{t:"Mondnacht",a:"Joseph von Eichendorff (1788–1857)",jz:"sommer",v:"Es war, als hätt der Himmel\nDie Erde still geküßt,\nDaß sie im Blütenschimmer\nVon ihm nun träumen müßt.\n\nDie Luft ging durch die Felder,\nDie Ähren wogten sacht,\nEs rauschten leis die Wälder,\nSo sternklar war die Nacht.\n\nUnd meine Seele spannte\nWeit ihre Flügel aus,\nFlog durch die stillen Lande,\nAls flöge sie nach Haus."},
+{t:"Sommerfrische (Auszug)",a:"Joachim Ringelnatz (1883–1934)",jz:"sommer",v:"Zupf dir ein Wölkchen aus dem Wolkenweiß,\nDas durch den sonnigen Himmel schreitet.\nUnd schmücke den Hut, der dich begleitet,\nMit einem grünen Reis."},
+{t:"Septembermorgen",a:"Eduard Mörike (1804–1875)",jz:"herbst",v:"Im Nebel ruhet noch die Welt,\nNoch träumen Wald und Wiesen:\nBald siehst du, wenn der Schleier fällt,\nDen blauen Himmel unverstellt,\nHerbstkräftig die gedämpfte Welt\nIn warmem Golde fließen."},
+{t:"Herbsttag (Auszug)",a:"Rainer Maria Rilke (1875–1926)",jz:"herbst",v:"Herr: es ist Zeit. Der Sommer war sehr groß.\nLeg deinen Schatten auf die Sonnenuhren,\nund auf den Fluren laß die Winde los.\n\nBefiehl den letzten Früchten voll zu sein;\ngib ihnen noch zwei südlichere Tage,\ndränge sie zur Vollendung hin und jage\ndie letzte Süße in den schweren Wein."},
+{t:"Oktoberlied (1. Strophe)",a:"Theodor Storm (1817–1888)",jz:"herbst",v:"Der Nebel steigt, es fällt das Laub;\nSchenk ein den Wein, den holden!\nWir wollen uns den grauen Tag\nVergolden, ja vergolden!"},
+{t:"Herr von Ribbeck auf Ribbeck im Havelland (Auszug)",a:"Theodor Fontane (1819–1898)",jz:"herbst",v:"Herr von Ribbeck auf Ribbeck im Havelland,\nEin Birnbaum in seinem Garten stand,\nUnd kam die goldene Herbsteszeit\nUnd die Birnen leuchteten weit und breit,\nDa stopfte, wenn's Mittag vom Turme scholl,\nDer von Ribbeck sich beide Taschen voll."},
+{t:"Die drei Spatzen",a:"Christian Morgenstern (1871–1914)",jz:"winter",v:"In einem leeren Haselstrauch\nda sitzen drei Spatzen, Bauch an Bauch.\n\nDer Erich rechts und links der Franz\nund mittendrin der freche Hans.\n\nSie haben die Augen zu, ganz zu,\nund obendrüber, da schneit es, hu!\n\nSie rücken zusammen dicht an dicht.\nSo warm wie der Hans hat's niemand nicht.\n\nSie hörn alle drei ihrer Herzlein Gepoch.\nUnd wenn sie nicht weg sind, so sitzen sie noch."},
+{t:"Knecht Ruprecht (Auszug)",a:"Theodor Storm (1817–1888)",jz:"winter",v:"Von drauß' vom Walde komm ich her;\nIch muß euch sagen, es weihnachtet sehr!\nAllüberall auf den Tannenspitzen\nSah ich goldene Lichtlein sitzen."},
+{t:"Weihnachten (1. Strophe)",a:"Joseph von Eichendorff (1788–1857)",jz:"winter",v:"Markt und Straßen stehn verlassen,\nStill erleuchtet jedes Haus,\nSinnend geh ich durch die Gassen,\nAlles sieht so festlich aus."},
+{t:"Wandrers Nachtlied",a:"Johann Wolfgang von Goethe (1749–1832)",v:"Über allen Gipfeln\nIst Ruh,\nIn allen Wipfeln\nSpürest du\nKaum einen Hauch;\nDie Vögelein schweigen im Walde.\nWarte nur, balde\nRuhest du auch."},
+{t:"Abendlied (1. und 2. Strophe)",a:"Matthias Claudius (1740–1815)",v:"Der Mond ist aufgegangen,\nDie goldnen Sternlein prangen\nAm Himmel hell und klar;\nDer Wald steht schwarz und schweiget,\nUnd aus den Wiesen steiget\nDer weiße Nebel wunderbar.\n\nWie ist die Welt so stille\nUnd in der Dämmrung Hülle\nSo traulich und so hold!\nAls eine stille Kammer,\nWo ihr des Tages Jammer\nVerschlafen und vergessen sollt."},
+{t:"Wünschelrute",a:"Joseph von Eichendorff (1788–1857)",v:"Schläft ein Lied in allen Dingen,\nDie da träumen fort und fort,\nUnd die Welt hebt an zu singen,\nTriffst du nur das Zauberwort."},
+{t:"Der Lattenzaun",a:"Christian Morgenstern (1871–1914)",v:"Es war einmal ein Lattenzaun,\nmit Zwischenraum, hindurchzuschaun.\n\nEin Architekt, der dieses sah,\nstand eines Abends plötzlich da –\n\nund nahm den Zwischenraum heraus\nund baute draus ein großes Haus.\n\nDer Zaun indessen stand ganz dumm,\nmit Latten ohne was herum.\n\nEin Anblick gräßlich und gemein.\nDrum zog ihn der Senat auch ein.\n\nDer Architekt jedoch entfloh\nnach Afri- od- Ameriko."},
+{t:"Das ästhetische Wiesel",a:"Christian Morgenstern (1871–1914)",v:"Ein Wiesel\nsaß auf einem Kiesel\ninmitten Bachgeriesel.\n\nWißt ihr,\nweshalb?\n\nDas Mondkalb\nverriet es mir\nim stillen:\n\nDas raffinier-\nte Tier\ntat's um des Reimes willen."},
+{t:"Bumerang",a:"Joachim Ringelnatz (1883–1934)",v:"War einmal ein Bumerang;\nWar ein Weniges zu lang.\nBumerang flog ein Stück,\nAber kam nicht mehr zurück.\nPublikum – noch stundenlang –\nWartete auf Bumerang."},
+{t:"Kluge Vögel",a:"Wilhelm Busch (1832–1908)",v:"Wenn einer, der mit Mühe kaum\nGekrochen ist auf einen Baum,\nSchon meint, daß er ein Vogel wär,\nSo irrt sich der."},
+{t:"Trost (aus „Die fromme Helene“)",a:"Wilhelm Busch (1832–1908)",v:"Es ist ein Brauch von alters her:\nWer Sorgen hat, hat auch Likör!"}
+];
+function renderGedicht(){
+  const box=document.getElementById('gedicht'); if(!box) return;
+  const jz=jahreszeit(new Date().getMonth());
+  const pool=GEDICHTE.filter(g=>!g.jz || g.jz===jz);
+  const g=pool[tagDesJahres(new Date()) % pool.length];
+  box.innerHTML='<p class="gedicht-titel">'+lotseEsc(g.t)+'</p>'+
+    '<p class="gedicht-text">'+lotseEsc(g.v)+'</p>'+
+    '<p class="gedicht-autor">'+lotseEsc(g.a)+'</p>';
+}
+
 /* ---------- Namenstage (traditioneller deutscher Kalender) ----------
    Schlüssel "Monat-Tag" (1-basiert). Vollständig offline, keine fremden
    Dienste. Namenstage sind regional verschieden – dies ist die verbreitete
@@ -2575,6 +2621,7 @@ function renderHeute(){
   document.getElementById('dayHead').innerHTML =
     `<div class="dat">${dat}</div><div class="moon">${mp.emoji} Mond: ${mp.name}</div>`;
   document.getElementById('namenstag').textContent = namenstagHeute(now);
+  renderGedicht();
   renderHoro();
   const spruchPool = SPRUECHE_SAISON[jahreszeit(now.getMonth())].concat(SPRUECHE);
   document.getElementById('spruch').textContent = spruchPool[tagDesJahres(now) % spruchPool.length];

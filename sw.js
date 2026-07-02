@@ -1,4 +1,6 @@
-/* Lotse – Service Worker (v11)
+/* Lotse – Service Worker (v12)
+   Neu gegenüber v11:
+   - Mein Tag: Gedicht des Tages (nur gemeinfreie Dichter, jahreszeitlich).
    Neu gegenüber v10:
    - Notfallzettel: Organspender (Ja/Nein) und 2. Notfallkontakt.
    Neu gegenüber v9:
@@ -25,7 +27,7 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v11';
+const CACHE = 'lotse-v12';
 const SHELL = [
   './',
   './index.html',
