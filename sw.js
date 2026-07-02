@@ -1,21 +1,18 @@
-/* Lotse – Service Worker (v4)
-   Neu gegenüber v3:
-   - Schiffsplaner: Untersee-Ziele (Gottlieben, Reichenau, Stein am Rhein …)
-     sind im Reiter "Verbindung" wählbar.
-   - Der Reiter "Schweiz" ist jetzt ein reines Infoblatt.
-   - Cache-Version erhöht, damit alte gespeicherte Kopien sauber ersetzt werden.
-   Neu gegenüber v2:
-   - Die BSB-Schiffsfahrplan-Seite (bsb-fahrplan.html) ist jetzt mit im
-     Offline-Speicher.
-   - Jede Seite wird unter ihrem EIGENEN Schlüssel gespeichert. Vorher landete
-     jede Seite unter './index.html' – das hätte mit einer zweiten Seite den
-     Offline-Speicher durcheinandergebracht.
-   Wie v2: Die Seite kommt zuerst frisch aus dem Netz (Updates erscheinen
-   automatisch), nur ohne Internet greift die gespeicherte Kopie. Symbole &
-   Manifest kommen zuerst aus dem Speicher. Fremde Dienste (Karten,
-   OpenStreetMap, Wetter) immer aus dem Netz. */
+/* Lotse – Service Worker (v7)
+   Neu gegenüber v6:
+   - Foto des Tages lädt die Bilderliste jetzt auch auf 1a-lotse.de.
+   - Zurück-Taste des Handys führt eine Ansicht zurück statt die App zu
+     schließen; Textgröße-Schalter und Merkzettel-Teilen sind neu.
+   Grundprinzip (unverändert seit v2):
+   - Jede Seite wird unter ihrem EIGENEN Schlüssel gespeichert.
+   - Die Seite kommt zuerst frisch aus dem Netz (Updates erscheinen
+     automatisch), nur ohne Internet greift die gespeicherte Kopie. Symbole &
+     Manifest kommen zuerst aus dem Speicher. Fremde Dienste (Karten,
+     OpenStreetMap, Wetter) immer aus dem Netz.
+   Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
+   erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v6';
+const CACHE = 'lotse-v7';
 const SHELL = [
   './',
   './index.html',
