@@ -380,6 +380,12 @@
   .land-btn:active,.land-btn.aktiv{background:#eef5f7;border-color:var(--sea);color:var(--sea)}
   .land-btn .flag{font-size:1.4rem;line-height:1}
   .land-close{width:100%;background:var(--sea);color:#fff;border:0;border-radius:14px;padding:16px;font-size:1.1rem;font-weight:800;cursor:pointer;font-family:inherit;margin-top:14px}
+  /* --- Ortswahl (Standort von Hand) --- */
+  .ort-liste{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .ort-btn{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px;font-size:1.05rem;font-weight:700;cursor:pointer;font-family:inherit;text-align:left;color:var(--ink);display:flex;align-items:center;gap:10px}
+  .ort-btn:active{background:#eef5f7;border-color:var(--sea)}
+  .ort-btn small{display:block;font-weight:400;color:var(--ink-soft);font-size:.9rem}
+  .ort-status{color:var(--ink-soft);font-size:.95rem;margin:0 0 12px;text-align:center}
   /* --- Weitergeben & Installation --- */
   .install-banner{display:flex;align-items:center;gap:10px;background:#eef5f7;border:1px solid #cfe0e6;border-radius:14px;padding:12px 14px;margin-bottom:14px}
   .install-banner .ib-text{flex:1;font-weight:700;color:var(--sea)}
@@ -414,7 +420,7 @@ try{
     <div class="brand"><b>Lotse</b><span>Die Anlaufstelle für alles</span></div>
     <div class="where" id="where">
       <span class="dot off" id="dot"></span>
-      <div class="txt"><small id="land">Standort wird gesucht…</small><strong id="ort">Einen Moment</strong></div>
+      <div class="txt" onclick="standortMenue()" role="button" style="cursor:pointer" title="Ort wählen"><small id="land">Standort wird gesucht…</small><strong id="ort">Einen Moment</strong></div>
       <button id="locBtn" onclick="toggleLand()">Land</button>
     </div>
   </header>
@@ -1812,7 +1818,7 @@ const LAENDER = {
   }
 };
 
-let STATE = { lat:47.5996, lon:9.5566, ort:"Langenargen", land:"DE", located:false, tempC:null };
+let STATE = { lat:47.5996, lon:9.5566, ort:"Langenargen", land:"DE", located:false, manuell:false, tempC:null };
 
 /* ---------- Navigation ---------- */
 /* Ansicht anzeigen (ohne den Verlauf anzufassen) */
@@ -1872,9 +1878,11 @@ function openSchiff(){
 /* ---------- Land anzeigen & umschalten ---------- */
 function paintLand(){
   const L = LAENDER[STATE.land];
-  document.getElementById('land').textContent = STATE.located ? L.name : "Standort nicht aktiv – "+L.name;
+  document.getElementById('land').textContent =
+    STATE.manuell ? "Gewählter Ort – "+L.name :
+    (STATE.located ? L.name : "Hier tippen und Ort wählen");
   document.getElementById('ort').textContent = STATE.ort;
-  document.getElementById('dot').classList.toggle('off', !STATE.located);
+  document.getElementById('dot').classList.toggle('off', !(STATE.located || STATE.manuell));
   // Notrufnummern
   document.getElementById('notrufNums').innerHTML = L.notruf.map(n=>`
     <a class="row call ${n.soft?'soft':''}" href="tel:${n.num.replace(/\s/g,'')}">
@@ -1914,6 +1922,7 @@ function toggleLand(){
 
 /* ---------- Standort holen ---------- */
 function locate(){
+  if(STATE.manuell){ paintLand(); aktualisiereTempKontext(); return; } // Wunsch-Ort gewählt: Ortung ruht
   if(!navigator.geolocation){ paintLand(); aktualisiereTempKontext(); return; }
   navigator.geolocation.getCurrentPosition(async pos=>{
     STATE.lat = pos.coords.latitude;
@@ -3048,6 +3057,15 @@ function markiereTextgroesse(i){
 markiereTextgroesse((()=>{ try{ return +localStorage.getItem('lotse_textgr')||0; }catch(e){ return 0; } })());
 
 /* ---------- Start ---------- */
+/* Von Hand gewählten Ort übernehmen (z. B. wenn die Ortung nicht klappt) */
+try{
+  const mo = JSON.parse(localStorage.getItem('lotse_manort')||'null');
+  if(mo && typeof mo.lat==='number' && typeof mo.lon==='number'){
+    STATE.lat=mo.lat; STATE.lon=mo.lon; STATE.ort=mo.ort||'Gewählter Ort';
+    if(mo.cc && LAENDER[mo.cc]) STATE.land=mo.cc;
+    STATE.manuell=true;
+  }
+}catch(e){}
 paintLand();
 locate();
 renderFoto();
@@ -4258,6 +4276,78 @@ function landOverlayClose(){
 function landWaehlen(cc){
   if(LAENDER[cc]){ STATE.land=cc; STATE.located=false; paintLand(); }
   landOverlayClose();
+}
+
+/* ---------- Ortswahl: Standort antippen und Ort von Hand wählen ----------
+   Für Geräte, bei denen die automatische Ortung nicht erlaubt ist oder
+   nicht funktioniert (z. B. iPhone-Web-Apps). Der gewählte Ort bleibt
+   gespeichert, bis wieder auf Automatik umgestellt wird. */
+var ORT_TREFFER = [];
+function standortMenue(){
+  var overlay=document.getElementById('ortOverlay');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='ortOverlay';
+    overlay.className='land-overlay';
+    overlay.onclick=function(e){ if(e.target===overlay) ortOverlayClose(); };
+    var sheet=document.createElement('div');
+    sheet.className='land-sheet';
+    sheet.innerHTML='<h3>Standort</h3>'+
+      '<p class="ort-status" id="ortStatus"></p>'+
+      '<button class="big-btn" onclick="ortAutomatik()">📍 Standort automatisch ermitteln</button>'+
+      '<p class="ort-status" style="margin:16px 0 8px">… oder Ort von Hand wählen:</p>'+
+      '<div class="search-box"><input id="ortSuchIn" type="text" placeholder="z. B. Friedrichshafen" enterkeyhint="search" onkeydown="if(event.key===\'Enter\')ortSuchen()"><button onclick="ortSuchen()">Suchen</button></div>'+
+      '<div class="ort-liste" id="ortListe"></div>'+
+      '<button class="land-close" onclick="ortOverlayClose()">Schließen</button>';
+    overlay.appendChild(sheet);
+    document.body.appendChild(overlay);
+  }
+  document.getElementById('ortStatus').textContent =
+    STATE.manuell ? 'Aktuell gewählt: '+STATE.ort :
+    (STATE.located ? 'Aktuell (automatisch): '+STATE.ort : 'Ortung ist aus – aktuell gilt der Standardort '+STATE.ort+'.');
+  document.getElementById('ortListe').innerHTML='';
+  var inp=document.getElementById('ortSuchIn'); if(inp) inp.value='';
+  overlay.style.display='flex';
+}
+function ortOverlayClose(){ var o=document.getElementById('ortOverlay'); if(o) o.style.display='none'; }
+async function ortSuchen(){
+  var q=(document.getElementById('ortSuchIn').value||'').trim();
+  var liste=document.getElementById('ortListe');
+  if(!q){ liste.innerHTML='<p class="ort-status">Bitte einen Ortsnamen eingeben.</p>'; return; }
+  liste.innerHTML='<div class="status"><div class="spin"></div>Ort wird gesucht…</div>';
+  try{
+    const g = await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(q)+'&count=6&language=de&format=json');
+    const gd = await g.json();
+    if(!gd.results || !gd.results.length){
+      liste.innerHTML='<p class="ort-status">Diesen Ort habe ich nicht gefunden – bitte anders schreiben.</p>';
+      return;
+    }
+    ORT_TREFFER = gd.results;
+    liste.innerHTML = gd.results.map(function(o,i){
+      var region=[o.admin1,o.country].filter(Boolean).join(', ');
+      return '<button class="ort-btn" onclick="ortWaehlen('+i+')"><span>'+lotseEsc(o.name)+'<small>'+lotseEsc(region)+'</small></span></button>';
+    }).join('');
+  }catch(e){
+    liste.innerHTML='<p class="ort-status">Suche gerade nicht möglich – bitte Internetverbindung prüfen.</p>';
+  }
+}
+function ortWaehlen(i){
+  var o=ORT_TREFFER[i]; if(!o) return;
+  STATE.lat=o.latitude; STATE.lon=o.longitude; STATE.ort=o.name;
+  var cc=(o.country_code||'').toUpperCase();
+  if(LAENDER[cc]) STATE.land=cc;
+  STATE.manuell=true; STATE.located=false;
+  try{ localStorage.setItem('lotse_manort', JSON.stringify({ort:o.name,lat:o.latitude,lon:o.longitude,cc:cc})); }catch(e){}
+  paintLand();
+  aktualisiereTempKontext();
+  ortOverlayClose();
+}
+function ortAutomatik(){
+  STATE.manuell=false;
+  try{ localStorage.removeItem('lotse_manort'); }catch(e){}
+  document.getElementById('land').textContent='Standort wird gesucht…';
+  ortOverlayClose();
+  locate();
 }
 </script>
 </body>
