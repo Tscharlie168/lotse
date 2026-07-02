@@ -1,4 +1,7 @@
-/* Lotse – Service Worker (v8)
+/* Lotse – Service Worker (v9)
+   Neu gegenüber v8:
+   - Hinweis bei Knöpfen, die fremde Seiten öffnen (Cookies/Datenschutz).
+   - Namenstage: an Festtagen steht jetzt ein Name voran.
    Neu gegenüber v7:
    - Notruf: "Wo bin ich?" (Adresse groß anzeigen) und Notfallzettel.
    - In der Nähe: Verweis auf den Apotheken-Notdienst (aponet.de).
@@ -15,7 +18,7 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v8';
+const CACHE = 'lotse-v9';
 const SHELL = [
   './',
   './index.html',
