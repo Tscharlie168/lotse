@@ -750,7 +750,7 @@ try{
 
       <h2 style="margin-top:22px;font-size:1.25rem">Kopfrechnen</h2>
       <div class="rezept-card">
-        <p style="color:var(--ink-soft);margin:0 0 10px">Kleines Einmaleins &ndash; wie in der Schulzeit.</p>
+        <p style="color:var(--ink-soft);margin:0 0 10px">Plus, Minus, Mal und Geteilt &ndash; denken Sie an &bdquo;Punkt vor Strich&ldquo;. Zu knifflig? Einfach zur n&auml;chsten Aufgabe weitergehen.</p>
         <p id="krFrage" style="font-size:1.5rem;font-weight:800;margin:0 0 12px;text-align:center"></p>
         <div id="krOpt" class="merk-liste"></div>
         <p id="krInfo" style="margin:12px 0 0;line-height:1.5"></p>
@@ -3685,15 +3685,53 @@ function memTipp(el){
   }
 }
 
-/* ====================== Kopfrechnen (kleines Einmaleins) ====================== */
+/* ====================== Kopfrechnen (alle vier Grundrechenarten) ====================== */
+/* Aufgaben mit 3 oder 4 Zahlen und + − × : (Punkt vor Strich).
+   Zwischen- und Endergebnisse sind immer ganze Zahlen von 0 bis 100;
+   passt eine gewürfelte Aufgabe nicht, wird neu gewürfelt. */
 var krRichtig=null, krFertig=false, krSerie=0;
+function krZuf(min,max){ return min+Math.floor(Math.random()*(max-min+1)); }
+function krTeiler(z){ var t=[],i; for(i=2;i<=z;i++){ if(z%i===0) t.push(i); } return t; }
+function krWert(zahlen,ops){
+  var ns=zahlen.slice(), os=ops.slice(), i, v;
+  for(i=0;i<os.length;){
+    if(os[i]==='×'||os[i]===':'){
+      if(os[i]==='×'){ v=ns[i]*ns[i+1]; if(v>100) return NaN; }
+      else { if(ns[i+1]===0||ns[i]%ns[i+1]!==0) return NaN; v=ns[i]/ns[i+1]; }
+      ns.splice(i,2,v); os.splice(i,1);
+    } else i++;
+  }
+  v=ns[0];
+  for(i=0;i<os.length;i++){ v=(os[i]==='+')?v+ns[i+1]:v-ns[i+1]; if(v<0) return NaN; }
+  return v;
+}
+function krAufgabe(){
+  var OPS=['+','−','×',':'], t, k, n, zahlen, ops, o, ts, w, ok;
+  for(t=0;t<300;t++){
+    n=(Math.random()<0.5)?3:4; zahlen=[krZuf(2,12)]; ops=[]; ok=true;
+    for(k=1;k<n;k++){
+      o=OPS[Math.floor(Math.random()*OPS.length)];
+      if(o===':'){ ts=krTeiler(zahlen[k-1]); if(!ts.length){ ok=false; break; } zahlen.push(ts[Math.floor(Math.random()*ts.length)]); }
+      else if(o==='×'){ zahlen.push(krZuf(2,9)); }
+      else { zahlen.push(krZuf(2,12)); }
+      ops.push(o);
+    }
+    if(!ok) continue;
+    w=krWert(zahlen,ops);
+    if(isNaN(w)||w<0||w>100) continue;
+    return {zahlen:zahlen,ops:ops,wert:w};
+  }
+  return {zahlen:[6,4,5],ops:['+','+'],wert:15};
+}
 function krNeu(){
-  var a=2+Math.floor(Math.random()*9), b=2+Math.floor(Math.random()*9);
-  krRichtig=a*b; krFertig=false;
-  document.getElementById('krFrage').textContent=a+' × '+b+' = ?';
+  var a=krAufgabe(), i;
+  krRichtig=a.wert; krFertig=false;
+  var txt=''+a.zahlen[0];
+  for(i=0;i<a.ops.length;i++){ txt+=' '+a.ops[i]+' '+a.zahlen[i+1]; }
+  document.getElementById('krFrage').textContent=txt+' = ?';
   var opts=[krRichtig];
-  var kand=mischen([krRichtig+a,krRichtig-a,krRichtig+b,krRichtig-b,(a+1)*b,(a-1)*b,a*(b+1),a*(b-1),krRichtig+10,krRichtig-10]);
-  for(var i=0;i<kand.length && opts.length<4;i++){ if(kand[i]>0 && opts.indexOf(kand[i])<0) opts.push(kand[i]); }
+  var kand=mischen([krRichtig+1,krRichtig-1,krRichtig+2,krRichtig-2,krRichtig+3,krRichtig-3,krRichtig+5,krRichtig-5,krRichtig+10,krRichtig-10]);
+  for(i=0;i<kand.length && opts.length<4;i++){ if(kand[i]>=0 && opts.indexOf(kand[i])<0) opts.push(kand[i]); }
   mischen(opts);
   document.getElementById('krOpt').innerHTML=opts.map(function(o){
     return '<button data-v="'+o+'" onclick="krPick(this)" style="text-align:center;background:#eef5f7;color:var(--sea);border:1px solid #cfe0e6;border-radius:12px;padding:14px;font-size:1.15rem;font-weight:700;cursor:pointer;font-family:inherit">'+o+'</button>';
@@ -4432,8 +4470,8 @@ function radarPlayToggle(){ if(RADAR.timer) radarStop(); else radarPlay(); }
 /* Zum Posten einer Neuigkeit: NEUIGKEIT.v auf ein neues Datum setzen und Text anpassen.
    Das Banner erscheint einmalig – nach dem Schließen nicht mehr, bis v sich ändert. */
 var NEUIGKEIT = {
-  v: '2026-07-02',
-  text: 'Der Notfallzettel (unter Notruf & Erste Hilfe) wurde erweitert. Und unter „Mein Tag" wartet neu das Gedicht des Tages auf Sie – ganz unten.'
+  v: '2026-07-03',
+  text: 'Unter „Unterhaltung" warten drei neue Spiele auf Sie: Paare finden, Kopfrechnen und Wort-Raten. Viel Vergnügen!'
 };
 function neuigkeitenInit(){
   var b=document.getElementById('neuigkeitenBanner');
