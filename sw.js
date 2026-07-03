@@ -1,4 +1,7 @@
-/* Lotse – Service Worker (v14) – Stand: 3. Juli 2026
+/* Lotse – Service Worker (v15) – Stand: 3. Juli 2026
+   Neu gegenüber v14:
+   - Kopfrechnen: Aufgaben mit 3-4 Zahlen und allen vier Grundrechenarten
+     (Punkt vor Strich) statt nur kleinem Einmaleins.
    Neu gegenüber v13:
    - Unterhaltung: drei neue Spiele (Paare finden, Kopfrechnen, Wort-Raten).
    - Witz des Tages merkt sich die Position, damit nach einem Neustart
@@ -34,7 +37,7 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v14';
+const CACHE = 'lotse-v15';
 const SHELL = [
   './',
   './index.html',
