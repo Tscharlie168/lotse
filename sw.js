@@ -1,4 +1,4 @@
-/* Lotse – Service Worker (v12)
+/* Lotse – Service Worker (v12) – Stand: 3. Juli 2026
    Neu gegenüber v11:
    - Mein Tag: Gedicht des Tages (nur gemeinfreie Dichter, jahreszeitlich).
    Neu gegenüber v10:
