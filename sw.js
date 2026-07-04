@@ -37,11 +37,12 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v15';
+const CACHE = 'lotse-v16';
 const SHELL = [
   './',
   './index.html',
   './bsb-fahrplan.html',
+  './autofaehre.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
@@ -71,7 +72,9 @@ self.addEventListener('fetch', e => {
 
   if (istSeite) {
     // Seite unter ihrem eigenen, sauberen Schlüssel ablegen (ohne ?lat=..&lng=..)
-    const pageKey = url.pathname.endsWith('/bsb-fahrplan.html') ? './bsb-fahrplan.html' : './index.html';
+    const pageKey =
+      url.pathname.endsWith('/bsb-fahrplan.html') ? './bsb-fahrplan.html' :
+      url.pathname.endsWith('/autofaehre.html')   ? './autofaehre.html'   : './index.html';
     // zuerst Netz (frischer Stand), bei Offline die passende Kopie
     e.respondWith(
       fetch(req).then(resp => {

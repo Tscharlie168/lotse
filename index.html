@@ -472,22 +472,34 @@ try{
           <span class="sub">Geschäft &amp; Öffnungszeiten</span>
         </button>
 
-        <button class="tile" onclick="go('fahrplan')">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 9h14"/><circle cx="8.5" cy="13" r="1.2"/><circle cx="15.5" cy="13" r="1.2"/><path d="M8 17l-2 4M16 17l2 4"/></svg></span>
-          <span class="lbl">Fahrplan &amp; Bus</span>
-          <span class="sub">Bahn und Bus in der Region</span>
-        </button>
-
         <button class="tile" onclick="openSchiff()">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13h16l-1.6 4.4a2 2 0 0 1-1.9 1.3H7.5a2 2 0 0 1-1.9-1.3L4 13z"/><path d="M6 13V8a1 1 0 0 1 1-1h7l3 6"/><path d="M10 7V4h3"/><path d="M3 21c1.2-1 2-1 3.2 0 1.2 1 2 1 3.2 0 1.2-1 2-1 3.2 0 1.2 1 2 1 3.2 0"/></svg></span>
           <span class="lbl">BSB Fahrplan</span>
           <span class="sub">Schiffe auf dem Bodensee &middot; Saison 2026</span>
         </button>
 
+        <button class="tile" onclick="openAutofaehre()">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15h18l-1.3 3.4a1.5 1.5 0 0 1-1.4 1H5.7a1.5 1.5 0 0 1-1.4-1L3 15z"/><path d="M6 12h12"/><path d="M7.5 12l1.3-2.6A1.3 1.3 0 0 1 10 8.6h4a1.3 1.3 0 0 1 1.2.8L16.5 12"/></svg></span>
+          <span class="lbl">Autofähre</span>
+          <span class="sub">Konstanz – Meersburg</span>
+        </button>
+
+        <button class="tile" onclick="go('fahrrad')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span>
+          <span class="lbl">Fahrrad &amp; unterwegs</span>
+          <span class="sub">ADFC &amp; Pannenhilfe</span>
+        </button>
+
         <button class="tile" onclick="go('auto')">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l1.6-4.4A2 2 0 0 1 8.5 5h7a2 2 0 0 1 1.9 1.6L19 11"/><path d="M3 11h18v5H3z"/><circle cx="7" cy="16.5" r="1.5"/><circle cx="17" cy="16.5" r="1.5"/></svg></span>
           <span class="lbl">Auto &amp; unterwegs</span>
           <span class="sub">Pannenhilfe &amp; Mitgliedsnummer</span>
+        </button>
+
+        <button class="tile" onclick="go('fahrplan')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 9h14"/><circle cx="8.5" cy="13" r="1.2"/><circle cx="15.5" cy="13" r="1.2"/><path d="M8 17l-2 4M16 17l2 4"/></svg></span>
+          <span class="lbl">Fahrplan &amp; Bus</span>
+          <span class="sub">Bahn und Bus in der Region</span>
         </button>
 
         <button class="tile" onclick="go('webcams')">
@@ -1162,6 +1174,49 @@ try{
       </details>
             <div class="ext-note"><span>🔗</span><span>Hier &ouml;ffnen sich fremde Internetseiten in einem neuen Fenster. Dort gelten die Cookie- und Datenschutzregeln des jeweiligen Anbieters &ndash; nicht die von Lotse.</span></div>
       <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
+    </section>
+
+    <!-- FAHRRAD & UNTERWEGS -->
+    <section class="view" id="v-fahrrad">
+      <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
+      <h2>Fahrrad &amp; unterwegs</h2>
+
+      <h2 style="margin-top:6px;font-size:1.25rem">Pannenhilfe rufen</h2>
+      <div class="rows">
+        <a class="row call soft" href="tel:022182779422"><div class="main"><b>ADFC-Pannenhilfe</b></div><div class="num">0221 82779422</div></a>
+      </div>
+      <div class="note">Die ADFC-Pannenhilfe ist ein Service für <b>ADFC-Mitglieder</b> – rund um die Uhr, deutschlandweit. Halten Sie Ihre <b>Mitgliedsnummer</b> bereit, sie steht auf dem Mitgliedsausweis. <b>Bei einem Unfall oder Verletzten zählt der Notruf 112.</b></div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Was tun bei einer Panne?</h2>
+      <p style="color:var(--ink-soft);margin:0 0 14px">Tippen Sie auf ein Thema, dann klappt die Anleitung auf.</p>
+
+      <details class="fa" open>
+        <summary>① Reifenpanne oder Defekt unterwegs</summary>
+        <div class="fa-body">
+          <ol>
+            <li>Schieben Sie das Rad <b>weg von der Fahrbahn</b> an eine sichere, gut sichtbare Stelle.</li>
+            <li>Bei Dunkelheit <b>Licht anlassen</b> oder eine Lampe nutzen, damit Sie gesehen werden.</li>
+            <li>In Ruhe die <b>ADFC-Pannenhilfe rufen</b> (Knopf oben) – die Hotline organisiert Hilfe oder eine Werkstatt in der Nähe.</li>
+            <li>Geht es nicht weiter: Das Rad darf oft <b>in Bus und Bahn</b> mit (Platz vorausgesetzt) – oder ein Taxi mit Radträger.</li>
+          </ol>
+          <p class="fa-key">Bei einem Sturz mit Verletzung zuerst den <b>Notruf 112</b>.</p>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>② Was die ADFC-Hotline wissen will</summary>
+        <div class="fa-body">
+          <p>Legen Sie sich das kurz zurecht, dann geht es schneller:</p>
+          <ol>
+            <li>Ihre <b>ADFC-Mitgliedsnummer</b> und Ihren Namen.</li>
+            <li><b>Wo</b> stehen Sie? Ort, Straße oder ein Anhaltspunkt in der Nähe.</li>
+            <li><b>Was</b> ist am Rad kaputt (z. B. Reifen platt, Kette gerissen, Motor beim Pedelec)?</li>
+          </ol>
+        </div>
+      </details>
+
+      <div class="ext-note"><span>🔗</span><span>Mehr zur ADFC-Pannenhilfe unter <b>adfc.de/pannenhilfe</b>. Dort gelten die Regeln des jeweiligen Anbieters – nicht die von Lotse.</span></div>
+      <button class="back" onclick="lotseZurueck()" style="margin-top:20px">‹ Zurück</button>
     </section>
 
     <!-- GEMEINSCHAFT ERLEBEN -->
@@ -1901,6 +1956,15 @@ try{ history.replaceState({v:'home'}, ''); }catch(e){}
 /* ---------- BSB Schiffsfahrplan (eigene Seite, Standort wird übergeben) ---------- */
 function openSchiff(){
   var u = 'bsb-fahrplan.html';
+  if(STATE && typeof STATE.lat==='number' && typeof STATE.lon==='number'){
+    u += '?lat=' + STATE.lat + '&lng=' + STATE.lon;
+  }
+  location.href = u;
+}
+
+/* ---------- Autofähre Konstanz–Meersburg (offizielle Seite) ---------- */
+function openAutofaehre(){
+  var u = 'autofaehre.html';
   if(STATE && typeof STATE.lat==='number' && typeof STATE.lon==='number'){
     u += '?lat=' + STATE.lat + '&lng=' + STATE.lon;
   }
