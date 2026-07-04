@@ -4328,7 +4328,7 @@ function paintBetrug(){
   var arrow='<span class="ic-right"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg></span>';
   document.getElementById('betrugStellen').innerHTML=stellen.map(function(s){
     return '<a class="row" href="'+s.url+'" target="_blank" rel="noopener"><div class="main"><b>'+s.b+'</b><small>'+s.s+'</small></div>'+arrow+'</a>';
-  }).join('')+'<div class="note" style="margin-top:10px">Angezeigt f\u00fcr '+(L?L.name:'')+'. \u00dcber den Knopf \u201eLand\u201c oben auf der Startseite umstellbar.</div>';
+  }).join('')+'<div class="note" style="margin-top:10px">Angezeigt f\u00fcr '+(L?L.name:'')+'. Das Land stellt sich automatisch nach Ihrem Standort ein.</div>';
 }
 
 /* ====================== Lotse weitergeben / Installation ====================== */
@@ -4516,6 +4516,9 @@ function standortMenue(){
       '<p class="ort-status" style="margin:16px 0 8px">… oder Ort von Hand wählen:</p>'+
       '<div class="search-box"><input id="ortSuchIn" type="text" placeholder="z. B. Friedrichshafen" enterkeyhint="search" onkeydown="if(event.key===\'Enter\')ortSuchen()"><button onclick="ortSuchen()">Suchen</button></div>'+
       '<div class="ort-liste" id="ortListe"></div>'+
+      '<div style="border-top:1px solid var(--line);margin:20px 0 14px"></div>'+
+      '<button class="big-btn" style="background:#fff;color:var(--sea);border:1.5px solid var(--sea);box-shadow:none" onclick="appAuffrischen()">🔄 Neu laden &amp; verbinden</button>'+
+      '<p class="ort-status" style="margin:8px 0 0">Hilft, wenn „nicht verbunden" erscheint. Ihre gespeicherten Angaben bleiben erhalten.</p>'+
       '<button class="land-close" onclick="ortOverlayClose()">Schließen</button>';
     overlay.appendChild(sheet);
     document.body.appendChild(overlay);
@@ -4528,6 +4531,30 @@ function standortMenue(){
   overlay.style.display='flex';
 }
 function ortOverlayClose(){ var o=document.getElementById('ortOverlay'); if(o) o.style.display='none'; }
+function appAuffrischen(){
+  var status=document.getElementById('ortStatus');
+  if(status) status.textContent='App wird neu geladen …';
+  var fertig=function(){ location.reload(); };
+  var jobs=[];
+  try{
+    if(window.caches && caches.keys){
+      jobs.push(caches.keys().then(function(keys){
+        return Promise.all(keys.map(function(k){ return caches.delete(k); }));
+      }).catch(function(){}));
+    }
+    if(navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
+      jobs.push(navigator.serviceWorker.getRegistrations().then(function(regs){
+        return Promise.all(regs.map(function(r){ return r.unregister(); }));
+      }).catch(function(){}));
+    }
+  }catch(e){}
+  if(jobs.length){
+    Promise.all(jobs).then(fertig).catch(fertig);
+    setTimeout(fertig,4000);
+  }else{
+    fertig();
+  }
+}
 async function ortSuchen(){
   var q=(document.getElementById('ortSuchIn').value||'').trim();
   var liste=document.getElementById('ortListe');
