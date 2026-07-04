@@ -49,6 +49,9 @@ select,input,button{font-family:inherit;}
 .dep.soon .t{color:var(--blue);}
 .dephead{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:12px;font-weight:600;color:var(--muted);padding:6px 6px 2px;}
 
+.wc-btn{display:inline-flex;align-items:center;gap:8px;background:#EAF7FB;border:1.5px solid var(--azure);color:var(--blue);border-radius:12px;padding:11px 16px;font-weight:600;font-size:15px;text-decoration:none;}
+.wc-btn:active{background:#d9eff6;}
+.wc-tip{margin:0 0 12px;font-size:14px;color:var(--ink);}
 .notice{background:#FFF7E9;border:1px solid #F0D9A8;border-radius:12px;padding:13px 14px;font-size:14px;color:#6b4e18;}
 .foot{font-size:13px;color:var(--muted);padding:2px 6px 26px;}
 .foot a{color:var(--blue);}
@@ -87,6 +90,12 @@ select,input,button{font-family:inherit;}
     </div>
 
     <div class="card" id="result"></div>
+
+    <div class="card">
+      <p class="lbl">Wartezeit am Hafen</p>
+      <p class="wc-tip">Die Hafen-Webcams zeigen live die Warteschlangen in Konstanz/Staad und Meersburg. Faustregel: etwa zwei volle Auto-Reihen bedeuten rund 15 Minuten Wartezeit. Zu Fuß und mit dem Rad kommen Sie fast immer direkt an Bord.</p>
+      <a class="wc-btn" href="https://www.stadtwerke-konstanz.de/faehre/webcams/" target="_blank" rel="noopener">📷 Hafen-Webcams ansehen</a>
+    </div>
 
     <div class="foot">
       <a class="ext" href="https://www.stadtwerke-konstanz.de/faehre/fahrplan/" target="_blank" rel="noopener">
