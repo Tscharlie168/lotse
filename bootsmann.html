@@ -119,7 +119,9 @@ a{color:inherit;}
 var GEO={lat:null,lng:null};
 function openPage(f){
   var u=f;
-  if(GEO.lat!=null){ u+='?lat='+GEO.lat+'&lng='+GEO.lng; }
+  var sep='?';
+  if(GEO.lat!=null){ u+=sep+'lat='+GEO.lat+'&lng='+GEO.lng; sep='&'; }
+  u+=sep+'von=bootsmann';
   location.href=u;
 }
 function wxCode(c){
