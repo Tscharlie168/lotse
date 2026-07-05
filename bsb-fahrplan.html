@@ -140,7 +140,7 @@ select,input,button{font-family:inherit;}
 <div class="lg-app">
   <header class="lg-head">
     <div class="lg-head-inner">
-      <a class="lg-back" href="./">&#8249; Zur&uuml;ck zum Lotse</a>
+      <a class="lg-back" id="backLink" href="./">&#8249; Zur&uuml;ck zum Lotse</a>
       <div class="lg-eyebrow">Bodensee · Hauptsaison 2026 · 14. Mai – 13. Sep</div>
       <h1>BSB <span>Fahrplan</span></h1>
       <p class="lg-sub">Beide Richtungen, Zwischenhäfen und die Schweiz — sauber an einem Ort.</p>
@@ -693,6 +693,10 @@ document.querySelectorAll(".lg-tabs button").forEach(function(btn){
       var fp=resolvePort(q.get("from"));if(fp>=0)state.from=fp;
     }
     var tp=resolvePort(q.get("to"));if(tp>=0)state.to=tp;
+    if(q.get("von")==="bootsmann"){
+      var bl=document.getElementById("backLink");
+      if(bl){ bl.href="bootsmann.html"; bl.innerHTML="\u2039 Zur\u00fcck"; }
+    }
   }catch(e){}
 })();
 
