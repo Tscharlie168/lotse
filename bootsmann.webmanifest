@@ -1,0 +1,14 @@
+{
+  "name": "Bootsmann",
+  "short_name": "Bootsmann",
+  "start_url": "bootsmann.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0E3553",
+  "theme_color": "#0E3553",
+  "icons": [
+    { "src": "bootsmann-icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "bootsmann-icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "bootsmann-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
