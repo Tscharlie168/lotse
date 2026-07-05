@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bootsmann">
+<meta name="theme-color" content="#0E3553">
+<link rel="apple-touch-icon" sizes="180x180" href="bootsmann-icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="bootsmann-icon-192.png">
+<link rel="manifest" href="bootsmann.webmanifest">
+<title>Bootsmann · Seehotel Uferglück</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{--ink:#0A2233;--navy:#103A5A;--blue:#15679E;--azure:#2BA6C9;--red:#C8472F;--sky:#EAF2F8;--paper:#F4F8FB;--line:#D8E5EF;--muted:#5C7488;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--paper);line-height:1.5;-webkit-font-smoothing:antialiased;}
+.app{max-width:560px;margin:0 auto;min-height:100vh;background:var(--paper);padding-bottom:26px;}
+a{color:inherit;}
+
+.lg-head{position:relative;background:linear-gradient(160deg,#0E3553 0%,#15679E 100%);color:#fff;padding:24px 22px 34px;overflow:hidden;}
+.lg-head-inner{position:relative;z-index:2;}
+.lg-head-top{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.lg-logo{width:44px;height:44px;flex:none;}
+.lg-logo svg{display:block;width:44px;height:44px;}
+.lg-eyebrow{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:600;color:#9FD4E6;}
+.lg-hotel{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:20px;color:#fff;line-height:1.05;}
+.lg-head h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:32px;line-height:1.04;margin:2px 0 0;}
+.lg-head h1 span{color:#62D0E8;}
+.lg-sub{margin:8px 0 0;font-size:14px;color:#D5E6F1;}
+.lg-wave{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:42px;z-index:1;fill:var(--paper);}
+
+.lg-weather{background:#fff;border:1px solid var(--line);border-radius:14px;margin:16px 16px 6px;padding:13px 15px;box-shadow:0 1px 3px rgba(16,58,90,.07);}
+.lg-weather-load,.lg-wx-fail{font-size:14px;color:var(--muted);text-align:center;padding:4px 0;}
+.lg-wx-now{display:flex;align-items:center;gap:13px;padding-bottom:11px;border-bottom:1px solid var(--line);margin-bottom:11px;}
+.lg-wx-ico{font-size:34px;line-height:1;}
+.lg-wx-nowtxt{display:flex;flex-direction:column;gap:2px;}
+.lg-wx-temp{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:30px;color:var(--navy);line-height:1;}
+.lg-wx-place{font-size:13px;color:var(--muted);}
+.lg-wx-place b{color:var(--ink);}
+.lg-wx-days{display:flex;gap:8px;}
+.lg-wx-day{flex:1;text-align:center;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:8px 4px;}
+.lg-wx-dname{display:block;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:11px;font-weight:600;color:var(--muted);}
+.lg-wx-dico{display:block;font-size:22px;margin:3px 0;line-height:1;}
+.lg-wx-drange{font-size:14px;font-weight:600;color:var(--navy);}
+.lg-wx-drange em{color:var(--muted);font-style:normal;font-weight:500;}
+
+.secttl{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:13px;font-weight:600;color:var(--muted);margin:18px 18px 8px;}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px;}
+.tile{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 14px;text-align:left;cursor:pointer;box-shadow:0 1px 3px rgba(16,58,90,.06);display:flex;flex-direction:column;gap:6px;min-height:118px;font:inherit;-webkit-tap-highlight-color:transparent;}
+.tile:active{background:var(--sky);}
+.tile .ic svg{width:34px;height:34px;}
+.tile b{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:20px;color:var(--ink);letter-spacing:.01em;line-height:1.05;}
+.tile small{font-size:13px;color:var(--muted);}
+
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;margin:16px;padding:14px;box-shadow:0 1px 3px rgba(16,58,90,.06);}
+.lbl{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:13px;font-weight:600;color:var(--muted);margin:0 0 10px;}
+.nrow{display:flex;align-items:center;justify-content:space-between;text-decoration:none;color:var(--ink);padding:11px 13px;border-radius:12px;background:#FDECE8;border:1px solid #F0C4B8;margin-bottom:8px;}
+.nrow span{font-size:15px;font-weight:500;}
+.nrow b{font-family:'IBM Plex Mono',monospace;font-size:23px;color:var(--red);}
+.nsub{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+.nsub a{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 4px;}
+.nsub a span{font-size:11px;color:var(--muted);}
+.nsub a b{font-family:'IBM Plex Mono',monospace;font-size:18px;color:var(--navy);}
+
+.foot{font-size:12px;color:var(--muted);text-align:center;padding:8px 22px 0;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="lg-head">
+    <div class="lg-head-inner">
+      <div class="lg-head-top">
+        <span class="lg-logo">
+          <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="bm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0E3553"/><stop offset="1" stop-color="#15679E"/></linearGradient><clipPath id="bc"><rect x="0" y="0" width="512" height="512" rx="112"/></clipPath></defs><rect x="0" y="0" width="512" height="512" rx="112" fill="url(#bm)"/><g transform="translate(256 268) scale(1.12) translate(-256 -268)"><rect x="252" y="166" width="8" height="42" rx="4" fill="#fff"/><path d="M260 170 h 34 l -12 12 l 12 12 h -34 Z" fill="#C8472F"/><rect x="216" y="204" width="80" height="30" rx="8" fill="#fff"/><rect x="182" y="232" width="148" height="56" rx="10" fill="#fff"/><circle cx="212" cy="260" r="11" fill="#0E3553"/><circle cx="256" cy="260" r="11" fill="#0E3553"/><circle cx="300" cy="260" r="11" fill="#0E3553"/><path d="M150 300 H 362 L 330 356 Q 320 366 304 366 H 208 Q 192 366 182 356 Z" fill="#fff"/><rect x="150" y="286" width="212" height="16" rx="6" fill="#62D0E8"/></g><g clip-path="url(#bc)"><path d="M-30 346 q 95 -30 190 0 t 190 0 t 190 0 L 560 540 L -30 540 Z" fill="#1B6EA0"/><path d="M-30 372 q 100 -28 200 0 t 200 0 t 200 0 L 570 540 L -30 540 Z" fill="#2BA6C9"/></g></svg>
+        </span>
+        <div>
+          <div class="lg-eyebrow">Gäste-Service</div>
+          <div class="lg-hotel">Seehotel Uferglück</div>
+        </div>
+      </div>
+      <h1>Willkommen am <span>Bodensee</span></h1>
+      <p class="lg-sub">Ihr Begleiter für Schiff, Fähre und Wetter</p>
+    </div>
+    <svg class="lg-wave" viewBox="0 0 1440 42" preserveAspectRatio="none"><path d="M0 42V20c120-16 260-16 380 0s260 16 380 0 260-16 380 0 200 12 300 6v16z"/></svg>
+  </header>
+
+  <div class="lg-weather" id="lg-weather"><div class="lg-weather-load">Wetter wird geladen …</div></div>
+
+  <p class="secttl">Unterwegs auf dem See</p>
+  <div class="tiles">
+    <button class="tile" onclick="openPage('bsb-fahrplan.html')">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#15679E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13h16l-1.6 4.4a2 2 0 0 1-1.9 1.3H7.5a2 2 0 0 1-1.9-1.3L4 13z"/><path d="M6 13V8a1 1 0 0 1 1-1h7l3 6"/><path d="M10 7V4h3"/><path d="M3 21c1.2-1 2-1 3.2 0 1.2 1 2 1 3.2 0 1.2-1 2-1 3.2 0 1.2 1 2 1 3.2 0"/></svg></span>
+      <b>Ausflugsschiffe</b>
+      <small>Kursschiffe auf dem See</small>
+    </button>
+    <button class="tile" onclick="openPage('autofaehre.html')">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#15679E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15h18l-1.3 3.4a1.5 1.5 0 0 1-1.4 1H5.7a1.5 1.5 0 0 1-1.4-1L3 15z"/><path d="M6 12h12"/><path d="M7.5 12l1.3-2.6A1.3 1.3 0 0 1 10 8.6h4a1.3 1.3 0 0 1 1.2.8L16.5 12"/></svg></span>
+      <b>Autofähre</b>
+      <small>Konstanz – Meersburg</small>
+    </button>
+  </div>
+
+  <div class="card">
+    <p class="lbl">Im Notfall</p>
+    <a class="nrow" href="tel:112"><span>Notruf (Europa)</span><b>112</b></a>
+    <div class="nsub">
+      <a href="tel:110"><span>Polizei DE</span><b>110</b></a>
+      <a href="tel:133"><span>Polizei AT</span><b>133</b></a>
+      <a href="tel:117"><span>Polizei CH</span><b>117</b></a>
+    </div>
+  </div>
+
+  <p class="foot">Ein Gäste-Service vom Seehotel Uferglück · Angaben ohne Gewähr</p>
+</div>
+
+<script>
+"use strict";
+var GEO={lat:null,lng:null};
+function openPage(f){
+  var u=f;
+  if(GEO.lat!=null){ u+='?lat='+GEO.lat+'&lng='+GEO.lng; }
+  location.href=u;
+}
+function wxCode(c){
+  if(c===0)return{t:"klar",i:"☀️"};
+  if(c===1)return{t:"heiter",i:"🌤️"};
+  if(c===2)return{t:"wolkig",i:"⛅"};
+  if(c===3)return{t:"bedeckt",i:"☁️"};
+  if(c===45||c===48)return{t:"Nebel",i:"🌫️"};
+  if(c>=51&&c<=57)return{t:"Nieselregen",i:"🌦️"};
+  if(c>=61&&c<=67)return{t:"Regen",i:"🌧️"};
+  if(c>=71&&c<=77)return{t:"Schnee",i:"❄️"};
+  if(c>=80&&c<=82)return{t:"Schauer",i:"🌦️"};
+  if(c>=85&&c<=86)return{t:"Schneeschauer",i:"🌨️"};
+  if(c>=95)return{t:"Gewitter",i:"⛈️"};
+  return{t:"—",i:"🌡️"};
+}
+function loadWx(){
+  var el=document.getElementById("lg-weather"); if(!el) return;
+  var url="https://api.open-meteo.com/v1/forecast?latitude=47.598&longitude=9.547&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Europe%2FBerlin&forecast_days=3";
+  fetch(url).then(function(r){return r.json();}).then(function(d){
+    if(!d||!d.current||!d.daily)throw 0;
+    var now=wxCode(d.current.weather_code); var nm=["Heute","Morgen","Übermorgen"];
+    var h='<div class="lg-wx-now"><span class="lg-wx-ico">'+now.i+'</span><div class="lg-wx-nowtxt"><span class="lg-wx-temp">'+Math.round(d.current.temperature_2m)+'°</span><span class="lg-wx-place">jetzt in <b>Langenargen</b> · '+now.t+'</span></div></div><div class="lg-wx-days">';
+    for(var i=0;i<3;i++){ var w=wxCode(d.daily.weather_code[i]);
+      h+='<div class="lg-wx-day"><span class="lg-wx-dname">'+nm[i]+'</span><span class="lg-wx-dico">'+w.i+'</span><span class="lg-wx-drange">'+Math.round(d.daily.temperature_2m_max[i])+'°<em> / '+Math.round(d.daily.temperature_2m_min[i])+'°</em></span></div>';
+    }
+    h+='</div>'; el.innerHTML=h;
+  }).catch(function(){ el.innerHTML='<div class="lg-wx-fail">Wetter gerade nicht verfügbar.</div>'; });
+}
+if(navigator.geolocation){
+  navigator.geolocation.getCurrentPosition(function(p){ GEO.lat=p.coords.latitude; GEO.lng=p.coords.longitude; }, function(){}, {timeout:6000, maximumAge:300000});
+}
+loadWx();
+</script>
+<script>
+if('serviceWorker' in navigator){ window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js'); }); }
+</script>
+</body>
+</html>

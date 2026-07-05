@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0E3553">
+<title>Autofähre Konstanz – Meersburg</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{--ink:#0A2233;--navy:#103A5A;--blue:#15679E;--azure:#2BA6C9;--red:#C8472F;--sky:#EAF2F8;--paper:#F4F8FB;--line:#D8E5EF;--muted:#5C7488;--gold:#B9842B;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--paper);line-height:1.5;-webkit-font-smoothing:antialiased;}
+.lg-app{max-width:560px;margin:0 auto;min-height:100vh;background:var(--paper);}
+select,input,button{font-family:inherit;}
+
+.lg-head{position:relative;background:linear-gradient(160deg,#0E3553 0%,#15679E 100%);color:#fff;padding:26px 22px 34px;overflow:hidden;}
+.lg-head-inner{position:relative;z-index:2;}
+.lg-back{display:inline-flex;align-items:center;gap:6px;color:#0A2233;text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:15px;letter-spacing:.05em;text-transform:uppercase;background:#7FD5EA;border:1.5px solid #62D0E8;border-radius:999px;padding:9px 16px;margin-bottom:14px;-webkit-tap-highlight-color:transparent;cursor:pointer;}
+.lg-back:active{background:#62D0E8;border-color:#2BA6C9;}
+.lg-eyebrow{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:600;color:#9FD4E6;}
+.lg-head h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:34px;line-height:1.04;margin:6px 0 0;letter-spacing:.01em;}
+.lg-head h1 span{color:#62D0E8;}
+.lg-sub{margin:8px 0 0;font-size:14px;color:#D5E6F1;}
+.lg-wave{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:44px;z-index:1;fill:var(--paper);}
+
+.wrap{padding:16px;}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 1px 3px rgba(16,58,90,.06);margin-bottom:14px;}
+.lbl{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:13px;font-weight:600;color:var(--muted);margin:0 0 8px;}
+
+.dir{display:flex;gap:8px;}
+.dir button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;color:var(--ink);line-height:1.2;}
+.dir button b{display:block;font-size:15px;font-weight:600;}
+.dir button small{display:block;font-size:12px;color:var(--muted);margin-top:2px;}
+.dir button.is-active{border-color:var(--azure);background:#EAF7FB;box-shadow:inset 0 0 0 1px var(--azure);}
+
+.when{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;}
+.when .fld{flex:1;min-width:120px;}
+.when .fld span{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;}
+.when input{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:12px;font-size:16px;color:var(--ink);background:#fff;}
+.now-btn{border:1.5px solid var(--azure);background:#EAF7FB;color:var(--blue);border-radius:12px;padding:11px 16px;font-weight:600;font-size:15px;cursor:pointer;}
+
+.deps{list-style:none;margin:0;padding:0;}
+.dep{display:flex;align-items:center;gap:12px;padding:13px 6px;border-bottom:1px solid var(--line);}
+.dep:last-child{border-bottom:none;}
+.dep .t{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:22px;color:var(--navy);min-width:74px;}
+.dep .meta{font-size:13px;color:var(--muted);flex:1;}
+.dep .in{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:14px;letter-spacing:.03em;text-transform:uppercase;color:#fff;background:var(--azure);border-radius:999px;padding:4px 11px;white-space:nowrap;}
+.dep.soon .t{color:var(--blue);}
+.dephead{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:12px;font-weight:600;color:var(--muted);padding:6px 6px 2px;}
+
+.wc-btn{display:inline-flex;align-items:center;gap:8px;background:#EAF7FB;border:1.5px solid var(--azure);color:var(--blue);border-radius:12px;padding:11px 16px;font-weight:600;font-size:15px;text-decoration:none;}
+.wc-btn:active{background:#d9eff6;}
+.wc-tip{margin:0 0 12px;font-size:14px;color:var(--ink);}
+.notice{background:#FFF7E9;border:1px solid #F0D9A8;border-radius:12px;padding:13px 14px;font-size:14px;color:#6b4e18;}
+.foot{font-size:13px;color:var(--muted);padding:2px 6px 26px;}
+.foot a{color:var(--blue);}
+.foot .ext{display:flex;gap:8px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin:10px 0;color:var(--ink);text-decoration:none;}
+.foot .ext b{color:var(--blue);}
+</style>
+</head>
+<body>
+<div class="lg-app">
+  <header class="lg-head">
+    <div class="lg-head-inner">
+      <button class="lg-back" onclick="zurueck()">‹ Zurück</button>
+      <div class="lg-eyebrow">Bodensee · Autofähre</div>
+      <h1>Konstanz <span>–</span> Meersburg</h1>
+      <p class="lg-sub">Nächste Abfahrten · rund um die Uhr</p>
+    </div>
+    <svg class="lg-wave" viewBox="0 0 1440 44" preserveAspectRatio="none"><path d="M0 44V20c120-16 260-16 380 0s260 16 380 0 260-16 380 0 200 12 300 6v18z"/></svg>
+  </header>
+
+  <div class="wrap">
+    <div class="card">
+      <p class="lbl">Richtung</p>
+      <div class="dir" id="dir">
+        <button data-dir="konstanz" onclick="setDir('konstanz')"><b>ab Konstanz</b><small>Staad</small></button>
+        <button data-dir="meersburg" onclick="setDir('meersburg')"><b>ab Meersburg</b><small>Fährhafen</small></button>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="lbl">Ab wann?</p>
+      <div class="when">
+        <label class="fld"><span>Datum</span><input type="date" id="date"></label>
+        <label class="fld"><span>Uhrzeit</span><input type="time" id="time"></label>
+        <button class="now-btn" onclick="jetzt()">Jetzt</button>
+      </div>
+    </div>
+
+    <div class="card" id="result"></div>
+
+    <div class="card">
+      <p class="lbl">Wartezeit am Hafen</p>
+      <p class="wc-tip">Die Hafen-Webcams zeigen live die Warteschlangen in Konstanz/Staad und Meersburg. Faustregel: etwa zwei volle Auto-Reihen bedeuten rund 15 Minuten Wartezeit. Zu Fuß und mit dem Rad kommen Sie fast immer direkt an Bord.</p>
+      <a class="wc-btn" href="https://www.stadtwerke-konstanz.de/faehre/webcams/" target="_blank" rel="noopener">📷 Hafen-Webcams ansehen</a>
+    </div>
+
+    <div class="foot">
+      <a class="ext" href="https://www.stadtwerke-konstanz.de/faehre/fahrplan/" target="_blank" rel="noopener">
+        <span>🔗</span><span>Störungen, Ausfälle und der Sonderfahrplan werden nur auf der <b>offiziellen Seite der Stadtwerke Konstanz</b> angezeigt. Dort gelten deren Regeln – nicht die von Lotse.</span>
+      </a>
+      Angaben ohne Gewähr · Hauptsaison-Fahrplan 27.3.–4.10.2026 · Überfahrt ca. 15 Minuten.
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ---- Fahrplan Hauptsaison 27.3.–4.10.2026 (Aushang Stadtwerke Konstanz) ---- */
+/* Pro Richtung, pro Tagtyp: w = Mo–Fr, we = Sa/So + Feiertag. Stunde -> Abfahrtsminuten. */
+var PLAN = {
+  konstanz:{
+    w:{0:[5],1:[5],2:[5],3:[5],4:[5],5:[5,35,50],6:[5,20,35,50],7:[5,20,35,50],8:[5,20,35,50],9:[5,20,30,45,55],10:[10,20,35,45],11:[0,10,25,35,50],12:[0,15,25,40,50],13:[5,15,30,40,55],14:[5,20,30,45,55],15:[10,20,35,45],16:[0,10,25,35,50],17:[0,15,25,40,50],18:[5,15,30,40,55],19:[5,20,35,50],20:[5,35],21:[5,35],22:[5],23:[5]},
+    we:{0:[5],1:[5],2:[5],3:[5],4:[5],5:[5],6:[5],7:[5,35],8:[5,35,50],9:[5,30,45,55],10:[10,20,35,45],11:[0,10,25,35,50],12:[0,15,25,40,50],13:[5,15,30,40,55],14:[5,20,30,45,55],15:[10,20,35,45],16:[0,10,25,35,50],17:[0,15,25,40,50],18:[5,15,30,40,55],19:[5,35,50],20:[5,35],21:[5,35],22:[5],23:[5]}
+  },
+  meersburg:{
+    w:{0:[35],1:[35],2:[35],3:[35],4:[35],5:[35],6:[5,20,35,50],7:[5,20,35,50],8:[5,20,35,50],9:[5,20,30,45,55],10:[10,20,35,45],11:[0,10,25,35,50],12:[0,15,25,40,50],13:[5,15,30,40,55],14:[5,20,30,45,55],15:[10,20,35,45],16:[0,10,25,35,50],17:[0,15,25,40,50],18:[5,15,30,40,55],19:[5,20,35,50],20:[5,20,35],21:[5,35],22:[5,35],23:[35]},
+    we:{0:[35],1:[35],2:[35],3:[35],4:[35],5:[35],6:[35],7:[35],8:[5,35],9:[5,20,30,55],10:[10,20,35,45],11:[0,10,25,35,50],12:[0,15,25,40,50],13:[5,15,30,40,50],14:[5,20,30,45,55],15:[10,20,35,45],16:[0,10,25,35,50],17:[0,15,25,40,50],18:[5,15,30,40,55],19:[5,20,35],20:[5,20,35],21:[5,35],22:[5,35],23:[35]}
+  }
+};
+
+var SEASON_START="2026-03-27", SEASON_END="2026-10-04";
+/* Feiertage Baden-Württemberg 2026 -> Sa/So-Fahrplan */
+var FEIERTAGE={"2026-01-01":1,"2026-01-06":1,"2026-04-03":1,"2026-04-06":1,"2026-05-01":1,"2026-05-14":1,"2026-05-25":1,"2026-06-04":1,"2026-10-03":1,"2026-11-01":1,"2026-12-25":1,"2026-12-26":1};
+
+var PORTS={konstanz:{lat:47.6870,lng:9.1960},meersburg:{lat:47.6940,lng:9.2710}};
+var STATE={dir:"konstanz",date:"",time:""};
+
+function pad(n){return (n<10?"0":"")+n;}
+function iso(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+function hhmm(d){return pad(d.getHours())+":"+pad(d.getMinutes());}
+
+function daytype(d){
+  var day=d.getDay();
+  if(day===0||day===6) return "we";
+  if(FEIERTAGE[iso(d)]) return "we";
+  return "w";
+}
+function distKm(a,b){
+  var R=6371,dLat=(b.lat-a.lat)*Math.PI/180,dLng=(b.lng-a.lng)*Math.PI/180;
+  var s=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));
+}
+
+function collect(dir,baseDate,fromMin,n){
+  var res=[],h,m,mins,plan,dt;
+  dt=daytype(baseDate); plan=PLAN[dir][dt];
+  for(h=0;h<24;h++){ mins=plan[h]||[]; for(m=0;m<mins.length;m++){ if(h*60+mins[m]>=fromMin) res.push({h:h,m:mins[m],off:0}); } }
+  if(res.length<n){
+    var nd=new Date(baseDate.getTime()); nd.setDate(nd.getDate()+1);
+    var nds=iso(nd);
+    if(nds>=SEASON_START && nds<=SEASON_END){
+      dt=daytype(nd); plan=PLAN[dir][dt];
+      for(h=0;h<24 && res.length<n+2;h++){ mins=plan[h]||[]; for(m=0;m<mins.length;m++){ res.push({h:h,m:mins[m],off:1}); } }
+    }
+  }
+  return res.slice(0,n);
+}
+
+function render(){
+  var box=document.getElementById("result");
+  document.querySelectorAll("#dir button").forEach(function(b){ b.classList.toggle("is-active", b.getAttribute("data-dir")===STATE.dir); });
+
+  if(STATE.date<SEASON_START || STATE.date>SEASON_END){
+    box.innerHTML='<div class="notice">Für dieses Datum gilt der <b>Nebensaison- oder Sonderfahrplan</b>. Diese Zeiten stehen auf der offiziellen Seite der Stadtwerke Konstanz (Link unten).</div>';
+    return;
+  }
+
+  var base=new Date(STATE.date+"T00:00:00");
+  var fromMin=parseInt(STATE.time.slice(0,2),10)*60+parseInt(STATE.time.slice(3,5),10);
+  if(isNaN(fromMin)) fromMin=0;
+  var list=collect(STATE.dir,base,fromMin,7);
+  var now=new Date();
+
+  if(!list.length){ box.innerHTML='<div class="notice">Für den Rest des Tages sind keine Abfahrten hinterlegt. Bitte Datum oder Uhrzeit ändern.</div>'; return; }
+
+  var ziel = STATE.dir==="konstanz" ? "nach Meersburg" : "nach Konstanz";
+  var html='<div class="dephead">Abfahrten '+ziel+'</div><ul class="deps">';
+  for(var i=0;i<list.length;i++){
+    var it=list[i];
+    var dep=new Date(base.getTime()); dep.setDate(dep.getDate()+it.off); dep.setHours(it.h,it.m,0,0);
+    var delta=Math.round((dep.getTime()-now.getTime())/60000);
+    var soon = delta>=0 && delta<=90;
+    var meta = it.off? "morgen" : "";
+    var inTxt = soon ? '<span class="in">'+(delta<=0?"jetzt":"in "+delta+" Min")+'</span>' : '';
+    html+='<li class="dep'+(soon?' soon':'')+'"><span class="t">'+pad(it.h)+':'+pad(it.m)+'</span><span class="meta">'+meta+'</span>'+inTxt+'</li>';
+  }
+  html+='</ul>';
+  box.innerHTML=html;
+}
+
+function setDir(d){ STATE.dir=d; render(); }
+function jetzt(){
+  var n=new Date();
+  STATE.date=iso(n); STATE.time=hhmm(n);
+  document.getElementById("date").value=STATE.date;
+  document.getElementById("time").value=STATE.time;
+  render();
+}
+function zurueck(){ location.href="./"; }
+
+(function init(){
+  var p=new URLSearchParams(location.search);
+  var lat=parseFloat(p.get("lat")), lng=parseFloat(p.get("lng"));
+  if(!isNaN(lat)&&!isNaN(lng)){
+    var here={lat:lat,lng:lng};
+    STATE.dir = distKm(here,PORTS.meersburg) < distKm(here,PORTS.konstanz) ? "meersburg" : "konstanz";
+  }
+  var n=new Date();
+  STATE.date=iso(n); STATE.time=hhmm(n);
+  document.getElementById("date").value=STATE.date;
+  document.getElementById("time").value=STATE.time;
+  document.getElementById("date").addEventListener("change",function(e){ STATE.date=e.target.value||STATE.date; render(); });
+  document.getElementById("time").addEventListener("change",function(e){ STATE.time=e.target.value||STATE.time; render(); });
+  render();
+})();
+</script>
+</body>
+</html>
