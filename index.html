@@ -484,18 +484,6 @@ try{
           <span class="sub">Konstanz – Meersburg</span>
         </button>
 
-        <button class="tile" onclick="go('fahrrad')">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span>
-          <span class="lbl">Fahrrad &amp; unterwegs</span>
-          <span class="sub">ADFC &amp; Pannenhilfe</span>
-        </button>
-
-        <button class="tile" onclick="go('auto')">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l1.6-4.4A2 2 0 0 1 8.5 5h7a2 2 0 0 1 1.9 1.6L19 11"/><path d="M3 11h18v5H3z"/><circle cx="7" cy="16.5" r="1.5"/><circle cx="17" cy="16.5" r="1.5"/></svg></span>
-          <span class="lbl">Auto &amp; unterwegs</span>
-          <span class="sub">Pannenhilfe &amp; Mitgliedsnummer</span>
-        </button>
-
         <button class="tile" onclick="go('fahrplan')">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 9h14"/><circle cx="8.5" cy="13" r="1.2"/><circle cx="15.5" cy="13" r="1.2"/><path d="M8 17l-2 4M16 17l2 4"/></svg></span>
           <span class="lbl">Fahrplan &amp; Bus</span>
@@ -506,6 +494,18 @@ try{
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="3.2"/><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/></svg></span>
           <span class="lbl">Webcams</span>
           <span class="sub">Live-Bilder aus der Region</span>
+        </button>
+
+        <button class="tile" onclick="go('fahrrad')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span>
+          <span class="lbl">Fahrrad &amp; unterwegs</span>
+          <span class="sub">ADFC &amp; Pannenhilfe</span>
+        </button>
+
+        <button class="tile" onclick="go('auto')">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l1.6-4.4A2 2 0 0 1 8.5 5h7a2 2 0 0 1 1.9 1.6L19 11"/><path d="M3 11h18v5H3z"/><circle cx="7" cy="16.5" r="1.5"/><circle cx="17" cy="16.5" r="1.5"/></svg></span>
+          <span class="lbl">Auto &amp; unterwegs</span>
+          <span class="sub">ADAC &amp; Pannenhilfe</span>
         </button>
 
         <button class="tile" onclick="go('gemeinschaft')">
@@ -1141,6 +1141,11 @@ try{
       <h2 style="margin-top:22px;font-size:1.25rem">Meine Mitgliedsnummer</h2>
       <div id="mitgliedBox"></div>
 
+      <h2 style="margin-top:22px;font-size:1.25rem">Wo bin ich?</h2>
+      <p style="color:var(--ink-soft);margin:0 0 12px">Die Pannenhilfe fragt zuerst, wo Sie stehen. Dieser Knopf zeigt Ihren Standort – groß zum Vorlesen.</p>
+      <button class="big-btn" onclick="woBinIch('woBoxAuto')">📍 Meinen Standort anzeigen</button>
+      <div id="woBoxAuto"></div>
+
       <h2 style="margin-top:22px;font-size:1.25rem">Was tun bei einer Panne?</h2>
       <p style="color:var(--ink-soft);margin:0 0 14px">Tippen Sie auf ein Thema, dann klappt die Anleitung auf.</p>
 
@@ -1186,6 +1191,18 @@ try{
         <a class="row call soft" href="tel:022182779422"><div class="main"><b>ADFC-Pannenhilfe</b></div><div class="num">0221 82779422</div></a>
       </div>
       <div class="note">Die ADFC-Pannenhilfe ist ein Service für <b>ADFC-Mitglieder</b> – rund um die Uhr, deutschlandweit. Halten Sie Ihre <b>Mitgliedsnummer</b> bereit, sie steht auf dem Mitgliedsausweis. <b>Bei einem Unfall oder Verletzten zählt der Notruf 112.</b></div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Meine ADFC-Nummer</h2>
+      <div id="mitgliedBoxRad"></div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Wo bin ich?</h2>
+      <p style="color:var(--ink-soft);margin:0 0 12px">Die ADFC-Hotline fragt zuerst, wo Sie stehen. Dieser Knopf zeigt Ihren Standort – groß zum Vorlesen.</p>
+      <button class="big-btn" onclick="woBinIch('woBoxRad')">📍 Meinen Standort anzeigen</button>
+      <div id="woBoxRad"></div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Werkstatt in der Nähe</h2>
+      <p style="color:var(--ink-soft);margin:0 0 12px">Kein ADFC-Mitglied oder lieber selbst richten lassen? Der Knopf zeigt Fahrradläden und Werkstätten in Ihrer Umgebung.</p>
+      <button class="big-btn" onclick="findNear('fahrradladen')">🔧 Fahrradladen / Werkstatt suchen</button>
 
       <h2 style="margin-top:22px;font-size:1.25rem">Was tun bei einer Panne?</h2>
       <p style="color:var(--ink-soft);margin:0 0 14px">Tippen Sie auf ein Thema, dann klappt die Anleitung auf.</p>
@@ -1928,6 +1945,7 @@ function zeigeView(name){
   if(name==='hilfe') renderHilfe();
   if(name==='betrug') paintBetrug();
   if(name==='auto') renderMitglied();
+  if(name==='fahrrad') renderMitgliedRad();
   if(name==='kochen') updatePortionUI();
   if(name==='vorlesen') renderVorlesen();
   if(name==='gemeinschaft') renderGemeinschaft();
@@ -2039,6 +2057,7 @@ function locate(){
 /* ---------- In der Nähe (OpenStreetMap / Overpass) ---------- */
 /* steps = Umkreis in Metern; wird erweitert, bis etwas gefunden wird (gut für ländliche Orte) */
 const CAT = {
+  fahrradladen:{q:'["shop"="bicycle"]', t:"Fahrradl\u00e4den in der N\u00e4he", n:"Fahrradladen / Werkstatt", steps:[2000,8000,20000]},
   toilets:{q:'["amenity"="toilets"]', t:"Toiletten in der Nähe", n:"Öffentliche Toilette", steps:[1500,5000,12000]},
   pharmacy:{q:'["amenity"="pharmacy"]', t:"Apotheken in der Nähe", n:"Apotheke", steps:[3000,8000,20000]},
   bench:{q:'["amenity"="bench"]', t:"Sitzbänke in der Nähe", n:"Sitzbank", steps:[1000,3000]},
@@ -4137,8 +4156,8 @@ function vertrautSms(){ var v=vertrautLoad(); if(v&&v.tel) window.location.href=
 /* ---------- Notruf: Wo bin ich? (Adresse groß zum Vorlesen) ----------
    Standort vom Gerät, Adresse von OpenStreetMap (Nominatim) – dieselbe
    Kartenquelle wie bei "In der Nähe". */
-function woBinIch(){
-  var box=document.getElementById('woBox');
+function woBinIch(boxId){
+  var box=document.getElementById(boxId||'woBox');
   if(!navigator.geolocation){ box.innerHTML='<div class="note">Standort wird von diesem Browser nicht unterstützt.</div>'; return; }
   box.innerHTML='<div class="status" style="margin-top:12px"><div class="spin"></div>Adresse wird ermittelt …</div>';
   navigator.geolocation.getCurrentPosition(function(p){
@@ -4245,6 +4264,32 @@ function renderMitglied(){
       '<div class="row call soft"><div class="main"><b>Meine Mitgliedsnummer</b></div><div class="num">'+lotseEsc(v.nr)+'</div></div>'+
       '<button class="flink" onclick="mitgliedForm()">Nummer \u00e4ndern</button>';
   } else { mitgliedForm(); }
+}
+/* ---------- ADFC-Mitgliedsnummer (eigener Speicher, nur auf diesem Gerät) ---------- */
+function mitgliedRadLoad(){ try{ return JSON.parse(localStorage.getItem('lotse_mitglied_rad')); }catch(e){ return null; } }
+function mitgliedRadForm(){
+  var box=document.getElementById('mitgliedBoxRad'); if(!box) return;
+  var v=mitgliedRadLoad()||{};
+  box.innerHTML=
+    '<div class="vertraut-set">'+
+    '<div class="note">Hinterlegen Sie Ihre ADFC-Mitgliedsnummer, damit Sie sie beim Pannenruf gleich zur Hand haben. Bleibt nur auf diesem Ger\u00e4t.</div>'+
+    '<input id="mgNrRad" type="text" inputmode="numeric" placeholder="ADFC-Mitgliedsnummer" value="'+lotseEsc(v.nr||'')+'">'+
+    '<button class="big-btn" onclick="mitgliedRadSave()">Speichern</button></div>';
+}
+function mitgliedRadSave(){
+  var n=(document.getElementById('mgNrRad').value||'').trim();
+  if(!n){ alert('Bitte eine Mitgliedsnummer eingeben.'); return; }
+  try{ localStorage.setItem('lotse_mitglied_rad', JSON.stringify({nr:n})); }catch(e){}
+  renderMitgliedRad();
+}
+function renderMitgliedRad(){
+  var box=document.getElementById('mitgliedBoxRad'); if(!box) return;
+  var v=mitgliedRadLoad();
+  if(v && v.nr){
+    box.innerHTML=
+      '<div class="row call soft"><div class="main"><b>Meine ADFC-Nummer</b></div><div class="num">'+lotseEsc(v.nr)+'</div></div>'+
+      '<button class="flink" onclick="mitgliedRadForm()">Nummer \u00e4ndern</button>';
+  } else { mitgliedRadForm(); }
 }
 /* ====================== Gemeinschaft erleben ====================== */
 function gSuche(was){
