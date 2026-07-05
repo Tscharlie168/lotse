@@ -200,7 +200,10 @@ function jetzt(){
   document.getElementById("time").value=STATE.time;
   render();
 }
-function zurueck(){ if(history.length>1){ history.back(); } else { location.href="index.html"; } }
+function zurueck(){
+  try{ if(new URLSearchParams(location.search).get("von")==="bootsmann"){ location.href="bootsmann.html"; return; } }catch(e){}
+  if(history.length>1){ history.back(); } else { location.href="index.html"; }
+}
 
 (function init(){
   var p=new URLSearchParams(location.search);
