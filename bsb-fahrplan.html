@@ -41,6 +41,10 @@ select,input,button{font-family:inherit;}
 
 .lg-controls{display:flex;align-items:flex-end;gap:8px;margin-top:12px;}
 .lg-field--date{flex:0 0 auto;min-width:160px;}
+.lg-daynext{flex:0 0 auto;border:1.5px solid var(--blue);background:var(--blue);color:#fff;border-radius:10px;padding:12px 14px;font-size:14px;font-weight:600;cursor:pointer;height:46px;white-space:nowrap;transition:.15s;}
+.lg-daynext:hover{background:var(--navy);border-color:var(--navy);}
+.lg-daynext:active{transform:scale(.98);}
+.lg-daynext:disabled{opacity:.4;cursor:default;}
 .lg-star{margin-left:auto;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:12px 14px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;height:46px;white-space:nowrap;transition:.15s;}
 .lg-star.is-on{color:var(--gold);border-color:var(--gold);background:#FBF4E6;}
 
@@ -427,6 +431,7 @@ function planerHTML(){
   h+='<button class="lg-loc" id="lg-loc">&#128205; N&auml;chsten Hafen verwenden</button>';
   if(state.locStatus) h+='<div class="lg-loc-status">'+esc(state.locStatus)+'</div>';
   h+='<div class="lg-controls"><label class="lg-field lg-field--date"><span>Tag</span><input type="date" id="lg-date" min="2026-05-14" max="2026-09-13" value="'+state.date+'"></label>';
+  h+='<button class="lg-daynext" id="lg-daynext"'+(state.date>=SAISON_MAX?" disabled":"")+' aria-label="Einen Tag weiter">N&auml;chster Tag &#8250;</button>';
   h+='<button class="lg-star'+(isFav?" is-on":"")+'" id="lg-star">'+(isFav?"&#9733; Gemerkt":"&#9734; Merken")+'</button></div>';
   if(special) h+='<div class="lg-banner">'+special+' — einzelne Kurse fallen aus oder fahren mit Umstieg. Details stehen direkt an der Verbindung.</div>';
   if(state.favs.length){h+='<div class="lg-favs">';for(var i=0;i<state.favs.length;i++){h+='<button class="lg-fav" data-fav="'+i+'">'+PORTS[state.favs[i].f]+' &rarr; '+PORTS[state.favs[i].t]+'</button>';}h+='</div>';}
@@ -648,6 +653,13 @@ function bind(){
   from.addEventListener("change",function(){state.from=+this.value;state.open=null;render();});
   to.addEventListener("change",function(){state.to=+this.value;state.open=null;render();});
   date.addEventListener("change",function(){if(this.value){state.date=this.value;state.open=null;render();}});
+  var dayNext=document.getElementById("lg-daynext");
+  if(dayNext) dayNext.addEventListener("click",function(){
+    var d=new Date(state.date+"T12:00:00");d.setDate(d.getDate()+1);
+    var iso=d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
+    if(iso>SAISON_MAX)iso=SAISON_MAX;
+    state.date=iso;state.open=null;render();
+  });
   document.getElementById("lg-swap").addEventListener("click",function(){var t=state.from;state.from=state.to;state.to=t;state.open=null;render();});
   var loc=document.getElementById("lg-loc");
   if(loc) loc.addEventListener("click",function(){
