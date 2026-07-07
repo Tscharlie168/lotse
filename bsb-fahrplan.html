@@ -592,14 +592,18 @@ function schweizHTML(){
     var lbl='font-family:\'Barlow Condensed\',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:12px;font-weight:600;color:var(--muted)';
     // Hinfahrt
     h+='<div style="'+hd+'">Hinfahrt &mdash; nach '+esc(PORTS[dest])+'</div>';
+    h+='<div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap">';
     h+='<label class="lg-field lg-field--date" style="display:flex;flex-direction:column;gap:5px;max-width:200px"><span style="'+lbl+'">Tag der Hinfahrt</span>';
     h+='<input type="date" id="lg-szwdate" min="2026-05-14" max="2026-09-13" value="'+state.date+'"></label>';
+    h+='<button class="lg-daynext" id="lg-szwdatenext"'+(state.date>=SAISON_MAX?" disabled":"")+' aria-label="Einen Tag weiter">N&auml;chster Tag &#8250;</button></div>';
     h+=schweizAbfahrtenHTML(dest,state.date);
     // Rückfahrt
     var retDate=state.schweizRet||state.date;
     h+='<div style="'+hd+';margin-top:26px;padding-top:18px;border-top:2px solid var(--sky)">R&uuml;ckfahrt &mdash; ab '+esc(PORTS[dest])+'</div>';
+    h+='<div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap">';
     h+='<label class="lg-field lg-field--date" style="display:flex;flex-direction:column;gap:5px;max-width:200px"><span style="'+lbl+'">Tag der R&uuml;ckfahrt</span>';
     h+='<input type="date" id="lg-szwretdate" min="2026-05-14" max="2026-09-13" value="'+retDate+'"></label>';
+    h+='<button class="lg-daynext" id="lg-szwretdatenext"'+(retDate>=SAISON_MAX?" disabled":"")+' aria-label="Einen Tag weiter">N&auml;chster Tag &#8250;</button></div>';
     h+=schweizRueckfahrtHTML(dest,retDate);
   }
   h+='<div class="lg-card" style="margin-top:18px"><h3>Praktisch beim Schweiz-Ausflug</h3><ul>'+
@@ -645,8 +649,23 @@ function bind(){
   });
   var szwDate=document.getElementById("lg-szwdate");
   if(szwDate) szwDate.addEventListener("change",function(){if(this.value){state.date=this.value;render();}});
+  var szwDateNext=document.getElementById("lg-szwdatenext");
+  if(szwDateNext) szwDateNext.addEventListener("click",function(){
+    var d=new Date(state.date+"T12:00:00");d.setDate(d.getDate()+1);
+    var iso=d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
+    if(iso>SAISON_MAX)iso=SAISON_MAX;
+    state.date=iso;render();
+  });
   var szwRet=document.getElementById("lg-szwretdate");
   if(szwRet) szwRet.addEventListener("change",function(){if(this.value){state.schweizRet=this.value;render();}});
+  var szwRetNext=document.getElementById("lg-szwretdatenext");
+  if(szwRetNext) szwRetNext.addEventListener("click",function(){
+    var base=state.schweizRet||state.date;
+    var d=new Date(base+"T12:00:00");d.setDate(d.getDate()+1);
+    var iso=d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
+    if(iso>SAISON_MAX)iso=SAISON_MAX;
+    state.schweizRet=iso;render();
+  });
 
   if(state.tab!=="planer") return;
   var from=document.getElementById("lg-from"),to=document.getElementById("lg-to"),date=document.getElementById("lg-date");
