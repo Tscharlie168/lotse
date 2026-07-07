@@ -38,7 +38,6 @@ select,input,button{font-family:inherit;}
 .when .fld{flex:1;min-width:120px;}
 .when .fld span{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;}
 .when input{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:12px;font-size:16px;color:var(--ink);background:#fff;}
-.now-btn{border:1.5px solid var(--azure);background:#EAF7FB;color:var(--blue);border-radius:12px;padding:11px 16px;font-weight:600;font-size:15px;cursor:pointer;}
 
 .deps{list-style:none;margin:0;padding:0;}
 .dep{display:flex;align-items:center;gap:12px;padding:13px 6px;border-bottom:1px solid var(--line);}
@@ -85,7 +84,6 @@ select,input,button{font-family:inherit;}
       <div class="when">
         <label class="fld"><span>Datum</span><input type="date" id="date"></label>
         <label class="fld"><span>Uhrzeit</span><input type="time" id="time"></label>
-        <button class="now-btn" onclick="jetzt()">Jetzt</button>
       </div>
     </div>
 
@@ -193,7 +191,7 @@ function render(){
 }
 
 function setDir(d){ STATE.dir=d; render(); }
-function jetzt(){
+function refreshNow(){
   var n=new Date();
   STATE.date=iso(n); STATE.time=hhmm(n);
   document.getElementById("date").value=STATE.date;
@@ -211,13 +209,13 @@ function zurueck(){
     var here={lat:lat,lng:lng};
     STATE.dir = distKm(here,PORTS.meersburg) < distKm(here,PORTS.konstanz) ? "meersburg" : "konstanz";
   }
-  var n=new Date();
-  STATE.date=iso(n); STATE.time=hhmm(n);
-  document.getElementById("date").value=STATE.date;
-  document.getElementById("time").value=STATE.time;
   document.getElementById("date").addEventListener("change",function(e){ STATE.date=e.target.value||STATE.date; render(); });
   document.getElementById("time").addEventListener("change",function(e){ STATE.time=e.target.value||STATE.time; render(); });
-  render();
+  refreshNow();
+  // Liste automatisch auf die aktuelle Zeit bringen, wenn die Seite wieder in den
+  // Vordergrund kommt (App-Wechsel, Zurueck-Navigation) – ersetzt den Jetzt-Knopf.
+  document.addEventListener("visibilitychange",function(){ if(!document.hidden) refreshNow(); });
+  window.addEventListener("pageshow",function(){ refreshNow(); });
 })();
 </script>
 </body>
