@@ -2080,20 +2080,72 @@ function dist(la,lo){
   const a=Math.sin(dLa/2)**2+Math.cos(STATE.lat*r)*Math.cos(la*r)*Math.sin(dLo/2)**2;
   return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
 }
+/* Mehrere Overpass-Spiegelserver gleichzeitig fragen und die erste gültige
+   Antwort nehmen. Jeder Versuch bricht nach timeoutMs ab, damit ein hängender
+   oder überlasteter Server die Suche nicht minutenlang blockiert. */
+const OVERPASS_MIRRORS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter'
+];
+async function overpassQuery(ql, timeoutMs){
+  const versuche = OVERPASS_MIRRORS.map(url=>{
+    const ctrl = new AbortController();
+    const t = setTimeout(()=>ctrl.abort(), timeoutMs);
+    return fetch(url,{method:'POST',body:'data='+encodeURIComponent(ql),signal:ctrl.signal})
+      .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      .finally(()=>clearTimeout(t));
+  });
+  return Promise.any(versuche); // erster Server, der antwortet, gewinnt
+}
+
+/* Kurzer Zwischenspeicher pro Kategorie + Standort, damit „zurück und nochmal" sofort da ist */
+const NEAR_CACHE = {};
+
+function renderNear(used, items){
+  const hint = used>=8000 ? `<div class="note">Im näheren Umkreis war nichts eingetragen – das Nächste liegt etwas weiter weg.</div>` : '';
+  document.getElementById('resBody').innerHTML = hint + `<div class="rows">`+items.map(i=>`
+    <a class="row" href="https://www.google.com/maps/dir/?api=1&destination=${i.la},${i.lo}" target="_blank" rel="noopener">
+      <div class="main"><b>${i.name}</b><small>${i.m<1000 ? i.m+' m entfernt' : (i.m<10000 ? (i.m/1000).toFixed(1).replace('.',',')+' km entfernt' : 'ca. '+Math.round(i.m/1000)+' km entfernt')}</small></div>
+      <div class="go">Weg zeigen ›</div>
+    </a>`).join('')+`</div>`;
+}
+
 async function findNear(cat){
   const c = CAT[cat];
   go('results');
   document.getElementById('resTitle').textContent = c.t;
-  document.getElementById('resBody').innerHTML = `<div class="status"><div class="spin"></div>Suche in Ihrer Umgebung…</div>`;
+  const resBody = document.getElementById('resBody');
+  resBody.innerHTML = `<div class="status"><div class="spin"></div>Suche in Ihrer Umgebung…</div>`;
+
+  // Frische Treffer der letzten 5 Minuten sofort anzeigen (kein neuer Server-Aufruf)
+  const key = cat+'|'+STATE.lat.toFixed(3)+'|'+STATE.lon.toFixed(3);
+  const cached = NEAR_CACHE[key];
+  if(cached && (Date.now()-cached.ts) < 300000){
+    renderNear(cached.used, cached.items);
+    return;
+  }
+
   try{
     let items = [], used = 0;
-    for(const radius of c.steps){
+    for(let i=0;i<c.steps.length;i++){
+      const radius = c.steps[i];
       used = radius;
+      // Beim Vergrößern des Umkreises kurz Bescheid geben
+      if(i>0){
+        resBody.innerHTML = `<div class="status"><div class="spin"></div>In unmittelbarer Nähe war nichts eingetragen – ich vergrößere den Suchradius auf ${Math.round(radius/1000)} km…</div>`;
+      }
       const sels = Array.isArray(c.q) ? c.q : [c.q];
-      const body = sels.map(sel => `node${sel}(around:${radius},${STATE.lat},${STATE.lon});way${sel}(around:${radius},${STATE.lat},${STATE.lon});`).join('');
-      const ql = `[out:json][timeout:25];(${body});out center 60;`;
-      const r = await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:'data='+encodeURIComponent(ql)});
-      const d = await r.json();
+      const qbody = sels.map(sel => `node${sel}(around:${radius},${STATE.lat},${STATE.lon});way${sel}(around:${radius},${STATE.lat},${STATE.lon});`).join('');
+      const ql = `[out:json][timeout:20];(${qbody});out center 60;`;
+
+      // Zwei Anläufe, bevor aufgegeben wird (jeder fragt alle Spiegelserver parallel)
+      let d = null;
+      for(let a=0;a<2;a++){
+        try{ d = await overpassQuery(ql, 12000); break; }
+        catch(err){ if(a===1) throw err; }
+      }
+
       items = d.elements.map(el=>{
         const la = el.lat ?? el.center?.lat, lo = el.lon ?? el.center?.lon;
         if(la==null) return null;
@@ -2104,17 +2156,13 @@ async function findNear(cat){
 
     if(!items.length){
       const km = (used/1000);
-      document.getElementById('resBody').innerHTML = `<div class="status">Im Umkreis von ${km} km ist nichts in der Karte eingetragen.<br>Das heißt nicht, dass es nichts gibt – nur, dass es bei OpenStreetMap noch fehlt.</div>`;
+      resBody.innerHTML = `<div class="status">Im Umkreis von ${km} km ist nichts in der Karte eingetragen.<br>Das heißt nicht, dass es nichts gibt – nur, dass es bei OpenStreetMap noch fehlt.</div>`;
       return;
     }
-    const hint = used>=8000 ? `<div class="note">Im näheren Umkreis war nichts eingetragen – das Nächste liegt etwas weiter weg.</div>` : '';
-    document.getElementById('resBody').innerHTML = hint + `<div class="rows">`+items.map(i=>`
-      <a class="row" href="https://www.google.com/maps/dir/?api=1&destination=${i.la},${i.lo}" target="_blank" rel="noopener">
-        <div class="main"><b>${i.name}</b><small>${i.m<1000 ? i.m+' m entfernt' : (i.m<10000 ? (i.m/1000).toFixed(1).replace('.',',')+' km entfernt' : 'ca. '+Math.round(i.m/1000)+' km entfernt')}</small></div>
-        <div class="go">Weg zeigen ›</div>
-      </a>`).join('')+`</div>`;
+    NEAR_CACHE[key] = {used, items, ts:Date.now()};
+    renderNear(used, items);
   }catch(e){
-    document.getElementById('resBody').innerHTML = `<div class="status">Das hat gerade nicht geklappt.<br>Bitte Internet prüfen und erneut versuchen.</div>`;
+    resBody.innerHTML = `<div class="status">Das hat gerade nicht geklappt.<br>Bitte Internet prüfen und erneut versuchen.</div>`;
   }
 }
 
