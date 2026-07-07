@@ -693,10 +693,6 @@ document.querySelectorAll(".lg-tabs button").forEach(function(btn){
       var fp=resolvePort(q.get("from"));if(fp>=0)state.from=fp;
     }
     var tp=resolvePort(q.get("to"));if(tp>=0)state.to=tp;
-    if(q.get("von")==="bootsmann"){
-      var bl=document.getElementById("backLink");
-      if(bl){ bl.href="bootsmann.html"; bl.innerHTML="\u2039 Zur\u00fcck"; }
-    }
   }catch(e){}
 })();
 
