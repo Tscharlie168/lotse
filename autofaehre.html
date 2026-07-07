@@ -201,7 +201,6 @@ function jetzt(){
   render();
 }
 function zurueck(){
-  try{ if(new URLSearchParams(location.search).get("von")==="bootsmann"){ location.href="bootsmann.html"; return; } }catch(e){}
   if(history.length>1){ history.back(); } else { location.href="index.html"; }
 }
 

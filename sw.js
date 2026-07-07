@@ -37,7 +37,7 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v17';
+const CACHE = 'lotse-v18';
 const SHELL = [
   './',
   './index.html',
@@ -47,12 +47,7 @@ const SHELL = [
   './icon-192.png',
   './icon-512.png',
   './apple-touch-icon.png',
-  './favicon-32.png',
-  './bootsmann.html',
-  './bootsmann.webmanifest',
-  './bootsmann-icon-180.png',
-  './bootsmann-icon-192.png',
-  './bootsmann-icon-512.png'
+  './favicon-32.png'
 ];
 
 self.addEventListener('install', e => {
@@ -79,8 +74,7 @@ self.addEventListener('fetch', e => {
     // Seite unter ihrem eigenen, sauberen Schlüssel ablegen (ohne ?lat=..&lng=..)
     const pageKey =
       url.pathname.endsWith('/bsb-fahrplan.html') ? './bsb-fahrplan.html' :
-      url.pathname.endsWith('/autofaehre.html')   ? './autofaehre.html'   :
-      url.pathname.endsWith('/bootsmann.html')    ? './bootsmann.html'    : './index.html';
+      url.pathname.endsWith('/autofaehre.html')   ? './autofaehre.html'   : './index.html';
     // zuerst Netz (frischer Stand), bei Offline die passende Kopie
     e.respondWith(
       fetch(req).then(resp => {
