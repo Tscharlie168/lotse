@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0E3553">
+<title>Tetris</title>
+<style>
+:root{--ink:#0A2233;--navy:#103A5A;--blue:#15679E;--azure:#2BA6C9;--sky:#EAF2F8;--paper:#F4F8FB;--line:#D8E5EF;--muted:#5C7488;--board:#0B1524;--grid:#16243a;}
+*{box-sizing:border-box;}
+html,body{margin:0;height:100%;}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--paper);line-height:1.5;-webkit-font-smoothing:antialiased;touch-action:manipulation;user-select:none;-webkit-user-select:none;}
+.app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;}
+
+.head{position:relative;background:linear-gradient(160deg,#0E3553 0%,#15679E 100%);color:#fff;padding:16px 18px 20px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:#0A2233;text-decoration:none;font-weight:600;font-size:15px;letter-spacing:.03em;text-transform:uppercase;background:#7FD5EA;border:1.5px solid #62D0E8;border-radius:999px;padding:9px 16px;cursor:pointer;}
+.back:active{background:#62D0E8;}
+.head h1{font-weight:800;font-size:30px;line-height:1;margin:12px 0 0;letter-spacing:.02em;}
+.head h1 span{color:#62D0E8;}
+
+.wrap{flex:1;display:flex;flex-direction:column;align-items:center;padding:12px;gap:10px;}
+.hud{width:100%;max-width:340px;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.stat{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 10px;text-align:center;}
+.stat span{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);}
+.stat b{font-size:20px;color:var(--navy);font-variant-numeric:tabular-nums;}
+.nextbox{flex:0 0 auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px 8px;text-align:center;}
+.nextbox span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:2px;}
+
+.boardwrap{position:relative;}
+canvas#board{display:block;background:var(--board);border:2px solid rgba(255,255,255,.15);border-radius:10px;box-shadow:0 10px 30px rgba(16,58,90,.25);}
+canvas#next{display:block;}
+
+.over{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(8,18,32,.82);border-radius:10px;color:#fff;text-align:center;padding:16px;}
+.over.show{display:flex;}
+.over h2{margin:0;font-size:26px;}
+.over p{margin:0;font-size:16px;}
+
+.pad{width:100%;max-width:340px;display:flex;flex-direction:column;gap:8px;}
+.padrow{display:flex;gap:8px;}
+.btn{flex:1;border:0;border-radius:12px;padding:14px 8px;font-size:22px;font-weight:700;background:#fff;border:1.5px solid var(--line);color:var(--navy);cursor:pointer;min-height:56px;}
+.btn:active{background:var(--sky);}
+.btn.rot{background:#EAF7FB;border-color:var(--azure);color:var(--blue);}
+.btn.drop{background:var(--blue);border-color:var(--blue);color:#fff;font-size:17px;letter-spacing:.02em;}
+.btn.soft{font-size:17px;}
+.start{width:100%;max-width:340px;border:0;border-radius:999px;padding:13px;font-size:17px;font-weight:700;background:#7cf7c7;color:#07110d;cursor:pointer;}
+.tip{max-width:340px;font-size:12.5px;color:var(--muted);text-align:center;margin:0;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="head">
+    <button class="back" onclick="zurueck()">&lsaquo; Zur&uuml;ck</button>
+    <h1>Tet<span>ris</span></h1>
+  </header>
+
+  <div class="wrap">
+    <div class="hud">
+      <div class="stat"><span>Punkte</span><b id="score">0</b></div>
+      <div class="stat"><span>Reihen</span><b id="lines">0</b></div>
+      <div class="stat"><span>Level</span><b id="level">1</b></div>
+      <div class="nextbox"><span>N&auml;chster</span><canvas id="next" width="52" height="52"></canvas></div>
+    </div>
+
+    <div class="boardwrap">
+      <canvas id="board"></canvas>
+      <div class="over" id="over">
+        <h2>Game Over</h2>
+        <p id="overScore">Punkte: 0</p>
+        <p style="opacity:.8">Tippen Sie auf &bdquo;Neues Spiel&ldquo;.</p>
+      </div>
+    </div>
+
+    <div class="pad">
+      <div class="padrow">
+        <button class="btn" id="bLeft" aria-label="Nach links">&#9664;</button>
+        <button class="btn rot" id="bRot" aria-label="Drehen">&#8635;</button>
+        <button class="btn" id="bRight" aria-label="Nach rechts">&#9654;</button>
+      </div>
+      <div class="padrow">
+        <button class="btn soft" id="bDown" aria-label="Nach unten">&#9660; Runter</button>
+        <button class="btn drop" id="bDrop" aria-label="Fallen lassen">&#10515; Fallen lassen</button>
+      </div>
+    </div>
+
+    <button class="start" id="startBtn">Neues Spiel</button>
+    <p class="tip">Knöpfe unten &middot; oder wischen (links/rechts/runter) und tippen zum Drehen &middot; am PC die Pfeiltasten.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+var COLS=10, ROWS=20;
+var boardC=document.getElementById("board"), bx=boardC.getContext("2d");
+var nextC=document.getElementById("next"), nx=nextC.getContext("2d");
+var cell=16, running=false, over=false, loopId=0;
+var grid, cur, nextP, score, lines, level, dropMs, acc, last;
+
+// 7 Steine als Matrix + Farbe
+var PIECES=[
+  {m:[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]], c:"#2BD4E0"}, // I
+  {m:[[1,1],[1,1]],                             c:"#F4C430"}, // O
+  {m:[[0,1,0],[1,1,1],[0,0,0]],                 c:"#B36AE0"}, // T
+  {m:[[0,1,1],[1,1,0],[0,0,0]],                 c:"#5DBB63"}, // S
+  {m:[[1,1,0],[0,1,1],[0,0,0]],                 c:"#E05656"}, // Z
+  {m:[[1,0,0],[1,1,1],[0,0,0]],                 c:"#4A78D8"}, // J
+  {m:[[0,0,1],[1,1,1],[0,0,0]],                 c:"#E08A3C"}  // L
+];
+
+function resize(){
+  // Zellgröße so wählen, dass Brett in Breite und Höhe passt
+  var maxW = Math.min(window.innerWidth*0.94, 340);
+  var maxH = window.innerHeight*0.56;
+  cell = Math.max(12, Math.floor(Math.min(maxW/COLS, maxH/ROWS)));
+  var dpr = window.devicePixelRatio||1;
+  boardC.style.width=(cell*COLS)+"px"; boardC.style.height=(cell*ROWS)+"px";
+  boardC.width=Math.floor(cell*COLS*dpr); boardC.height=Math.floor(cell*ROWS*dpr);
+  bx.setTransform(dpr,0,0,dpr,0,0);
+  draw();
+}
+window.addEventListener("resize", resize);
+
+function newGrid(){ var g=[]; for(var r=0;r<ROWS;r++){ g.push(new Array(COLS).fill(null)); } return g; }
+function randPiece(){ return PIECES[(Math.random()*PIECES.length)|0]; }
+function rotate(m){ var n=m.length, r=[]; for(var i=0;i<n;i++){ r.push([]); for(var j=0;j<n;j++){ r[i].push(m[n-1-j][i]); } } return r; }
+
+function collides(m,px,py){
+  for(var r=0;r<m.length;r++){ for(var c=0;c<m[r].length;c++){
+    if(!m[r][c]) continue;
+    var x=px+c, y=py+r;
+    if(x<0||x>=COLS||y>=ROWS) return true;
+    if(y>=0 && grid[y][x]) return true;
+  }}
+  return false;
+}
+
+function spawn(piece){
+  var m=piece.m;
+  cur={m:m, c:piece.c, x:Math.floor((COLS-m[0].length)/2), y:0};
+  if(collides(cur.m,cur.x,cur.y)){ gameOver(); }
+}
+
+function move(dx){ if(running&&!collides(cur.m,cur.x+dx,cur.y)){ cur.x+=dx; draw(); } }
+function rotateCur(){
+  if(!running) return;
+  var r=rotate(cur.m), kicks=[0,-1,1,-2,2];
+  for(var i=0;i<kicks.length;i++){ if(!collides(r,cur.x+kicks[i],cur.y)){ cur.m=r; cur.x+=kicks[i]; draw(); return; } }
+}
+function softDrop(){
+  if(!running) return;
+  if(!collides(cur.m,cur.x,cur.y+1)){ cur.y++; score+=1; acc=0; updateHud(); draw(); }
+  else lock();
+}
+function hardDrop(){
+  if(!running) return;
+  while(!collides(cur.m,cur.x,cur.y+1)){ cur.y++; score+=2; }
+  updateHud(); lock();
+}
+
+function lock(){
+  for(var r=0;r<cur.m.length;r++){ for(var c=0;c<cur.m[r].length;c++){
+    if(cur.m[r][c] && cur.y+r>=0){ grid[cur.y+r][cur.x+c]=cur.c; }
+  }}
+  clearLines();
+  spawn(nextP); nextP=randPiece(); drawNext();
+  draw();
+}
+
+function clearLines(){
+  var cleared=0;
+  for(var r=ROWS-1;r>=0;r--){
+    var full=true;
+    for(var c=0;c<COLS;c++){ if(!grid[r][c]){ full=false; break; } }
+    if(full){ grid.splice(r,1); grid.unshift(new Array(COLS).fill(null)); cleared++; r++; }
+  }
+  if(cleared){
+    var pts=[0,40,100,300,1200][cleared]*level;
+    score+=pts; lines+=cleared;
+    var nl=Math.floor(lines/10)+1;
+    if(nl>level){ level=nl; dropMs=speed(level); }
+    updateHud();
+  }
+}
+function speed(lv){ return Math.max(90, 800-(lv-1)*65); }
+
+function updateHud(){
+  document.getElementById("score").textContent=score;
+  document.getElementById("lines").textContent=lines;
+  document.getElementById("level").textContent=level;
+}
+
+function cellRect(ctx,x,y,col){
+  ctx.fillStyle=col;
+  ctx.fillRect(x+1,y+1,cell-2,cell-2);
+  ctx.fillStyle="rgba(255,255,255,.18)";
+  ctx.fillRect(x+1,y+1,cell-2,Math.max(2,cell*0.18));
+}
+
+function draw(){
+  bx.clearRect(0,0,cell*COLS,cell*ROWS);
+  if(!grid) return;
+  // feines Gitter
+  bx.strokeStyle="rgba(255,255,255,.05)"; bx.lineWidth=1;
+  for(var c=1;c<COLS;c++){ bx.beginPath(); bx.moveTo(c*cell,0); bx.lineTo(c*cell,ROWS*cell); bx.stroke(); }
+  for(var r=1;r<ROWS;r++){ bx.beginPath(); bx.moveTo(0,r*cell); bx.lineTo(COLS*cell,r*cell); bx.stroke(); }
+  // gelegte Steine
+  for(var y=0;y<ROWS;y++){ for(var x=0;x<COLS;x++){ if(grid[y][x]) cellRect(bx,x*cell,y*cell,grid[y][x]); } }
+  // aktueller Stein
+  if(cur){ for(var r2=0;r2<cur.m.length;r2++){ for(var c2=0;c2<cur.m[r2].length;c2++){
+    if(cur.m[r2][c2] && cur.y+r2>=0) cellRect(bx,(cur.x+c2)*cell,(cur.y+r2)*cell,cur.c);
+  }}}
+}
+
+function drawNext(){
+  nx.clearRect(0,0,nextC.width,nextC.height);
+  if(!nextP) return;
+  var m=nextP.m, sz=10, w=m[0].length, h=m.length;
+  var ox=(nextC.width-w*sz)/2, oy=(nextC.height-h*sz)/2;
+  for(var r=0;r<h;r++){ for(var c=0;c<w;c++){ if(m[r][c]){
+    nx.fillStyle=nextP.c; nx.fillRect(ox+c*sz+1,oy+r*sz+1,sz-2,sz-2);
+  }}}
+}
+
+function gameOver(){
+  running=false; over=true;
+  cancelAnimationFrame(loopId);
+  document.getElementById("overScore").textContent="Punkte: "+score;
+  document.getElementById("over").classList.add("show");
+}
+
+function start(){
+  grid=newGrid(); score=0; lines=0; level=1; dropMs=speed(1); acc=0; over=false;
+  document.getElementById("over").classList.remove("show");
+  nextP=randPiece(); spawn(randPiece()); nextP=nextP; drawNext();
+  updateHud(); draw();
+  running=true; last=performance.now();
+  cancelAnimationFrame(loopId); loopId=requestAnimationFrame(loop);
+}
+
+function loop(ts){
+  if(!running) return;
+  var dt=ts-last; last=ts; acc+=dt;
+  while(acc>=dropMs){
+    acc-=dropMs;
+    if(!collides(cur.m,cur.x,cur.y+1)) cur.y++;
+    else { lock(); if(!running) return; }
+  }
+  draw();
+  loopId=requestAnimationFrame(loop);
+}
+
+// --- Steuerung: Knöpfe ---
+function bind(id,fn){ var el=document.getElementById(id);
+  el.addEventListener("click",function(e){ e.preventDefault(); fn(); });
+}
+bind("bLeft",function(){ move(-1); });
+bind("bRight",function(){ move(1); });
+bind("bRot", rotateCur);
+bind("bDown", softDrop);
+bind("bDrop", hardDrop);
+document.getElementById("startBtn").addEventListener("click", start);
+
+// --- Tastatur (PC) ---
+document.addEventListener("keydown",function(e){
+  if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"," "].indexOf(e.key)>=0) e.preventDefault();
+  if(e.key==="ArrowLeft") move(-1);
+  else if(e.key==="ArrowRight") move(1);
+  else if(e.key==="ArrowUp") rotateCur();
+  else if(e.key==="ArrowDown") softDrop();
+  else if(e.key===" ") hardDrop();
+});
+
+// --- Wischen auf dem Brett ---
+var tsx=0,tsy=0,tmoved=false;
+boardC.addEventListener("pointerdown",function(e){ tsx=e.clientX; tsy=e.clientY; tmoved=false; });
+boardC.addEventListener("pointerup",function(e){
+  var dx=e.clientX-tsx, dy=e.clientY-tsy, T=cell*0.9;
+  if(Math.abs(dx)<12 && Math.abs(dy)<12){ rotateCur(); return; }
+  if(Math.abs(dx)>Math.abs(dy)){ move(dx>0?1:-1); }
+  else if(dy>T){ hardDrop(); }
+});
+
+// --- Pause, wenn Seite in den Hintergrund geht ---
+document.addEventListener("visibilitychange",function(){
+  if(document.hidden){ cancelAnimationFrame(loopId); }
+  else if(running && !over){ last=performance.now(); loopId=requestAnimationFrame(loop); }
+});
+
+function zurueck(){
+  if(history.length>1){ history.back(); } else { location.href="index.html"; }
+}
+
+resize();
+start();
+</script>
+</body>
+</html>

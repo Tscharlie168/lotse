@@ -790,6 +790,13 @@ try{
         </div>
       </div>
       <button class="big-btn" id="muStartBtn" onclick="musikRunde()">Spiel starten</button>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Tetris</h2>
+      <div class="rezept-card">
+        <p style="color:var(--ink-soft);margin:0 0 12px">Der Klassiker: Reihen vollständig füllen, dann lösen sie sich auf. Mit großen Knöpfen zum Bewegen und Drehen.</p>
+        <button class="big-btn" style="margin:0" onclick="openTetris()">Tetris spielen</button>
+      </div>
+
       <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
     </section>
 
@@ -1988,6 +1995,9 @@ function openAutofaehre(){
   }
   location.href = u;
 }
+
+/* ---------- Tetris (eigene Seite) ---------- */
+function openTetris(){ location.href = 'tetris.html'; }
 
 /* ---------- Land anzeigen & umschalten ---------- */
 function paintLand(){
