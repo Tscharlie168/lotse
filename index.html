@@ -99,21 +99,19 @@
   .tile.alarm{background:var(--alarm);border-color:var(--alarm-dark);color:#fff}
   .tile.alarm .ic{color:#fff;background:rgba(255,255,255,.22)}
   .tile.alarm .lbl{color:#fff}
-  /* Startseite: alle 14 Hauptkacheln exakt gleich groß, größere Symbole,
-     kein Untertitel mehr – nur Symbol + fetter Titel, eng beieinander.
+  /* Startseite: alle 14 Hauptkacheln exakt gleich groß. Symbol + fetter
+     Titel, beide zentriert, kompakte/niedrige Kachel.
      Farbe/Größe nur hier (.home-tile), NICHT in der Basis .tile, damit das
-     Kachel-Menü in "Unterhaltung" (.spiel-tile) unberührt bleibt.
-     .lbl reserviert 2 Zeilen Platz, damit alle Kacheln gleich hoch bleiben;
-     etwaige Restluft liegt UNTER dem Titel (unauffällig), nicht zwischen
-     Symbol und Titel. */
+     Kachel-Menü in "Unterhaltung" (.spiel-tile) unberührt bleibt. */
   .home-tile{
     background:color-mix(in srgb,var(--acc,var(--sea)) 32%,#fff);
     border-color:color-mix(in srgb,var(--acc,var(--sea)) 48%,#fff);
-    min-height:150px;padding-top:8px;padding-bottom:6px;padding-left:12px;padding-right:12px;gap:0;
+    align-items:center;text-align:center;
+    padding-top:10px;padding-bottom:10px;padding-left:10px;padding-right:10px;gap:4px;
   }
-  .home-tile .ic{width:100px;height:100px;border-radius:26px;flex:0 0 auto;color:var(--acc,var(--sea));background:color-mix(in srgb,var(--acc,var(--sea)) 32%,#fff)}
-  .home-tile .ic svg{width:78px;height:78px}
-  .home-tile .lbl{color:var(--ink);line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.3em}
+  .home-tile .ic{width:50px;height:50px;border-radius:13px;flex:0 0 auto;color:var(--acc,var(--sea));background:color-mix(in srgb,var(--acc,var(--sea)) 32%,#fff)}
+  .home-tile .ic svg{width:34px;height:34px}
+  .home-tile .lbl{color:var(--ink);line-height:1.15;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .spiel-tile{min-height:120px;gap:8px}
   .spiel-tile .ic{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--acc,var(--sea));background:color-mix(in srgb,var(--acc,var(--sea)) 15%,#fff)}
   .spiel-tile .ic svg{width:28px;height:28px}
