@@ -97,6 +97,12 @@
   .tile .lbl{font-size:1.18rem;font-weight:800;line-height:1.2}
   .tile .sub{font-size:.92rem;color:var(--ink-soft);margin-top:-4px}
   .tile.alarm{background:var(--alarm);border-color:var(--alarm-dark);color:#fff}
+  .spiel-tile{min-height:120px;gap:8px}
+  .spiel-tile .ic{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--acc,var(--sea));background:#eef4f7;background:color-mix(in srgb,var(--acc,var(--sea)) 15%,#fff)}
+  .spiel-tile .ic svg{width:28px;height:28px}
+  .spiel-tile .lbl{color:var(--ink)}
+  .spielblock{display:none}
+  .spielblock.show{display:block}
   .tile.alarm .ic *{stroke:#fff}
   .tile.full{grid-column:1 / -1}
 
@@ -730,74 +736,125 @@ try{
 
     <!-- UNTERHALTUNG -->
     <section class="view" id="v-unterhaltung">
-      <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>Unterhaltung</h2>
-
-      <h2 style="margin-top:6px;font-size:1.25rem">Witz des Tages</h2>
-      <div class="rezept-card"><p id="unWitz" style="font-size:1.15rem;line-height:1.5;margin:0"></p></div>
-      <button class="big-btn" onclick="unWitzNext()">N&auml;chster Witz</button>
-
-      <h2 style="margin-top:22px;font-size:1.25rem">Schon gewusst?</h2>
-      <div class="rezept-card"><p id="unFakt" style="font-size:1.15rem;line-height:1.5;margin:0"></p></div>
-      <button class="big-btn" onclick="unFaktNext()">N&auml;chste</button>
-
-      <h2 style="margin-top:22px;font-size:1.25rem">Kleines Quiz</h2>
-      <div class="rezept-card">
-        <p id="unQuizFrage" style="font-size:1.15rem;line-height:1.5;margin:0 0 12px"></p>
-        <div id="unQuizOpt" class="merk-liste"></div>
-        <p id="unQuizInfo" style="margin:12px 0 0;line-height:1.5"></p>
-      </div>
-      <button class="big-btn" onclick="unQuizNext()">N&auml;chste Frage</button>
-
-      <h2 style="margin-top:22px;font-size:1.25rem">Paare finden</h2>
-      <div class="rezept-card">
-        <p style="color:var(--ink-soft);margin:0 0 10px">Decken Sie zwei Karten auf. Passen die Bilder zusammen, bleiben sie offen. Finden Sie alle Paare!</p>
-        <div id="memWahl" style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="big-btn" style="flex:1;min-width:120px;margin:0" onclick="memStart(16)">16 Karten</button>
-          <button class="big-btn" style="flex:1;min-width:120px;margin:0" onclick="memStart(20)">20 Karten</button>
+      <div id="unMenu">
+        <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
+        <h2>Unterhaltung</h2>
+        <p style="color:var(--ink-soft);margin:0 0 14px">W&auml;hlen Sie ein Spiel aus &ndash; tippen Sie einfach auf eine Karte.</p>
+        <div class="grid">
+          <button class="tile spiel-tile" style="--acc:#E8A61C" onclick="spielOeffnen('witz')">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01"/><path d="M8.5 14.5a4 4 0 0 0 7 0"/></svg></span>
+            <span class="lbl">Witz des Tages</span><span class="sub">Zum Schmunzeln</span>
+          </button>
+          <button class="tile spiel-tile" style="--acc:#2B8CC9" onclick="spielOeffnen('fakt')">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0-3.6 10.8c.5.4.8 1 .9 1.7l.2 1h5l.2-1c.1-.7.4-1.3.9-1.7A6 6 0 0 0 12 3z"/><path d="M9.5 20h5"/></svg></span>
+            <span class="lbl">Schon gewusst?</span><span class="sub">Erstaunliches Wissen</span>
+          </button>
+          <button class="tile spiel-tile" style="--acc:#8B5CD6" onclick="spielOeffnen('quiz')">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.3a2.8 2.8 0 0 1 5.4 1c0 1.8-2.7 2.3-2.7 4"/><path d="M12 17.5h.01"/></svg></span>
+            <span class="lbl">Kleines Quiz</span><span class="sub">Raten &amp; lernen</span>
+          </button>
+          <button class="tile spiel-tile" style="--acc:#3CA35A" onclick="spielOeffnen('paare')">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="9" height="13" rx="2"/><rect x="12" y="7" width="9" height="13" rx="2"/></svg></span>
+            <span class="lbl">Paare finden</span><span class="sub">Memory-Spiel</span>
+          </button>
+          <button class="tile spiel-tile" style="--acc:#E07B1C" onclick="spielOeffnen('kopf')">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg></span>
+            <span class="lbl">Kopfrechnen</span><span class="sub">F&uuml;rs K&ouml;pfchen</span>
+          </button>
+          <button class="tile spiel-tile" style="--acc:#159E8C" onclick="spielOeffnen('wort')">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19l6-14 6 14"/><path d="M8.5 14h7"/></svg></span>
+            <span class="lbl">Wort-Raten</span><span class="sub">Buchstaben tippen</span>
+          </button>
+          <button class="tile spiel-tile" style="--acc:#D6467F" onclick="spielOeffnen('lied')">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17V5l10-2v12"/><circle cx="6.5" cy="17" r="2.5"/><circle cx="16.5" cy="15" r="2.5"/></svg></span>
+            <span class="lbl">Lied raten</span><span class="sub">Titel erraten</span>
+          </button>
+          <button class="tile spiel-tile" style="--acc:#D8483A" onclick="openTetris()">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/><rect x="14" y="9" width="5" height="5"/><rect x="9" y="14" width="5" height="5"/></svg></span>
+            <span class="lbl">Tetris</span><span class="sub">Der Klassiker</span>
+          </button>
         </div>
-        <div id="memBrett" style="display:none"></div>
-        <p id="memStatus" style="margin:12px 0 0;line-height:1.5;font-weight:700;text-align:center"></p>
+        <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
       </div>
 
-      <h2 style="margin-top:22px;font-size:1.25rem">Kopfrechnen</h2>
-      <div class="rezept-card">
-        <p style="color:var(--ink-soft);margin:0 0 10px">Plus, Minus, Mal und Geteilt &ndash; denken Sie an &bdquo;Punkt vor Strich&ldquo;. Zu knifflig? Einfach zur n&auml;chsten Aufgabe weitergehen.</p>
-        <p id="krFrage" style="font-size:1.5rem;font-weight:800;margin:0 0 12px;text-align:center"></p>
-        <div id="krOpt" class="merk-liste"></div>
-        <p id="krInfo" style="margin:12px 0 0;line-height:1.5"></p>
+      <div class="spielblock" id="sp-witz">
+        <button class="back" onclick="spieleMenu()">&lsaquo; Zur&uuml;ck zu den Spielen</button>
+        <h2 style="margin-top:6px;font-size:1.4rem">Witz des Tages</h2>
+        <div class="rezept-card"><p id="unWitz" style="font-size:1.15rem;line-height:1.5;margin:0"></p></div>
+        <button class="big-btn" onclick="unWitzNext()">N&auml;chster Witz</button>
       </div>
-      <button class="big-btn" onclick="krNeu()">N&auml;chste Aufgabe</button>
 
-      <h2 style="margin-top:22px;font-size:1.25rem">Wort-Raten</h2>
-      <div class="rezept-card">
-        <p style="color:var(--ink-soft);margin:0 0 10px">Erraten Sie das gesuchte Wort: Tippen Sie unten auf die Buchstaben.</p>
-        <div id="wrWort" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:12px"></div>
-        <p id="wrStatus" style="text-align:center;margin:0 0 12px;line-height:1.5;font-weight:700"></p>
-        <div id="wrTasten" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px"></div>
+      <div class="spielblock" id="sp-fakt">
+        <button class="back" onclick="spieleMenu()">&lsaquo; Zur&uuml;ck zu den Spielen</button>
+        <h2 style="margin-top:6px;font-size:1.4rem">Schon gewusst?</h2>
+        <div class="rezept-card"><p id="unFakt" style="font-size:1.15rem;line-height:1.5;margin:0"></p></div>
+        <button class="big-btn" onclick="unFaktNext()">N&auml;chste</button>
       </div>
-      <button class="big-btn" onclick="wrNeu()">Neues Wort</button>
 
-      <h2 style="margin-top:22px;font-size:1.25rem">Lied raten</h2>
-      <div class="rezept-card">
-        <p style="color:var(--ink-soft);margin:0 0 10px">H&ouml;ren Sie einen kurzen Ausschnitt und raten Sie den Titel. (Braucht Internet.)</p>
-        <div id="muStatus" style="font-size:1.1rem;line-height:1.4;margin-bottom:10px"></div>
-        <div id="muOpt" class="merk-liste"></div>
-        <p id="muInfo" style="margin:12px 0 0;line-height:1.5"></p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-          <button class="big-btn" id="muStop" onclick="musikStop()" style="display:none;background:var(--alarm);color:#fff;flex:1;min-width:150px;margin:0">&#9209;&#65039; Ton stoppen</button>
-          <button class="flink" id="muReplay" onclick="musikReplay()" style="display:none">&#9654; Nochmal h&ouml;ren</button>
+      <div class="spielblock" id="sp-quiz">
+        <button class="back" onclick="spieleMenu()">&lsaquo; Zur&uuml;ck zu den Spielen</button>
+        <h2 style="margin-top:6px;font-size:1.4rem">Kleines Quiz</h2>
+        <div class="rezept-card">
+          <p id="unQuizFrage" style="font-size:1.15rem;line-height:1.5;margin:0 0 12px"></p>
+          <div id="unQuizOpt" class="merk-liste"></div>
+          <p id="unQuizInfo" style="margin:12px 0 0;line-height:1.5"></p>
+        </div>
+        <button class="big-btn" onclick="unQuizNext()">N&auml;chste Frage</button>
+      </div>
+
+      <div class="spielblock" id="sp-paare">
+        <button class="back" onclick="spieleMenu()">&lsaquo; Zur&uuml;ck zu den Spielen</button>
+        <h2 style="margin-top:6px;font-size:1.4rem">Paare finden</h2>
+        <div class="rezept-card">
+          <p style="color:var(--ink-soft);margin:0 0 10px">Decken Sie zwei Karten auf. Passen die Bilder zusammen, bleiben sie offen. Finden Sie alle Paare!</p>
+          <div id="memWahl" style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="big-btn" style="flex:1;min-width:120px;margin:0" onclick="memStart(16)">16 Karten</button>
+            <button class="big-btn" style="flex:1;min-width:120px;margin:0" onclick="memStart(20)">20 Karten</button>
+          </div>
+          <div id="memBrett" style="display:none"></div>
+          <p id="memStatus" style="margin:12px 0 0;line-height:1.5;font-weight:700;text-align:center"></p>
         </div>
       </div>
-      <button class="big-btn" id="muStartBtn" onclick="musikRunde()">Spiel starten</button>
 
-      <h2 style="margin-top:22px;font-size:1.25rem">Tetris</h2>
-      <div class="rezept-card">
-        <p style="color:var(--ink-soft);margin:0 0 12px">Der Klassiker: Reihen vollständig füllen, dann lösen sie sich auf. Mit großen Knöpfen zum Bewegen und Drehen.</p>
-        <button class="big-btn" style="margin:0" onclick="openTetris()">Tetris spielen</button>
+      <div class="spielblock" id="sp-kopf">
+        <button class="back" onclick="spieleMenu()">&lsaquo; Zur&uuml;ck zu den Spielen</button>
+        <h2 style="margin-top:6px;font-size:1.4rem">Kopfrechnen</h2>
+        <div class="rezept-card">
+          <p style="color:var(--ink-soft);margin:0 0 10px">Plus, Minus, Mal und Geteilt &ndash; denken Sie an &bdquo;Punkt vor Strich&ldquo;. Zu knifflig? Einfach zur n&auml;chsten Aufgabe weitergehen.</p>
+          <p id="krFrage" style="font-size:1.5rem;font-weight:800;margin:0 0 12px;text-align:center"></p>
+          <div id="krOpt" class="merk-liste"></div>
+          <p id="krInfo" style="margin:12px 0 0;line-height:1.5"></p>
+        </div>
+        <button class="big-btn" onclick="krNeu()">N&auml;chste Aufgabe</button>
       </div>
 
-      <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
+      <div class="spielblock" id="sp-wort">
+        <button class="back" onclick="spieleMenu()">&lsaquo; Zur&uuml;ck zu den Spielen</button>
+        <h2 style="margin-top:6px;font-size:1.4rem">Wort-Raten</h2>
+        <div class="rezept-card">
+          <p style="color:var(--ink-soft);margin:0 0 10px">Erraten Sie das gesuchte Wort: Tippen Sie unten auf die Buchstaben.</p>
+          <div id="wrWort" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:12px"></div>
+          <p id="wrStatus" style="text-align:center;margin:0 0 12px;line-height:1.5;font-weight:700"></p>
+          <div id="wrTasten" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px"></div>
+        </div>
+        <button class="big-btn" onclick="wrNeu()">Neues Wort</button>
+      </div>
+
+      <div class="spielblock" id="sp-lied">
+        <button class="back" onclick="spieleMenu()">&lsaquo; Zur&uuml;ck zu den Spielen</button>
+        <h2 style="margin-top:6px;font-size:1.4rem">Lied raten</h2>
+        <div class="rezept-card">
+          <p style="color:var(--ink-soft);margin:0 0 10px">H&ouml;ren Sie einen kurzen Ausschnitt und raten Sie den Titel. (Braucht Internet.)</p>
+          <div id="muStatus" style="font-size:1.1rem;line-height:1.4;margin-bottom:10px"></div>
+          <div id="muOpt" class="merk-liste"></div>
+          <p id="muInfo" style="margin:12px 0 0;line-height:1.5"></p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+            <button class="big-btn" id="muStop" onclick="musikStop()" style="display:none;background:var(--alarm);color:#fff;flex:1;min-width:150px;margin:0">&#9209;&#65039; Ton stoppen</button>
+            <button class="flink" id="muReplay" onclick="musikReplay()" style="display:none">&#9654; Nochmal h&ouml;ren</button>
+          </div>
+        </div>
+        <button class="big-btn" id="muStartBtn" onclick="musikRunde()">Spiel starten</button>
+      </div>
     </section>
 
     <!-- PRODUKT SCANNEN (Barcode) -->
@@ -1998,6 +2055,19 @@ function openAutofaehre(){
 
 /* ---------- Tetris (eigene Seite) ---------- */
 function openTetris(){ location.href = 'tetris.html'; }
+
+/* ---------- Unterhaltung: Kachel-Menü / einzelnes Spiel öffnen ---------- */
+function spielOeffnen(id){
+  var m=document.getElementById('unMenu'); if(m) m.style.display='none';
+  document.querySelectorAll('#v-unterhaltung .spielblock').forEach(function(b){ b.classList.remove('show'); });
+  var b=document.getElementById('sp-'+id); if(b) b.classList.add('show');
+  window.scrollTo(0,0);
+}
+function spieleMenu(){
+  document.querySelectorAll('#v-unterhaltung .spielblock').forEach(function(b){ b.classList.remove('show'); });
+  var m=document.getElementById('unMenu'); if(m) m.style.display='';
+  window.scrollTo(0,0);
+}
 
 /* ---------- Land anzeigen & umschalten ---------- */
 function paintLand(){
@@ -3792,6 +3862,7 @@ function renderUnterhaltung(){
   if(document.getElementById('krFrage') && !document.getElementById('krFrage').textContent) krNeu();
   if(document.getElementById('wrWort') && !document.getElementById('wrWort').innerHTML) wrNeu();
   if(typeof musikInit==='function') musikInit();
+  if(typeof spieleMenu==='function') spieleMenu();
 }
 
 /* ====================== Paare finden (Memory) ====================== */
