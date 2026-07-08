@@ -109,7 +109,7 @@
   .home-tile{
     background:color-mix(in srgb,var(--acc,var(--sea)) 32%,#fff);
     border-color:color-mix(in srgb,var(--acc,var(--sea)) 48%,#fff);
-    min-height:150px;padding-top:0;gap:0;
+    min-height:150px;padding-top:8px;padding-bottom:14px;padding-left:12px;padding-right:12px;gap:0;
   }
   .home-tile .ic{width:100px;height:100px;border-radius:26px;flex:0 0 auto;color:var(--acc,var(--sea));background:color-mix(in srgb,var(--acc,var(--sea)) 32%,#fff)}
   .home-tile .ic svg{width:56px;height:56px}
@@ -472,7 +472,7 @@ try{
       <div class="grid">
         <button class="tile home-tile" id="tileWerkzeuge" onclick="go('werkzeuge')" style="position:relative;--acc:#4A78D8">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
-          <span class="lbl">Praktische Helfer</span>
+          <span class="lbl">Kleine Helfer</span>
           <span id="werkzeugeBadge" style="display:none;position:absolute;top:10px;right:10px;width:12px;height:12px;border-radius:6px;background:#43a047"></span>
         </button>
 
@@ -513,17 +513,17 @@ try{
 
         <button class="tile home-tile" onclick="go('fahrrad')" style="--acc:#3CA35A">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span>
-          <span class="lbl">Fahrrad &amp; unterwegs</span>
+          <span class="lbl">Bike unterwegs</span>
         </button>
 
         <button class="tile home-tile" onclick="go('auto')" style="--acc:#5C6B84">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l1.6-4.4A2 2 0 0 1 8.5 5h7a2 2 0 0 1 1.9 1.6L19 11"/><path d="M3 11h18v5H3z"/><circle cx="7" cy="16.5" r="1.5"/><circle cx="17" cy="16.5" r="1.5"/></svg></span>
-          <span class="lbl">Auto &amp; unterwegs</span>
+          <span class="lbl">Auto unterwegs</span>
         </button>
 
         <button class="tile home-tile" onclick="go('gemeinschaft')" style="--acc:#E8825C">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M15 14.2a4.5 4.5 0 0 1 5.5 4.3"/></svg></span>
-          <span class="lbl">Gemeinschaft erleben</span>
+          <span class="lbl">Gemeinschaft</span>
         </button>
 
         <button class="tile home-tile" onclick="go('unterhaltung')" style="--acc:#D6467F">
@@ -533,7 +533,7 @@ try{
 
         <button class="tile home-tile" onclick="go('kochen')" style="--acc:#D97A2E">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v7M8 3v7M11 3v7M8 10v11"/><path d="M16 3c-1.5 0-3 1.5-3 5s1.5 4 3 4M16 3c1.5 0 3 1.5 3 5s-1.5 4-3 4M16 12v9"/></svg></span>
-          <span class="lbl">Was koche ich heute?</span>
+          <span class="lbl">Was koche ich?</span>
         </button>
 
         <button class="tile home-tile" onclick="go('betrug')" style="--acc:#A8433C">
