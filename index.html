@@ -2118,6 +2118,15 @@ async function findNear(cat){
   const resBody = document.getElementById('resBody');
   resBody.innerHTML = `<div class="status"><div class="spin"></div>Suche in Ihrer Umgebung…</div>`;
 
+  // Nach ein paar Sekunden ohne Ergebnis freundlich um Geduld bitten
+  let patience = null;
+  const armPatience = () => {
+    clearTimeout(patience);
+    patience = setTimeout(() => {
+      resBody.innerHTML = `<div class="status"><div class="spin"></div>Das dauert gerade einen Moment – einen kleinen Augenblick Geduld bitte…</div>`;
+    }, 4500);
+  };
+
   // Frische Treffer der letzten 5 Minuten sofort anzeigen (kein neuer Server-Aufruf)
   const key = cat+'|'+STATE.lat.toFixed(3)+'|'+STATE.lon.toFixed(3);
   const cached = NEAR_CACHE[key];
@@ -2135,6 +2144,7 @@ async function findNear(cat){
       if(i>0){
         resBody.innerHTML = `<div class="status"><div class="spin"></div>In unmittelbarer Nähe war nichts eingetragen – ich vergrößere den Suchradius auf ${Math.round(radius/1000)} km…</div>`;
       }
+      armPatience(); // Geduld-Hinweis (neu) für diese Such-Stufe
       const sels = Array.isArray(c.q) ? c.q : [c.q];
       const qbody = sels.map(sel => `node${sel}(around:${radius},${STATE.lat},${STATE.lon});way${sel}(around:${radius},${STATE.lat},${STATE.lon});`).join('');
       const ql = `[out:json][timeout:20];(${qbody});out center 60;`;
@@ -2145,6 +2155,7 @@ async function findNear(cat){
         try{ d = await overpassQuery(ql, 12000); break; }
         catch(err){ if(a===1) throw err; }
       }
+      clearTimeout(patience);
 
       items = d.elements.map(el=>{
         const la = el.lat ?? el.center?.lat, lo = el.lon ?? el.center?.lon;
@@ -2163,6 +2174,8 @@ async function findNear(cat){
     renderNear(used, items);
   }catch(e){
     resBody.innerHTML = `<div class="status">Das hat gerade nicht geklappt.<br>Bitte Internet prüfen und erneut versuchen.</div>`;
+  }finally{
+    clearTimeout(patience);
   }
 }
 
