@@ -569,7 +569,6 @@ try{
     <!-- WERKZEUGE -->
     <section class="view" id="v-werkzeuge">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>Praktische Helfer</h2>
       <div class="cats">
         <button class="cat helfer-cat" onclick="go('countdown')" style="--acc:#E07B1C">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14M5 2h14M17 22v-4.17a2 2 0 0 0-.59-1.41L12 12l-4.41 4.42A2 2 0 0 0 7 17.83V22M7 2v4.17a2 2 0 0 0 .59 1.41L12 12l4.41-4.42A2 2 0 0 0 17 6.17V2"/></svg>
@@ -630,7 +629,6 @@ try{
     <!-- LUPE -->
     <section class="view" id="v-lupe">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>Lupe</h2>
       <div class="lupe-stage" id="lupeStage">
         <video id="lupeVideo" playsinline autoplay muted></video>
         <canvas id="lupeCanvas" hidden></canvas>
@@ -648,7 +646,6 @@ try{
     <!-- STOPPUHR -->
     <section class="view" id="v-stoppuhr">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>Stoppuhr</h2>
       <div class="uhr-zeit" id="uhrZeit">00:00,0</div>
       <div class="btn-reihe">
         <button id="uhrStartBtn" onclick="uhrToggle()">Start</button>
@@ -660,7 +657,6 @@ try{
     <!-- COUNTDOWN -->
     <section class="view" id="v-countdown">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>Countdown</h2>
       <div class="uhr-zeit" id="cdZeit">00:00</div>
       <div class="cd-row">
         <button onclick="cdPreset(60)">1 Min</button>
@@ -684,7 +680,6 @@ try{
     <!-- RECHNER -->
     <section class="view" id="v-rechner">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>Rechner</h2>
       <div class="rechner-anzeige" id="rechnerAnzeige">0</div>
       <div class="rechner-grid">
         <button class="rfn" onclick="rechC()">C</button>
@@ -712,7 +707,6 @@ try{
     <!-- MIT GOOGLE-KI SUCHEN -->
     <section class="view" id="v-kisuche">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>Mit Google-KI suchen</h2>
       <div class="search-box">
         <input id="kiQ" type="text" placeholder="Frage eingeben &hellip;" enterkeyhint="search" onkeydown="if(event.key==='Enter')kiSuche()">
         <button onclick="kiSuche()">Suchen</button>
@@ -723,7 +717,6 @@ try{
     <!-- MERKZETTEL -->
     <section class="view" id="v-merkzettel">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>Merkzettel</h2>
       <div class="search-box">
         <input id="merkInput" type="text" placeholder="Was m&ouml;chten Sie notieren?" enterkeyhint="done" onkeydown="if(event.key==='Enter')merkAdd()">
         <button onclick="merkAdd()">Hinzuf&uuml;gen</button>
@@ -736,7 +729,6 @@ try{
     <!-- SPRACHNOTIZ -->
     <section class="view" id="v-sprachnotiz">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>Sprachnotiz</h2>
       <p style="color:var(--ink-soft);margin:0 0 14px">Sprechen Sie eine kurze Notiz auf &ndash; zum Beispiel einen Einkauf oder eine Erinnerung &ndash; und h&ouml;ren Sie sie sp&auml;ter wieder ab. Die Notizen bleiben nur auf diesem Ger&auml;t.</p>
       <button class="big-btn" id="snRecBtn" onclick="snToggle()">&#127908; Aufnehmen</button>
       <div id="snStatus" class="note" style="margin-top:10px"></div>
@@ -747,7 +739,6 @@ try{
     <section class="view" id="v-unterhaltung">
       <div id="unMenu">
         <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-        <h2>Unterhaltung</h2>
         <p style="color:var(--ink-soft);margin:0 0 14px">W&auml;hlen Sie ein Spiel aus &ndash; tippen Sie einfach auf eine Karte.</p>
         <div class="grid">
           <button class="tile spiel-tile" style="--acc:#E8A61C" onclick="spielOeffnen('witz')">
@@ -788,21 +779,18 @@ try{
 
       <div class="spielblock" id="sp-witz">
         <button class="back" onclick="spieleMenu()">&lsaquo; Zur&uuml;ck zu den Spielen</button>
-        <h2 style="margin-top:6px;font-size:1.4rem">Witz des Tages</h2>
         <div class="rezept-card"><p id="unWitz" style="font-size:1.15rem;line-height:1.5;margin:0"></p></div>
         <button class="big-btn" onclick="unWitzNext()">N&auml;chster Witz</button>
       </div>
 
       <div class="spielblock" id="sp-fakt">
         <button class="back" onclick="spieleMenu()">&lsaquo; Zur&uuml;ck zu den Spielen</button>
-        <h2 style="margin-top:6px;font-size:1.4rem">Schon gewusst?</h2>
         <div class="rezept-card"><p id="unFakt" style="font-size:1.15rem;line-height:1.5;margin:0"></p></div>
         <button class="big-btn" onclick="unFaktNext()">N&auml;chste</button>
       </div>
 
       <div class="spielblock" id="sp-quiz">
         <button class="back" onclick="spieleMenu()">&lsaquo; Zur&uuml;ck zu den Spielen</button>
-        <h2 style="margin-top:6px;font-size:1.4rem">Kleines Quiz</h2>
         <div class="rezept-card">
           <p id="unQuizFrage" style="font-size:1.15rem;line-height:1.5;margin:0 0 12px"></p>
           <div id="unQuizOpt" class="merk-liste"></div>
@@ -813,7 +801,6 @@ try{
 
       <div class="spielblock" id="sp-paare">
         <button class="back" onclick="spieleMenu()">&lsaquo; Zur&uuml;ck zu den Spielen</button>
-        <h2 style="margin-top:6px;font-size:1.4rem">Paare finden</h2>
         <div class="rezept-card">
           <p style="color:var(--ink-soft);margin:0 0 10px">Decken Sie zwei Karten auf. Passen die Bilder zusammen, bleiben sie offen. Finden Sie alle Paare!</p>
           <div id="memWahl" style="display:flex;gap:8px;flex-wrap:wrap">
@@ -827,7 +814,6 @@ try{
 
       <div class="spielblock" id="sp-kopf">
         <button class="back" onclick="spieleMenu()">&lsaquo; Zur&uuml;ck zu den Spielen</button>
-        <h2 style="margin-top:6px;font-size:1.4rem">Kopfrechnen</h2>
         <div class="rezept-card">
           <p style="color:var(--ink-soft);margin:0 0 10px">Plus, Minus, Mal und Geteilt &ndash; denken Sie an &bdquo;Punkt vor Strich&ldquo;. Zu knifflig? Einfach zur n&auml;chsten Aufgabe weitergehen.</p>
           <p id="krFrage" style="font-size:1.5rem;font-weight:800;margin:0 0 12px;text-align:center"></p>
@@ -839,7 +825,6 @@ try{
 
       <div class="spielblock" id="sp-wort">
         <button class="back" onclick="spieleMenu()">&lsaquo; Zur&uuml;ck zu den Spielen</button>
-        <h2 style="margin-top:6px;font-size:1.4rem">Wort-Raten</h2>
         <div class="rezept-card">
           <p style="color:var(--ink-soft);margin:0 0 10px">Erraten Sie das gesuchte Wort: Tippen Sie unten auf die Buchstaben.</p>
           <div id="wrWort" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:12px"></div>
@@ -851,7 +836,6 @@ try{
 
       <div class="spielblock" id="sp-lied">
         <button class="back" onclick="spieleMenu()">&lsaquo; Zur&uuml;ck zu den Spielen</button>
-        <h2 style="margin-top:6px;font-size:1.4rem">Lied raten</h2>
         <div class="rezept-card">
           <p style="color:var(--ink-soft);margin:0 0 10px">H&ouml;ren Sie einen kurzen Ausschnitt und raten Sie den Titel. (Braucht Internet.)</p>
           <div id="muStatus" style="font-size:1.1rem;line-height:1.4;margin-bottom:10px"></div>
@@ -869,7 +853,6 @@ try{
     <!-- PRODUKT SCANNEN (Barcode) -->
     <section class="view" id="v-barcode">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>Produkt scannen</h2>
       <p style="color:var(--ink-soft);margin:0 0 12px">Halten Sie den Strichcode (Barcode) einer Lebensmittel-Packung vor die Kamera. Sie sehen dann Name, Zutaten, Allergene und den Nutri-Score. Daf&uuml;r ist eine Internet-Verbindung n&ouml;tig.</p>
       <button class="big-btn" id="bcStartBtn" onclick="bcToggleScan()">Scan starten</button>
       <div id="bcReader" style="display:none;margin-top:12px;border-radius:14px;overflow:hidden"></div>
@@ -884,7 +867,6 @@ try{
     <!-- VORLESEN -->
     <section class="view" id="v-vorlesen">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>Text vorlesen lassen</h2>
       <p style="color:var(--ink-soft);margin:0 0 12px">Halten Sie die Handy-Kamera über das Kleingedruckte – Ihr Handy kann den Text erkennen, vergrößern und vorlesen. So geht's:</p>
       <div class="btn-reihe">
         <button id="vorIos" onclick="vorSet('ios')">iPhone</button>
@@ -897,7 +879,6 @@ try{
     <!-- WO GEPARKT -->
     <section class="view" id="v-parken">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>Wo habe ich geparkt?</h2>
       <div id="parkInfo" class="park-info"></div>
       <button class="big-btn" onclick="parkSave()">Standort jetzt merken</button>
       <div id="parkActions" style="display:none;margin-top:4px">
@@ -912,14 +893,12 @@ try{
     <!-- TASCHENLAMPE -->
     <section class="view" id="v-taschenlampe">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>Taschenlampe</h2>
       <div id="lampMain"></div>
     </section>
 
     <!-- SO GEHT'S -->
     <section class="view" id="v-hilfe">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>So geht's auf Ihrem Handy</h2>
       <div class="hilfe-switch">Anleitung f&uuml;r:
         <button id="hilfeIos" onclick="hilfeSet('ios')">iPhone</button>
         <button id="hilfeAnd" onclick="hilfeSet('android')">Android</button>
@@ -930,7 +909,6 @@ try{
     <!-- IST DAS ECHT -->
     <section class="view" id="v-betrug">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>Ist das echt?</h2>
       <div class="betrug-regel">F&uuml;r einen echten Gewinn zahlt man <u>nie</u> etwas.<br>Kein Geld, keine Daten, kein Anruf unter Druck.</div>
 
       <h3 class="betrug-h3 warn"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9.5 16.5H2.5z"/><path d="M12 10v4"/><path d="M12 17.5h.01"/></svg>Das sind Warnzeichen</h3>
@@ -969,7 +947,6 @@ try{
     <!-- LOTSE WEITERGEBEN -->
     <section class="view" id="v-weitergeben">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
-      <h2>Lotse weitergeben</h2>
       <p class="wg-intro">Halten Sie diesen Code vor die Kamera des anderen Handys &ndash; dann &ouml;ffnet sich Lotse dort von selbst.</p>
       <div class="wg-qr"><svg viewBox="0 0 33 33" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-label="QR-Code zu Lotse"><rect width="33" height="33" fill="#fff"/><path d="M4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM14 4h1v1h-1zM18 4h1v1h-1zM19 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM25 4h1v1h-1zM26 4h1v1h-1zM27 4h1v1h-1zM28 4h1v1h-1zM4 5h1v1h-1zM10 5h1v1h-1zM18 5h1v1h-1zM19 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM28 5h1v1h-1zM4 6h1v1h-1zM6 6h1v1h-1zM7 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM15 6h1v1h-1zM19 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM25 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM14 7h1v1h-1zM16 7h1v1h-1zM18 7h1v1h-1zM22 7h1v1h-1zM24 7h1v1h-1zM25 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM13 8h1v1h-1zM15 8h1v1h-1zM17 8h1v1h-1zM18 8h1v1h-1zM19 8h1v1h-1zM22 8h1v1h-1zM24 8h1v1h-1zM25 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM12 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM17 9h1v1h-1zM19 9h1v1h-1zM20 9h1v1h-1zM22 9h1v1h-1zM28 9h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM23 10h1v1h-1zM24 10h1v1h-1zM25 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM28 10h1v1h-1zM13 11h1v1h-1zM18 11h1v1h-1zM19 11h1v1h-1zM4 12h1v1h-1zM7 12h1v1h-1zM9 12h1v1h-1zM10 12h1v1h-1zM12 12h1v1h-1zM17 12h1v1h-1zM20 12h1v1h-1zM21 12h1v1h-1zM23 12h1v1h-1zM4 13h1v1h-1zM5 13h1v1h-1zM6 13h1v1h-1zM7 13h1v1h-1zM8 13h1v1h-1zM12 13h1v1h-1zM16 13h1v1h-1zM20 13h1v1h-1zM21 13h1v1h-1zM22 13h1v1h-1zM28 13h1v1h-1zM4 14h1v1h-1zM6 14h1v1h-1zM7 14h1v1h-1zM8 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM12 14h1v1h-1zM14 14h1v1h-1zM16 14h1v1h-1zM20 14h1v1h-1zM22 14h1v1h-1zM24 14h1v1h-1zM27 14h1v1h-1zM28 14h1v1h-1zM6 15h1v1h-1zM7 15h1v1h-1zM12 15h1v1h-1zM15 15h1v1h-1zM16 15h1v1h-1zM17 15h1v1h-1zM21 15h1v1h-1zM23 15h1v1h-1zM24 15h1v1h-1zM5 16h1v1h-1zM9 16h1v1h-1zM10 16h1v1h-1zM11 16h1v1h-1zM13 16h1v1h-1zM18 16h1v1h-1zM22 16h1v1h-1zM23 16h1v1h-1zM25 16h1v1h-1zM27 16h1v1h-1zM28 16h1v1h-1zM8 17h1v1h-1zM11 17h1v1h-1zM13 17h1v1h-1zM15 17h1v1h-1zM17 17h1v1h-1zM21 17h1v1h-1zM22 17h1v1h-1zM25 17h1v1h-1zM26 17h1v1h-1zM28 17h1v1h-1zM4 18h1v1h-1zM6 18h1v1h-1zM7 18h1v1h-1zM10 18h1v1h-1zM13 18h1v1h-1zM14 18h1v1h-1zM15 18h1v1h-1zM17 18h1v1h-1zM18 18h1v1h-1zM20 18h1v1h-1zM23 18h1v1h-1zM24 18h1v1h-1zM26 18h1v1h-1zM28 18h1v1h-1zM5 19h1v1h-1zM7 19h1v1h-1zM12 19h1v1h-1zM15 19h1v1h-1zM19 19h1v1h-1zM20 19h1v1h-1zM24 19h1v1h-1zM27 19h1v1h-1zM4 20h1v1h-1zM5 20h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM20 20h1v1h-1zM21 20h1v1h-1zM22 20h1v1h-1zM23 20h1v1h-1zM24 20h1v1h-1zM25 20h1v1h-1zM26 20h1v1h-1zM12 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM16 21h1v1h-1zM17 21h1v1h-1zM18 21h1v1h-1zM20 21h1v1h-1zM24 21h1v1h-1zM25 21h1v1h-1zM28 21h1v1h-1zM4 22h1v1h-1zM5 22h1v1h-1zM6 22h1v1h-1zM7 22h1v1h-1zM8 22h1v1h-1zM9 22h1v1h-1zM10 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM18 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM22 22h1v1h-1zM24 22h1v1h-1zM25 22h1v1h-1zM27 22h1v1h-1zM28 22h1v1h-1zM4 23h1v1h-1zM10 23h1v1h-1zM12 23h1v1h-1zM14 23h1v1h-1zM16 23h1v1h-1zM18 23h1v1h-1zM20 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM26 23h1v1h-1zM27 23h1v1h-1zM4 24h1v1h-1zM6 24h1v1h-1zM7 24h1v1h-1zM8 24h1v1h-1zM10 24h1v1h-1zM14 24h1v1h-1zM20 24h1v1h-1zM21 24h1v1h-1zM22 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM25 24h1v1h-1zM28 24h1v1h-1zM4 25h1v1h-1zM6 25h1v1h-1zM7 25h1v1h-1zM8 25h1v1h-1zM10 25h1v1h-1zM12 25h1v1h-1zM14 25h1v1h-1zM15 25h1v1h-1zM18 25h1v1h-1zM20 25h1v1h-1zM23 25h1v1h-1zM24 25h1v1h-1zM25 25h1v1h-1zM26 25h1v1h-1zM4 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM10 26h1v1h-1zM14 26h1v1h-1zM19 26h1v1h-1zM20 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h1v1h-1zM4 27h1v1h-1zM10 27h1v1h-1zM18 27h1v1h-1zM19 27h1v1h-1zM20 27h1v1h-1zM21 27h1v1h-1zM22 27h1v1h-1zM25 27h1v1h-1zM4 28h1v1h-1zM5 28h1v1h-1zM6 28h1v1h-1zM7 28h1v1h-1zM8 28h1v1h-1zM9 28h1v1h-1zM10 28h1v1h-1zM12 28h1v1h-1zM13 28h1v1h-1zM16 28h1v1h-1zM19 28h1v1h-1zM20 28h1v1h-1zM22 28h1v1h-1zM23 28h1v1h-1zM27 28h1v1h-1zM28 28h1v1h-1z" fill="#0d2f3f"/></svg></div>
       <div class="wg-url">1a-lotse.de</div>
@@ -984,7 +961,6 @@ try{
     <!-- NOTRUF -->
     <section class="view" id="v-notruf">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
-      <h2>Notruf & Erste Hilfe</h2>
       <div class="rows" id="notrufNums"></div>
       <div class="note">Im Zweifel immer den <b>Notruf 112</b> wählen. Lieber einmal zu viel anrufen als zu wenig – und die Person nie allein lassen.</div>
 
@@ -1134,7 +1110,6 @@ try{
     <!-- IN DER NÄHE -->
     <section class="view" id="v-nearby">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
-      <h2>In der Nähe</h2>
       <div class="cats">
         <button class="cat" onclick="findNear('pharmacy')"><span style="font-size:1.7rem">💊</span>Apotheke</button>
         <button class="cat" onclick="findNear('bakery')"><span style="font-size:1.7rem">🥨</span>Bäckerei</button>
@@ -1169,7 +1144,6 @@ try{
     <!-- FAHRPLAN -->
     <section class="view" id="v-wetter">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
-      <h2>Wetter</h2>
       <div class="search-box">
         <input id="wetterQ" type="text" placeholder="Anderer Ort, z. B. Bregenz" autocomplete="off">
         <button onclick="wetterSuche()">Suchen</button>
@@ -1196,7 +1170,6 @@ try{
 
     <section class="view" id="v-fahrplan">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
-      <h2>Fahrplan & Bus</h2>
       <div class="rows" id="fahrRows"></div>
             <div class="ext-note"><span>🔗</span><span>Hier &ouml;ffnen sich fremde Internetseiten in einem neuen Fenster. Dort gelten die Cookie- und Datenschutzregeln des jeweiligen Anbieters &ndash; nicht die von Lotse.</span></div>
       <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
@@ -1205,7 +1178,6 @@ try{
     <!-- AUTO & UNTERWEGS -->
     <section class="view" id="v-auto">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
-      <h2>Auto &amp; unterwegs</h2>
 
       <h2 style="margin-top:6px;font-size:1.25rem">Pannenhilfe rufen</h2>
       <div class="rows" id="panneNums"></div>
@@ -1257,7 +1229,6 @@ try{
     <!-- FAHRRAD & UNTERWEGS -->
     <section class="view" id="v-fahrrad">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
-      <h2>Fahrrad &amp; unterwegs</h2>
 
       <h2 style="margin-top:6px;font-size:1.25rem">Pannenhilfe rufen</h2>
       <div class="rows">
@@ -1312,7 +1283,6 @@ try{
     <!-- GEMEINSCHAFT ERLEBEN -->
     <section class="view" id="v-gemeinschaft">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
-      <h2>Gemeinschaft erleben</h2>
       <p style="color:var(--ink-soft);margin:0 0 14px">Mitmachen, andere treffen, dabei sein – hier finden Sie Anschluss in Ihrer Nähe.</p>
 
       <h2 style="margin-top:6px;font-size:1.25rem">Etwas Bestimmtes suchen</h2>
@@ -1340,7 +1310,6 @@ try{
     <!-- WEBCAMS -->
     <section class="view" id="v-webcams">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
-      <h2>Webcams</h2>
       <p style="color:var(--ink-soft);margin:0 0 12px">Live-Bilder der Region – die nächstgelegene zuerst. Tippen öffnet die Seite des Betreibers.</p>
       <div class="rows" id="webcamRows"></div>
 
@@ -1356,7 +1325,6 @@ try{
     <!-- SUCHEN -->
     <section class="view" id="v-suchen">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
-      <h2>Suchen</h2>
       <div class="search-box">
         <input id="q" type="text" placeholder="z. B. Bäckerei, Arzt, Edeka" enterkeyhint="search">
         <button onclick="doSearch()">Los</button>
@@ -1381,7 +1349,6 @@ try{
     <!-- WAS KOCHE ICH HEUTE -->
     <section class="view" id="v-kochen">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
-      <h2>Was koche ich heute?</h2>
       <div class="btn-reihe" id="portionWahl" style="margin-bottom:14px">
         <button onclick="setPortionen(1)">1 Person</button>
         <button onclick="setPortionen(2)">2 Pers.</button>
@@ -1409,7 +1376,6 @@ try{
     <!-- RECHTLICHES & KONTAKT -->
     <section class="view" id="v-recht">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
-      <h2>Rechtliches & Kontakt</h2>
 
       <div class="card-info">
         <h3>Verbesserung vorschlagen</h3>
@@ -1463,7 +1429,6 @@ try{
     </section>
     <section class="view" id="v-heute">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
-      <h2>Mein Tag</h2>
       <div class="day-head" id="dayHead"></div>
       <div class="card-info"><h3>📖 Namenstag heute</h3><p id="namenstag"></p><p style="margin:6px 0 0;font-size:.85rem;color:var(--ink-soft)">Nach altem Kalenderbrauch &ndash; regional teils verschieden.</p></div>
       <div class="horo" id="horo"></div>
