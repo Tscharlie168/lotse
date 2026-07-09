@@ -230,13 +230,18 @@ var COURSES = [
   {"no":313,"svc":"snack","line":"sbs","stops":[[10,"18:20","18:20"],[30,"19:15","19:15"]]},
   // Romanshorn/Arbon → Rorschach (morgens), über Horn
   {"no":7042,"svc":"snack","line":"sbs","stops":[[28,"10:20","10:20"],[29,"10:55","10:55"],[31,"11:07","11:07"],[30,"11:20","11:20"]]},
-  // Romanshorn/Arbon → Langenargen (27.6.–13.9., separat als eigene Strecke
-  // "Romanshorn–Arbon–Langenargen–Rorschach" nachzutragen)
-  {"no":911,"svc":"snack","line":"sbs","stops":[[28,"08:50","08:50"],[29,"09:20","09:23"],[6,"10:05","10:05"]]},
-  {"no":912,"svc":"snack","line":"sbs","stops":[[28,"12:05","12:05"],[29,"12:35","12:38"],[6,"13:20","13:20"]]},
-  {"no":913,"svc":"snack","line":"sbs","stops":[[29,"14:38","14:38"],[6,"15:20","15:20"]]},
-  // Rorschach → Arbon → Romanshorn
-  {"no":914,"svc":"snack","line":"sbs","stops":[[30,"11:02","11:02"],[29,"11:27","11:30"],[28,"12:00","12:00"]]},
+  // === Romanshorn – Arbon – Langenargen – Rorschach, Quelle: VSU-Fahrplan
+  // 2026 S. 10, nur 27.6.–13.9. (line "sbs-2706") ===
+  // Romanshorn/Arbon → Langenargen
+  {"no":7220,"svc":"snack","line":"sbs-2706","stops":[[28,"08:50","08:50"],[29,"09:20","09:23"],[6,"10:05","10:05"]]},
+  {"no":7222,"svc":"snack","line":"sbs-2706","stops":[[28,"12:05","12:05"],[29,"12:35","12:38"],[6,"13:20","13:20"]]},
+  {"no":7223,"svc":"snack","line":"sbs-2706","stops":[[29,"14:38","14:38"],[6,"15:20","15:20"]]},
+  // Rorschach → Horn → Arbon → Romanshorn
+  {"no":7221,"svc":"snack","line":"sbs-2706","stops":[[30,"11:02","11:02"],[31,"11:17","11:17"],[29,"11:27","11:30"],[28,"12:00","12:00"]]},
+  // Rorschach → Horn → Arbon (endet in Arbon, keine Weiterfahrt)
+  {"no":7223,"svc":"snack","line":"sbs-2706","stops":[[30,"14:10","14:10"],[31,"14:25","14:25"],[29,"14:35","14:35"]]},
+  // Arbon → Romanshorn (Rorschach/Horn ohne Halt laut Fahrplan)
+  {"no":7224,"svc":"snack","line":"sbs-2706","stops":[[29,"16:02","16:05"],[28,"16:35","16:35"]]},
   // Rorschach → Horn → Arbon → Romanshorn (spätabends)
   {"no":7043,"svc":"snack","line":"sbs","stops":[[30,"19:18","19:18"],[31,"19:33","19:33"],[29,"19:43","19:43"],[28,"20:13","20:13"]]},
   // Rorschach → Immenstaad → Hagnau → Kreuzlingen (täglich)
@@ -305,6 +310,10 @@ function courseValidOn(c,dObj,dStr){
     // Freitags 27.06–13.09.2026
     if(dStr<"2026-06-27"||dStr>"2026-09-13") return false;
     return dObj.getDay()===5;
+  }
+  if(c.line==="sbs-2706"){
+    // Romanshorn-Arbon-Langenargen-Rorschach: täglich, aber nur 27.06.-13.09.2026
+    return dStr>="2026-06-27" && dStr<="2026-09-13";
   }
   return true; // obersee + sbs: täglich Hauptsaison
 }
