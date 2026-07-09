@@ -176,6 +176,9 @@
     border-left:5px solid var(--acc,var(--sea));padding:14px 12px;gap:12px}
   .helfer-cat svg{color:var(--acc,var(--sea));flex:0 0 auto}
   .helfer-cat span{font-weight:700}
+  /* "In der Nähe": dünne farbige Umrandung um die ganze Kachel, Rest
+     (zentriertes Emoji+Text, weißer Hintergrund) bleibt wie bei .cat. */
+  .cat-accent{border-width:1.5px;border-color:var(--acc,var(--line))}
   /* Gleicher Look wie "Kleine Helfer" (farbiger Rand + farbiges Symbol),
      hier für Zeilen-Listen (.row) statt Kacheln. Nur für die damit markierten
      Listen (Fahrplan & Bus, Webcams, Anschluss finden), NICHT global auf
@@ -1152,18 +1155,18 @@ try{
     <section class="view" id="v-nearby">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
       <div class="cats">
-        <button class="cat" onclick="findNear('pharmacy')"><span style="font-size:1.7rem">💊</span>Apotheke</button>
-        <button class="cat" onclick="findNear('bakery')"><span style="font-size:1.7rem">🥨</span>Bäckerei</button>
-        <button class="cat" onclick="findNear('busstop')"><span style="font-size:1.7rem">🚏</span>Bushaltestelle</button>
-        <button class="cat" onclick="findNear('cafe')"><span style="font-size:1.7rem">☕</span>Café</button>
-        <button class="cat" onclick="findNear('atm')"><span style="font-size:1.7rem">🏧</span>Geldautomat</button>
-        <button class="cat" onclick="findNear('hofladen')"><span style="font-size:1.7rem">🏡</span>Hofladen</button>
-        <button class="cat" onclick="findNear('lebensmittel')"><span style="font-size:1.7rem">🛒</span>Lebensmittel</button>
-        <button class="cat" onclick="findNear('sights')"><span style="font-size:1.7rem">🏰</span>Sehenswürdigkeit</button>
-        <button class="cat" onclick="findNear('bench')"><span style="font-size:1.7rem">🪑</span>Sitzbank</button>
-        <button class="cat" onclick="findNear('toilets')"><span style="font-size:1.7rem">🚻</span>Toilette</button>
-        <button class="cat" onclick="findNear('water')"><span style="font-size:1.7rem">🚰</span>Trinkwasser</button>
-        <button class="cat" onclick="findNear('automat')"><span style="font-size:1.7rem">🧺</span>Verkaufsautomat</button>
+        <button class="cat cat-accent" style="--acc:#D8524A" onclick="findNear('pharmacy')"><span style="font-size:1.7rem">💊</span>Apotheke</button>
+        <button class="cat cat-accent" style="--acc:#C08A2E" onclick="findNear('bakery')"><span style="font-size:1.7rem">🥨</span>Bäckerei</button>
+        <button class="cat cat-accent" style="--acc:#4A78D8" onclick="findNear('busstop')"><span style="font-size:1.7rem">🚏</span>Bushaltestelle</button>
+        <button class="cat cat-accent" style="--acc:#8B5E3C" onclick="findNear('cafe')"><span style="font-size:1.7rem">☕</span>Café</button>
+        <button class="cat cat-accent" style="--acc:#3CA35A" onclick="findNear('atm')"><span style="font-size:1.7rem">🏧</span>Geldautomat</button>
+        <button class="cat cat-accent" style="--acc:#B5541F" onclick="findNear('hofladen')"><span style="font-size:1.7rem">🏡</span>Hofladen</button>
+        <button class="cat cat-accent" style="--acc:#1FA98C" onclick="findNear('lebensmittel')"><span style="font-size:1.7rem">🛒</span>Lebensmittel</button>
+        <button class="cat cat-accent" style="--acc:#8B5CD6" onclick="findNear('sights')"><span style="font-size:1.7rem">🏰</span>Sehenswürdigkeit</button>
+        <button class="cat cat-accent" style="--acc:#5C7488" onclick="findNear('bench')"><span style="font-size:1.7rem">🪑</span>Sitzbank</button>
+        <button class="cat cat-accent" style="--acc:#2F8FA0" onclick="findNear('toilets')"><span style="font-size:1.7rem">🚻</span>Toilette</button>
+        <button class="cat cat-accent" style="--acc:#4FA8D8" onclick="findNear('water')"><span style="font-size:1.7rem">🚰</span>Trinkwasser</button>
+        <button class="cat cat-accent" style="--acc:#C9469B" onclick="findNear('automat')"><span style="font-size:1.7rem">🧺</span>Verkaufsautomat</button>
       </div>
       <a class="row" style="margin-top:16px" href="https://www.aponet.de/apotheke/notdienstsuche" target="_blank" rel="noopener">
         <span style="font-size:1.7rem;flex:0 0 auto">🌙</span>
