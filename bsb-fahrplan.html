@@ -165,22 +165,25 @@ select,input,button{font-family:inherit;}
 <script>
 "use strict";
 
-var PORTS = ["Konstanz", "Mainau", "Meersburg", "Hagnau", "Immenstaad", "Friedrichshafen", "Langenargen", "Kressbronn", "Nonnenhorn", "Wasserburg", "Lindau", "Bregenz", "Kreuzlingen", "Gottlieben", "Ermatingen", "Reichenau", "Mannenbach", "Berlingen", "Gaienhofen", "Steckborn", "Hemmenhofen", "Wangen", "Mammern", "Öhningen", "Stein am Rhein", "Diessenhofen/Gailingen", "Büsingen", "Schaffhausen", "Romanshorn", "Arbon", "Rorschach"];
+var PORTS = ["Konstanz", "Mainau", "Meersburg", "Hagnau", "Immenstaad", "Friedrichshafen", "Langenargen", "Kressbronn", "Nonnenhorn", "Wasserburg", "Lindau", "Bregenz", "Kreuzlingen", "Gottlieben", "Ermatingen", "Reichenau", "Mannenbach", "Berlingen", "Gaienhofen", "Steckborn", "Hemmenhofen", "Wangen", "Mammern", "Öhningen", "Stein am Rhein", "Diessenhofen/Gailingen", "Büsingen", "Schaffhausen", "Romanshorn", "Arbon", "Rorschach", "Horn"];
+// Index 31 (Horn) ist nur Zwischenstopp auf der SBS-Strecke Rorschach–Arbon,
+// wie die Untersee-Kleinstopps bewusst NICHT einzeln anwählbar (siehe SELECTABLE).
 // Indizes 28–30 sind Schweizer SBS-Häfen (kein BSB/URh-Betrieb)
 var SBS_PORTS = [28, 29, 30];
 // ungefähre Hafenkoordinaten [lat,lng] für die Standort-Erkennung
-var COORDS = [[47.659, 9.178], [47.705, 9.197], [47.694, 9.271], [47.685, 9.318], [47.677, 9.367], [47.651, 9.48], [47.598, 9.547], [47.586, 9.6], [47.583, 9.628], [47.56, 9.638], [47.545, 9.685], [47.504, 9.747], [47.6499, 9.1738], [47.662, 9.133], [47.672, 9.084], [47.6957, 9.0636], [47.687, 9.056], [47.692, 9.001], [47.692, 8.965], [47.666, 8.972], [47.69, 8.93], [47.687, 8.9], [47.65, 8.84], [47.663, 8.887], [47.66, 8.859], [47.69, 8.75], [47.697, 8.687], [47.696, 8.632], [47.565, 9.360], [47.514, 9.431], [47.478, 9.491]];
+var COORDS = [[47.659, 9.178], [47.705, 9.197], [47.694, 9.271], [47.685, 9.318], [47.677, 9.367], [47.651, 9.48], [47.598, 9.547], [47.586, 9.6], [47.583, 9.628], [47.56, 9.638], [47.545, 9.685], [47.504, 9.747], [47.6499, 9.1738], [47.662, 9.133], [47.672, 9.084], [47.6957, 9.0636], [47.687, 9.056], [47.692, 9.001], [47.692, 8.965], [47.666, 8.972], [47.69, 8.93], [47.687, 8.9], [47.65, 8.84], [47.663, 8.887], [47.66, 8.859], [47.69, 8.75], [47.697, 8.687], [47.696, 8.632], [47.565, 9.360], [47.514, 9.431], [47.478, 9.491], [47.494, 9.462]];
 function nearestPort(lat,lng){var best=-1,bd=Infinity;for(var i=0;i<COORDS.length;i++){var dlat=lat-COORDS[i][0],dlng=(lng-COORDS[i][1])*Math.cos(lat*Math.PI/180),d=dlat*dlat+dlng*dlng;if(d<bd){bd=d;best=i;}}return {idx:best,far:Math.sqrt(bd)>0.6};}
 function resolvePort(s){if(s==null)return -1;var t=String(s).trim();var num=parseInt(t,10);if(!isNaN(num)&&String(num)===t&&num>=0&&num<PORTS.length)return num;t=t.toLowerCase();for(var i=0;i<PORTS.length;i++){if(PORTS[i].toLowerCase()===t)return i;}return -1;}
 
 // stop = [portIndex, ankunft, abfahrt]
 var COURSES = [
-  {"no":141,"svc":"restaurant","line":"obersee","stops":[[5, "9:10", "9:10"], [6, "9:35", "9:35"], [7, "9:55", "9:55"], [8, "10:05", "10:05"], [9, "10:15", "10:15"], [10, "10:35", "10:35"]]},
+  {"no":121,"svc":"restaurant","line":"obersee","stops":[[5, "9:10", "9:10"], [6, "9:35", "9:35"], [7, "9:55", "9:55"], [8, "10:05", "10:05"], [9, "10:15", "10:15"], [10, "10:35", "10:35"]]},
+  {"no":141,"svc":"restaurant","line":"obersee","stops":[[10, "9:55", "9:55"], [11, "10:17", "10:17"]]},
   {"no":111,"svc":"restaurant","line":"obersee","stops":[[0, "9:05", "9:05"], [2, "9:35", "9:45"], [3, "10:00", "10:00"], [4, "10:15", "10:15"], [5, "10:45", "10:55"], [6, "11:20", "11:20"], [7, "11:40", "11:40"], [8, "11:50", "11:50"], [9, "12:00", "12:00"], [10, "12:20", "12:25"], [11, "12:47", "12:47"]]},
   {"no":143,"svc":"restaurant","line":"obersee","stops":[[5, "12:30", "12:30"], [6, "12:55", "12:55"], [7, "13:15", "13:15"], [8, "13:25", "13:25"], [9, "13:35", "13:35"], [10, "13:55", "14:00"], [11, "14:22", "14:22"]]},
   {"no":125,"svc":"snack","line":"obersee","stops":[[5, "14:20", "14:20"], [6, "14:45", "14:45"], [7, "15:05", "15:05"], [8, "15:15", "15:15"], [9, "15:25", "15:25"], [10, "15:45", "15:50"], [11, "16:12", "16:12"]]},
   {"no":145,"svc":"restaurant","line":"obersee","stops":[[5, "16:35", "16:35"], [6, "17:00", "17:00"], [7, "17:20", "17:20"], [8, "17:30", "17:30"], [9, "17:40", "17:40"], [10, "18:00", "18:05"], [11, "18:27", "18:27"]]},
-  {"no":153,"svc":"snack","line":"obersee","stops":[[0, "15:15", "15:15"], [2, "16:15", "16:25"], [3, "16:40", "16:40"], [4, "16:55", "16:55"], [5, "17:25", "17:35"], [6, "18:00", "18:00"], [7, "18:20", "18:20"], [8, "18:30", "18:30"], [9, "18:40", "18:40"], [10, "19:00", "19:05"], [11, "19:27", "19:27"]]},
+  {"no":153,"svc":"snack","line":"obersee","stops":[[0, "15:15", "15:15"], [1, "15:55", "15:55"], [2, "16:15", "16:25"], [3, "16:40", "16:40"], [4, "16:55", "16:55"], [5, "17:25", "17:35"], [6, "18:00", "18:00"], [7, "18:20", "18:20"], [8, "18:30", "18:30"], [9, "18:40", "18:40"], [10, "19:00", "19:05"], [11, "19:27", "19:27"]]},
   {"no":150,"svc":"snack","line":"obersee","stops":[[11, "9:20", "9:20"], [10, "9:42", "9:50"], [9, "10:10", "10:10"], [8, "10:20", "10:20"], [7, "10:30", "10:30"], [6, "10:50", "10:50"], [5, "11:15", "11:25"], [4, "11:55", "11:55"], [3, "12:10", "12:10"], [2, "12:25", "12:35"], [1, "13:00", "13:00"], [0, "13:30", "13:30"]]},
   {"no":142,"svc":"restaurant","line":"obersee","stops":[[11, "10:25", "10:25"], [10, "10:47", "10:55"], [9, "11:15", "11:15"], [8, "11:25", "11:25"], [7, "11:35", "11:35"], [6, "11:55", "11:55"], [5, "12:20", "12:20"]]},
   {"no":124,"svc":"snack","line":"obersee","stops":[[11, "12:15", "12:15"], [10, "12:37", "12:50"], [9, "13:10", "13:10"], [8, "13:20", "13:20"], [7, "13:30", "13:30"], [6, "13:50", "13:50"], [5, "14:15", "14:15"]]},
@@ -195,38 +198,41 @@ var COURSES = [
   {"no":533,"svc":"restaurant","line":"untersee","stops":[[27, "11:10", "11:10"], [26, "11:38", "11:38"], [25, "12:10", "12:10"], [24, "13:15", "13:15"], [23, "13:32", "13:32"], [22, "13:39", "13:39"], [21, "13:45", "13:45"], [20, "13:57", "13:57"], [19, "14:03", "14:03"], [18, "14:09", "14:09"], [17, "14:18", "14:18"], [16, "14:27", "14:27"], [15, "14:38", "14:38"], [14, "14:50", "14:50"], [13, "15:17", "15:17"], [0, "15:45", "15:45"], [12, "15:55", "15:55"]]},
   {"no":543,"svc":"restaurant","line":"untersee","stops":[[27, "13:18", "13:18"], [26, "13:46", "13:46"], [25, "14:18", "14:18"], [24, "15:23", "15:23"], [23, "15:40", "15:40"], [22, "15:47", "15:47"], [21, "15:53", "15:53"], [20, "16:05", "16:05"], [19, "16:11", "16:11"], [18, "16:17", "16:17"], [17, "16:26", "16:26"], [16, "16:35", "16:35"], [15, "16:46", "16:46"], [14, "16:58", "16:58"], [13, "17:25", "17:25"], [0, "17:53", "17:53"], [12, "18:05", "18:05"]]},
   {"no":551,"svc":"restaurant","line":"untersee","stops":[[27, "15:18", "15:18"], [26, "15:46", "15:46"], [25, "16:18", "16:18"], [24, "17:23", "17:23"], [23, "17:40", "17:40"], [22, "17:47", "17:47"], [21, "17:53", "17:53"], [20, "18:05", "18:05"], [19, "18:11", "18:11"], [18, "18:17", "18:17"], [17, "18:26", "18:26"], [16, "18:35", "18:35"], [15, "18:46", "18:46"], [14, "18:58", "18:58"], [13, "19:25", "19:25"], [0, "19:53", "19:53"], [12, "20:05", "20:05"]]},
-  // === SBS Dreiländereck – Quelle: SBS Fahrplan 2026, täglich Hauptsaison ===
+  // === SBS Dreiländereck – Quelle: VSU-Fahrplan 2026 S. 9, echte Kursnummern
+  // (vorher standen hier erfundene 900er-Nummern aus einer anderen Quelle –
+  // am 9.7.2026 gegen das offizielle PDF korrigiert). täglich Hauptsaison ===
   // Rorschach → Lindau (via Wasserburg oder Bregenz)
-  {"no":901,"svc":"snack","line":"sbs","stops":[[30,"10:40","10:40"],[10,"11:40","11:40"]]},
-  {"no":902,"svc":"snack","line":"sbs","stops":[[30,"11:25","11:25"],[11,"12:42","12:42"],[10,"13:05","13:05"]]},
-  {"no":903,"svc":"snack","line":"sbs","stops":[[30,"13:05","13:05"],[9,"13:55","13:55"],[10,"14:15","14:15"]]},
-  {"no":904,"svc":"snack","line":"sbs","stops":[[30,"14:20","14:20"],[9,"15:15","15:15"],[10,"15:40","15:40"]]},
-  {"no":905,"svc":"snack","line":"sbs","stops":[[30,"17:05","17:05"],[9,"17:50","17:50"],[10,"18:15","18:15"]]},
+  {"no":302,"svc":"snack","line":"sbs","stops":[[30,"10:40","10:40"],[10,"11:40","11:40"]]},
+  {"no":72,"svc":"snack","line":"sbs","stops":[[30,"11:25","11:25"],[11,"12:42","12:42"],[10,"13:05","13:05"]]},
+  {"no":304,"svc":"snack","line":"sbs","stops":[[30,"13:05","13:05"],[9,"13:55","13:55"],[10,"14:15","14:15"]]},
+  {"no":312,"svc":"snack","line":"sbs","stops":[[30,"14:20","14:20"],[9,"15:15","15:15"],[10,"15:40","15:40"]]},
+  {"no":306,"svc":"snack","line":"sbs","stops":[[30,"17:05","17:05"],[9,"17:50","17:50"],[10,"18:15","18:15"]]},
   // Lindau → Rorschach
-  {"no":906,"svc":"snack","line":"sbs","stops":[[10,"11:45","11:45"],[9,"12:05","12:05"],[30,"12:55","12:55"]]},
-  {"no":907,"svc":"snack","line":"sbs","stops":[[10,"13:10","13:10"],[30,"14:06","14:06"]]},
-  {"no":908,"svc":"snack","line":"sbs","stops":[[10,"15:50","15:50"],[30,"16:51","16:51"]]},
-  {"no":909,"svc":"snack","line":"sbs","stops":[[10,"18:20","18:20"],[30,"19:15","19:15"]]},
-  // Romanshorn/Arbon → Rorschach (morgens)
-  {"no":916,"svc":"snack","line":"sbs","stops":[[28,"10:20","10:20"],[29,"10:55","10:55"],[30,"11:20","11:20"]]},
-  // Romanshorn/Arbon → Langenargen
+  {"no":303,"svc":"snack","line":"sbs","stops":[[10,"11:45","11:45"],[9,"12:05","12:05"],[30,"12:55","12:55"]]},
+  {"no":73,"svc":"snack","line":"sbs","stops":[[10,"13:10","13:10"],[30,"14:06","14:06"]]},
+  {"no":305,"svc":"snack","line":"sbs","stops":[[10,"15:50","15:50"],[30,"16:51","16:51"]]},
+  {"no":313,"svc":"snack","line":"sbs","stops":[[10,"18:20","18:20"],[30,"19:15","19:15"]]},
+  // Romanshorn/Arbon → Rorschach (morgens), über Horn
+  {"no":7042,"svc":"snack","line":"sbs","stops":[[28,"10:20","10:20"],[29,"10:55","10:55"],[31,"11:07","11:07"],[30,"11:20","11:20"]]},
+  // Romanshorn/Arbon → Langenargen (27.6.–13.9., separat als eigene Strecke
+  // "Romanshorn–Arbon–Langenargen–Rorschach" nachzutragen)
   {"no":911,"svc":"snack","line":"sbs","stops":[[28,"08:50","08:50"],[29,"09:20","09:23"],[6,"10:05","10:05"]]},
   {"no":912,"svc":"snack","line":"sbs","stops":[[28,"12:05","12:05"],[29,"12:35","12:38"],[6,"13:20","13:20"]]},
   {"no":913,"svc":"snack","line":"sbs","stops":[[29,"14:38","14:38"],[6,"15:20","15:20"]]},
   // Rorschach → Arbon → Romanshorn
   {"no":914,"svc":"snack","line":"sbs","stops":[[30,"11:02","11:02"],[29,"11:27","11:30"],[28,"12:00","12:00"]]},
-  {"no":915,"svc":"snack","line":"sbs","stops":[[30,"19:18","19:18"],[29,"19:43","19:43"],[28,"20:13","20:13"]]},
+  // Rorschach → Horn → Arbon → Romanshorn (spätabends)
+  {"no":7043,"svc":"snack","line":"sbs","stops":[[30,"19:18","19:18"],[31,"19:33","19:33"],[29,"19:43","19:43"],[28,"20:13","20:13"]]},
   // Rorschach → Immenstaad → Hagnau → Kreuzlingen (täglich)
   {"no":917,"svc":"snack","line":"sbs","stops":[[30,"09:30","09:30"],[4,"12:10","12:10"],[3,"12:30","12:30"],[12,"12:25","12:25"]]},
   // Kreuzlingen → Hagnau → Immenstaad → Rorschach (täglich)
   {"no":918,"svc":"snack","line":"sbs","stops":[[12,"15:20","15:20"],[3,"15:55","15:55"],[4,"16:05","16:05"],[30,"18:55","18:55"]]},
   // Freitags 27.06–13.09: Romanshorn → Immenstaad → Hagnau
-  {"no":920,"svc":"snack","line":"sbs-fr","stops":[[28,"13:20","13:20"],[4,"14:00","14:05"],[3,"14:20","14:20"]]},
-  // Freitags: Hagnau/Immenstaad → Romanshorn (Rückfahrten)
-  {"no":921,"svc":"snack","line":"sbs-fr","stops":[[3,"16:00","16:00"],[4,"16:20","16:20"]]},
-  {"no":922,"svc":"snack","line":"sbs-fr","stops":[[3,"17:30","17:30"],[4,"17:50","17:50"]]},
-  {"no":923,"svc":"snack","line":"sbs-fr","stops":[[3,"19:55","19:55"],[4,"20:15","20:15"]]},
-  {"no":924,"svc":"snack","line":"sbs-fr","stops":[[4,"21:10","21:10"],[3,"21:25","21:30"],[28,"22:35","22:35"]]}
+  {"no":920,"svc":"snack","line":"sbs-fr","stops":[[28,"13:20","13:20"],[4,"14:00","14:05"],[3,"14:20","14:20"]]}
+  // Die Rückfahrten (vormals 921–924) sind entfernt: Sie zeigten Hagnau/
+  // Immenstaad → Romanshorn, real fährt die Linie an diesen Uhrzeiten aber
+  // weiter Richtung Altnau/Güttingen. Korrekte Version folgt zusammen mit
+  // der Strecke "Romanshorn – Immenstaad – Hagnau – Altnau" (Schritt 4).
 ];
 
 var WEEKDAYS = ["So","Mo","Di","Mi","Do","Fr","Sa"];
