@@ -165,13 +165,13 @@ select,input,button{font-family:inherit;}
 <script>
 "use strict";
 
-var PORTS = ["Konstanz", "Mainau", "Meersburg", "Hagnau", "Immenstaad", "Friedrichshafen", "Langenargen", "Kressbronn", "Nonnenhorn", "Wasserburg", "Lindau", "Bregenz", "Kreuzlingen", "Gottlieben", "Ermatingen", "Reichenau", "Mannenbach", "Berlingen", "Gaienhofen", "Steckborn", "Hemmenhofen", "Wangen", "Mammern", "Öhningen", "Stein am Rhein", "Diessenhofen/Gailingen", "Büsingen", "Schaffhausen", "Romanshorn", "Arbon", "Rorschach", "Horn", "Uttwil", "Altnau", "Bottighofen", "Güttingen", "Staad", "Altenrhein", "Rheineck"];
+var PORTS = ["Konstanz", "Mainau", "Meersburg", "Hagnau", "Immenstaad", "Friedrichshafen", "Langenargen", "Kressbronn", "Nonnenhorn", "Wasserburg", "Lindau", "Bregenz", "Kreuzlingen", "Gottlieben", "Ermatingen", "Reichenau", "Mannenbach", "Berlingen", "Gaienhofen", "Steckborn", "Hemmenhofen", "Wangen", "Mammern", "Öhningen", "Stein am Rhein", "Diessenhofen/Gailingen", "Büsingen", "Schaffhausen", "Romanshorn", "Arbon", "Rorschach", "Horn", "Uttwil", "Altnau", "Bottighofen", "Güttingen", "Staad", "Altenrhein", "Rheineck", "Radolfzell", "Iznang"];
 // Index 31 (Horn) ist nur Zwischenstopp auf der SBS-Strecke Rorschach–Arbon,
 // wie die Untersee-Kleinstopps bewusst NICHT einzeln anwählbar (siehe SELECTABLE).
 // Indizes 28–30, 32–38 sind Schweizer SBS-Häfen (kein BSB/URh-Betrieb)
 var SBS_PORTS = [28, 29, 30, 32, 33, 34, 35, 36, 37, 38];
 // ungefähre Hafenkoordinaten [lat,lng] für die Standort-Erkennung
-var COORDS = [[47.659, 9.178], [47.705, 9.197], [47.694, 9.271], [47.685, 9.318], [47.677, 9.367], [47.651, 9.48], [47.598, 9.547], [47.586, 9.6], [47.583, 9.628], [47.56, 9.638], [47.545, 9.685], [47.504, 9.747], [47.6499, 9.1738], [47.662, 9.133], [47.672, 9.084], [47.6957, 9.0636], [47.687, 9.056], [47.692, 9.001], [47.692, 8.965], [47.666, 8.972], [47.69, 8.93], [47.687, 8.9], [47.65, 8.84], [47.663, 8.887], [47.66, 8.859], [47.69, 8.75], [47.697, 8.687], [47.696, 8.632], [47.565, 9.360], [47.514, 9.431], [47.478, 9.491], [47.494, 9.462], [47.583, 9.339], [47.586, 9.283], [47.616, 9.219], [47.599, 9.320], [47.473, 9.545], [47.487, 9.560], [47.462, 9.548]];
+var COORDS = [[47.659, 9.178], [47.705, 9.197], [47.694, 9.271], [47.685, 9.318], [47.677, 9.367], [47.651, 9.48], [47.598, 9.547], [47.586, 9.6], [47.583, 9.628], [47.56, 9.638], [47.545, 9.685], [47.504, 9.747], [47.6499, 9.1738], [47.662, 9.133], [47.672, 9.084], [47.6957, 9.0636], [47.687, 9.056], [47.692, 9.001], [47.692, 8.965], [47.666, 8.972], [47.69, 8.93], [47.687, 8.9], [47.65, 8.84], [47.663, 8.887], [47.66, 8.859], [47.69, 8.75], [47.697, 8.687], [47.696, 8.632], [47.565, 9.360], [47.514, 9.431], [47.478, 9.491], [47.494, 9.462], [47.583, 9.339], [47.586, 9.283], [47.616, 9.219], [47.599, 9.320], [47.473, 9.545], [47.487, 9.560], [47.462, 9.548], [47.741, 8.968], [47.727, 8.917]];
 function nearestPort(lat,lng){var best=-1,bd=Infinity;for(var i=0;i<COORDS.length;i++){var dlat=lat-COORDS[i][0],dlng=(lng-COORDS[i][1])*Math.cos(lat*Math.PI/180),d=dlat*dlat+dlng*dlng;if(d<bd){bd=d;best=i;}}return {idx:best,far:Math.sqrt(bd)>0.6};}
 function resolvePort(s){if(s==null)return -1;var t=String(s).trim();var num=parseInt(t,10);if(!isNaN(num)&&String(num)===t&&num>=0&&num<PORTS.length)return num;t=t.toLowerCase();for(var i=0;i<PORTS.length;i++){if(PORTS[i].toLowerCase()===t)return i;}return -1;}
 
@@ -214,6 +214,17 @@ var COURSES = [
   {"no":533,"svc":"restaurant","line":"untersee","stops":[[27, "11:10", "11:10"], [26, "11:38", "11:38"], [25, "12:10", "12:10"], [24, "13:15", "13:15"], [23, "13:32", "13:32"], [22, "13:39", "13:39"], [21, "13:45", "13:45"], [20, "13:57", "13:57"], [19, "14:03", "14:03"], [18, "14:09", "14:09"], [17, "14:18", "14:18"], [16, "14:27", "14:27"], [15, "14:38", "14:38"], [14, "14:50", "14:50"], [13, "15:17", "15:17"], [0, "15:45", "15:45"], [12, "15:55", "15:55"]]},
   {"no":543,"svc":"restaurant","line":"untersee","stops":[[27, "13:18", "13:18"], [26, "13:46", "13:46"], [25, "14:18", "14:18"], [24, "15:23", "15:23"], [23, "15:40", "15:40"], [22, "15:47", "15:47"], [21, "15:53", "15:53"], [20, "16:05", "16:05"], [19, "16:11", "16:11"], [18, "16:17", "16:17"], [17, "16:26", "16:26"], [16, "16:35", "16:35"], [15, "16:46", "16:46"], [14, "16:58", "16:58"], [13, "17:25", "17:25"], [0, "17:53", "17:53"], [12, "18:05", "18:05"]]},
   {"no":551,"svc":"restaurant","line":"untersee","stops":[[27, "15:18", "15:18"], [26, "15:46", "15:46"], [25, "16:18", "16:18"], [24, "17:23", "17:23"], [23, "17:40", "17:40"], [22, "17:47", "17:47"], [21, "17:53", "17:53"], [20, "18:05", "18:05"], [19, "18:11", "18:11"], [18, "18:17", "18:17"], [17, "18:26", "18:26"], [16, "18:35", "18:35"], [15, "18:46", "18:46"], [14, "18:58", "18:58"], [13, "19:25", "19:25"], [0, "19:53", "19:53"], [12, "20:05", "20:05"]]},
+  // === Kreuzlingen-Schaffhausen: 3 Donnerstags-Sonderkurse, Quelle: VSU-
+  // Fahrplan 2026 S. 14, nur Do, 27.6.-13.9. (line "untersee-do") ===
+  {"no":527,"svc":"restaurant","line":"untersee-do","stops":[[20,"9:57","9:57"],[19,"10:03","10:03"],[18,"10:09","10:09"],[17,"10:18","10:18"],[16,"10:27","10:27"],[15,"10:38","10:38"],[14,"10:50","10:50"],[13,"11:17","11:17"],[0,"11:45","11:45"],[12,"11:55","11:55"]]},
+  {"no":546,"svc":"restaurant","line":"untersee-do","stops":[[12,"12:00","12:00"],[0,"12:12","12:12"],[13,"12:32","12:32"],[14,"12:52","12:52"],[15,"13:06","13:06"],[16,"13:13","13:13"],[17,"13:23","13:23"],[18,"13:33","13:33"],[19,"13:39","13:39"],[20,"13:45","13:45"],[21,"13:57","13:57"],[22,"14:04","14:04"],[23,"14:12","14:12"],[24,"14:25","15:30"],[25,"16:05","16:05"],[26,"16:20","16:20"],[27,"16:45","16:45"]]},
+  {"no":555,"svc":"restaurant","line":"untersee-do","stops":[[27,"16:50","16:50"],[26,"17:18","17:18"],[25,"17:50","17:50"],[24,"18:55","18:55"],[23,"19:12","19:12"],[22,"19:19","19:19"],[21,"19:25","19:25"],[20,"19:37","19:37"],[19,"19:43","19:43"],[18,"19:49","19:49"]]},
+  // === Radolfzell ↔ Reichenau, Quelle: VSU-Fahrplan 2026 S. 14, Rundkurse,
+  // Mi-So, 27.6.-13.9. (line "radolfzell") ===
+  {"no":"613/614","svc":"snack","line":"radolfzell","stops":[[39,"10:00","10:00"],[40,"10:10","10:10"],[16,"10:35","10:35"],[15,"10:45","10:50"],[40,"11:15","11:15"],[39,"11:25","11:25"]]},
+  {"no":"615/616","svc":"snack","line":"radolfzell","stops":[[39,"11:30","11:30"],[16,"12:00","12:00"],[15,"12:10","12:15"],[40,"12:40","12:40"],[39,"12:50","12:50"]]},
+  {"no":"617/618","svc":"snack","line":"radolfzell","stops":[[39,"14:05","14:05"],[40,"14:15","14:15"],[16,"14:40","14:40"],[15,"14:50","14:55"],[40,"15:20","15:20"],[39,"15:30","15:30"]]},
+  {"no":"619/620","svc":"snack","line":"radolfzell","stops":[[39,"15:35","15:35"],[40,"15:45","15:45"],[16,"16:10","16:10"],[15,"16:20","16:25"],[40,"16:50","16:50"],[39,"17:00","17:00"]]},
   // === SBS Dreiländereck – Quelle: VSU-Fahrplan 2026 S. 9, echte Kursnummern
   // (vorher standen hier erfundene 900er-Nummern aus einer anderen Quelle –
   // am 9.7.2026 gegen das offizielle PDF korrigiert). täglich Hauptsaison ===
@@ -345,6 +356,17 @@ function courseValidOn(c,dObj,dStr){
     var wd=dObj.getDay();
     return wd===4||wd===0;
   }
+  if(c.line==="untersee-do"){
+    // Kreuzlingen-Schaffhausen Sonderkurse 527/546/555: nur Do, 27.06.-13.09.2026
+    if(dStr<"2026-06-27"||dStr>"2026-09-13") return false;
+    return dObj.getDay()===4;
+  }
+  if(c.line==="radolfzell"){
+    // Radolfzell-Reichenau: Mi-So, 27.06.-13.09.2026
+    if(dStr<"2026-06-27"||dStr>"2026-09-13") return false;
+    var w2=dObj.getDay();
+    return w2===0||w2>=3;
+  }
   return true; // obersee + sbs: täglich Hauptsaison (auch Romanshorn-Kreuzlingen-Meersburg
   // und Rorschach-Rheineck, die laut PDF bis 4.10. fahren - deckt sich mit SAISON_MAX=13.9.)
 }
@@ -425,10 +447,10 @@ function svcTag(svc){return svc==="restaurant"?'<span class="lg-tag lg-tag--rest
 
 // Nur die wählbaren Haupthäfen (kleine Untersee-Haltestellen sind ausgeblendet,
 // bleiben aber in COURSES für Umstiegsberechnungen erhalten)
-var SELECTABLE = [0,1,2,3,4,5,6,7,8,9,10,11, 13,15, 24, 27, 28,29,30, 32,33,34,35,36,37,38];
+var SELECTABLE = [0,1,2,3,4,5,6,7,8,9,10,11, 13,15, 24, 27, 28,29,30, 32,33,34,35,36,37,38, 39,40];
 var SELECT_GROUPS = [
   ["Obersee & Bregenz", [0,1,2,3,4,5,6,7,8,9,10,11]],
-  ["Untersee (Auswahl)", [13,15,24,27]],
+  ["Untersee (Auswahl)", [13,15,24,27,39,40]],
   ["Schweizer Ufer (SBS)", [28,29,30,32,33,34,35,36,37,38]]
 ];
 function selectOptions(sel){var h="";for(var g=0;g<SELECT_GROUPS.length;g++){var grp=SELECT_GROUPS[g];h+='<optgroup label="'+grp[0]+'">';for(var j=0;j<grp[1].length;j++){var i=grp[1][j];h+='<option value="'+i+'"'+(i===sel?" selected":"")+'>'+PORTS[i]+'</option>';}h+='</optgroup>';}return h;}
