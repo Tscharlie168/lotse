@@ -2100,16 +2100,16 @@ function paintLand(){
   // Fahrplan: Verbindung von hier aus (mit Abfahrtszeiten) + landesweiter Planer
   document.getElementById('fahrRows').innerHTML = `
     <a class="row row-accent" href="javascript:void(0)" onclick="planRoute()" style="--acc:#4A78D8">
-      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 19 21 12 17 5 21 12 2z"/></svg></span>
       <div class="main"><b>Verbindung von hier aus</b><small>Ziel eingeben – zeigt die nächsten Abfahrten mit Bus &amp; Bahn</small></div>
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 19 21 12 17 5 21 12 2z"/></svg></span>
     </a>
     <a class="row row-accent" href="javascript:void(0)" onclick="nearStops()" style="--acc:#E07B1C">
-      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="10" rx="3"/><path d="M4 11h16"/><circle cx="8" cy="18" r="1.5"/><circle cx="16" cy="18" r="1.5"/></svg></span>
       <div class="main"><b>Abfahrten an Haltestelle</b><small>Nächste Station antippen – dann erscheinen die Abfahrtszeiten</small></div>
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="10" rx="3"/><path d="M4 11h16"/><circle cx="8" cy="18" r="1.5"/><circle cx="16" cy="18" r="1.5"/></svg></span>
     </a>` + L.fahr.map(f=>`
     <a class="row row-accent" href="${f.url}" target="_blank" rel="noopener" style="--acc:#1FA98C">
-      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 12h18" stroke-dasharray="2 3"/><circle cx="8" cy="9" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="15" r="1" fill="currentColor" stroke="none"/></svg></span>
       <div class="main"><b>${f.b}</b><small>${f.s} &amp; Tickets</small></div>
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 12h18" stroke-dasharray="2 3"/><circle cx="8" cy="9" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="15" r="1" fill="currentColor" stroke="none"/></svg></span>
     </a>`).join('');
 }
 /* ---------- Standort holen ---------- */
@@ -4464,7 +4464,7 @@ function renderGemeinschaft(){
       ic:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16"/><path d="M8 3v4M16 3v4"/>'}
   ];
   box.innerHTML=rows.map(function(r){
-    return '<a class="row row-accent" href="'+r.url+'" target="_blank" rel="noopener" style="--acc:'+r.acc+'"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+r.ic+'</svg></span><div class="main"><b>'+r.b+'</b><small>'+r.s+'</small></div></a>';
+    return '<a class="row row-accent" href="'+r.url+'" target="_blank" rel="noopener" style="--acc:'+r.acc+'"><div class="main"><b>'+r.b+'</b><small>'+r.s+'</small></div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+r.ic+'</svg></span></a>';
   }).join('');
 }
 /* ====================== Webcams (standortsortiert) ====================== */
@@ -4562,7 +4562,7 @@ function renderWebcams(){
     } else {
       var camIc='<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="3.2"/><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/></svg></span>';
       rows.innerHTML=liste.map(function(x){
-        return '<a class="row row-accent" href="'+x.w.url+'" target="_blank" rel="noopener" style="--acc:#C9469B">'+camIc+'<div class="main"><b>'+x.w.n+'</b><small>'+x.w.o+' \u00b7 '+webcamDistanz(x.m)+' entfernt</small></div></a>';
+        return '<a class="row row-accent" href="'+x.w.url+'" target="_blank" rel="noopener" style="--acc:#C9469B"><div class="main"><b>'+x.w.n+'</b><small>'+x.w.o+' \u00b7 '+webcamDistanz(x.m)+' entfernt</small></div>'+camIc+'</a>';
       }).join('');
     }
   }
@@ -4571,7 +4571,7 @@ function renderWebcams(){
     var portale=(WEBCAM_PORTALE_BY_LAND[STATE.land]||[]).concat(WEBCAM_PORTALE_GLOBAL);
     var camIc2='<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="3.2"/><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/></svg></span>';
     por.innerHTML=portale.map(function(p){
-      return '<a class="row row-accent" href="'+p.url+'" target="_blank" rel="noopener" style="--acc:#C9469B">'+camIc2+'<div class="main"><b>'+p.b+'</b><small>'+p.s+'</small></div></a>';
+      return '<a class="row row-accent" href="'+p.url+'" target="_blank" rel="noopener" style="--acc:#C9469B"><div class="main"><b>'+p.b+'</b><small>'+p.s+'</small></div>'+camIc2+'</a>';
     }).join('');
   }
 }
