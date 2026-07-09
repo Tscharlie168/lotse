@@ -165,13 +165,13 @@ select,input,button{font-family:inherit;}
 <script>
 "use strict";
 
-var PORTS = ["Konstanz", "Mainau", "Meersburg", "Hagnau", "Immenstaad", "Friedrichshafen", "Langenargen", "Kressbronn", "Nonnenhorn", "Wasserburg", "Lindau", "Bregenz", "Kreuzlingen", "Gottlieben", "Ermatingen", "Reichenau", "Mannenbach", "Berlingen", "Gaienhofen", "Steckborn", "Hemmenhofen", "Wangen", "Mammern", "Öhningen", "Stein am Rhein", "Diessenhofen/Gailingen", "Büsingen", "Schaffhausen", "Romanshorn", "Arbon", "Rorschach", "Horn", "Uttwil", "Altnau", "Bottighofen", "Güttingen", "Staad", "Altenrhein", "Rheineck", "Radolfzell", "Iznang"];
+var PORTS = ["Konstanz", "Mainau", "Meersburg", "Hagnau", "Immenstaad", "Friedrichshafen", "Langenargen", "Kressbronn", "Nonnenhorn", "Wasserburg", "Lindau", "Bregenz", "Kreuzlingen", "Gottlieben", "Ermatingen", "Reichenau", "Mannenbach", "Berlingen", "Gaienhofen", "Steckborn", "Hemmenhofen", "Wangen", "Mammern", "Öhningen", "Stein am Rhein", "Diessenhofen/Gailingen", "Büsingen", "Schaffhausen", "Romanshorn", "Arbon", "Rorschach", "Horn", "Uttwil", "Altnau", "Bottighofen", "Güttingen", "Staad", "Altenrhein", "Rheineck", "Radolfzell", "Iznang", "Unteruhldingen", "Dingelsdorf", "Überlingen"];
 // Index 31 (Horn) ist nur Zwischenstopp auf der SBS-Strecke Rorschach–Arbon,
 // wie die Untersee-Kleinstopps bewusst NICHT einzeln anwählbar (siehe SELECTABLE).
 // Indizes 28–30, 32–38 sind Schweizer SBS-Häfen (kein BSB/URh-Betrieb)
 var SBS_PORTS = [28, 29, 30, 32, 33, 34, 35, 36, 37, 38];
 // ungefähre Hafenkoordinaten [lat,lng] für die Standort-Erkennung
-var COORDS = [[47.659, 9.178], [47.705, 9.197], [47.694, 9.271], [47.685, 9.318], [47.677, 9.367], [47.651, 9.48], [47.598, 9.547], [47.586, 9.6], [47.583, 9.628], [47.56, 9.638], [47.545, 9.685], [47.504, 9.747], [47.6499, 9.1738], [47.662, 9.133], [47.672, 9.084], [47.6957, 9.0636], [47.687, 9.056], [47.692, 9.001], [47.692, 8.965], [47.666, 8.972], [47.69, 8.93], [47.687, 8.9], [47.65, 8.84], [47.663, 8.887], [47.66, 8.859], [47.69, 8.75], [47.697, 8.687], [47.696, 8.632], [47.565, 9.360], [47.514, 9.431], [47.478, 9.491], [47.494, 9.462], [47.583, 9.339], [47.586, 9.283], [47.616, 9.219], [47.599, 9.320], [47.473, 9.545], [47.487, 9.560], [47.462, 9.548], [47.741, 8.968], [47.727, 8.917]];
+var COORDS = [[47.659, 9.178], [47.705, 9.197], [47.694, 9.271], [47.685, 9.318], [47.677, 9.367], [47.651, 9.48], [47.598, 9.547], [47.586, 9.6], [47.583, 9.628], [47.56, 9.638], [47.545, 9.685], [47.504, 9.747], [47.6499, 9.1738], [47.662, 9.133], [47.672, 9.084], [47.6957, 9.0636], [47.687, 9.056], [47.692, 9.001], [47.692, 8.965], [47.666, 8.972], [47.69, 8.93], [47.687, 8.9], [47.65, 8.84], [47.663, 8.887], [47.66, 8.859], [47.69, 8.75], [47.697, 8.687], [47.696, 8.632], [47.565, 9.360], [47.514, 9.431], [47.478, 9.491], [47.494, 9.462], [47.583, 9.339], [47.586, 9.283], [47.616, 9.219], [47.599, 9.320], [47.473, 9.545], [47.487, 9.560], [47.462, 9.548], [47.741, 8.968], [47.727, 8.917], [47.653, 9.352], [47.723, 9.143], [47.769, 9.179]];
 function nearestPort(lat,lng){var best=-1,bd=Infinity;for(var i=0;i<COORDS.length;i++){var dlat=lat-COORDS[i][0],dlng=(lng-COORDS[i][1])*Math.cos(lat*Math.PI/180),d=dlat*dlat+dlng*dlng;if(d<bd){bd=d;best=i;}}return {idx:best,far:Math.sqrt(bd)>0.6};}
 function resolvePort(s){if(s==null)return -1;var t=String(s).trim();var num=parseInt(t,10);if(!isNaN(num)&&String(num)===t&&num>=0&&num<PORTS.length)return num;t=t.toLowerCase();for(var i=0;i<PORTS.length;i++){if(PORTS[i].toLowerCase()===t)return i;}return -1;}
 
@@ -192,7 +192,7 @@ var COURSES = [
   {"no":153,"svc":"snack","line":"obersee","stops":[[0, "15:15", "15:15"], [1, "15:55", "15:55"], [2, "16:15", "16:25"], [3, "16:40", "16:40"], [4, "16:55", "16:55"], [5, "17:25", "17:35"], [6, "18:00", "18:00"], [7, "18:20", "18:20"], [8, "18:30", "18:30"], [9, "18:40", "18:40"], [10, "19:00", "19:05"], [11, "19:27", "19:27"]]},
   {"no":135,"svc":"snack","line":"obersee","stops":[[0, "17:05", "17:05"], [1, "17:45", "17:45"], [2, "18:05", "18:15"], [3, "18:30", "18:30"], [4, "18:45", "18:45"], [5, "19:15", "19:15"]]},
   {"no":130,"svc":"snack","line":"obersee","stops":[[5, "9:10", "9:10"], [4, "9:40", "9:40"], [3, "9:55", "9:55"], [2, "10:10", "10:20"], [1, "10:40", "10:40"]]},
-  {"no":"4000e","svc":"snack","line":"obersee","stops":[[2, "10:20", "10:20"], [0, "11:05", "11:05"]]},
+  {"no":"4000e","svc":"snack","line":"obersee","stops":[[41, "9:20", "9:20"], [1, "9:35", "9:40"], [2, "10:10", "10:20"], [0, "11:05", "11:05"]]},
   {"no":150,"svc":"snack","line":"obersee","stops":[[11, "9:20", "9:20"], [10, "9:42", "9:50"], [9, "10:10", "10:10"], [8, "10:20", "10:20"], [7, "10:30", "10:30"], [6, "10:50", "10:50"], [5, "11:15", "11:25"], [4, "11:55", "11:55"], [3, "12:10", "12:10"], [2, "12:25", "12:35"], [1, "13:00", "13:00"], [0, "13:30", "13:30"]]},
   {"no":142,"svc":"restaurant","line":"obersee","stops":[[11, "10:25", "10:25"], [10, "10:47", "10:55"], [9, "11:15", "11:15"], [8, "11:25", "11:25"], [7, "11:35", "11:35"], [6, "11:55", "11:55"], [5, "12:20", "12:20"]]},
   {"no":132,"svc":"snack","line":"obersee","stops":[[5, "12:30", "12:30"], [4, "13:00", "13:00"], [3, "13:15", "13:15"], [2, "13:30", "13:40"], [0, "14:10", "14:10"]]},
@@ -288,7 +288,35 @@ var COURSES = [
   {"no":7206,"svc":"snack","line":"sbs-fr","stops":[[4,"15:40","15:40"],[3,"15:55","16:00"],[33,"16:20","16:25"],[35,"16:35","16:40"],[4,"17:05","17:05"]]},
   {"no":7207,"svc":"snack","line":"sbs-fr","stops":[[4,"17:10","17:10"],[3,"17:25","17:30"],[33,"17:50","17:55"],[35,"18:05","18:10"],[4,"18:35","18:35"]]},
   {"no":7208,"svc":"snack","line":"sbs-fr","stops":[[4,"18:40","18:40"],[3,"18:55","19:55"],[33,"20:15","20:20"],[35,"20:30","20:35"],[4,"21:00","21:00"]]},
-  {"no":7209,"svc":"snack","line":"sbs-fr","stops":[[4,"21:10","21:10"],[3,"21:25","21:30"],[33,"21:50","21:52"],[35,"22:02","22:04"],[28,"22:35","22:35"]]}
+  {"no":7209,"svc":"snack","line":"sbs-fr","stops":[[4,"21:10","21:10"],[3,"21:25","21:30"],[33,"21:50","21:52"],[35,"22:02","22:04"],[28,"22:35","22:35"]]},
+  // === Konstanz ↔ Überlingen, Quelle: VSU-Fahrplan 2026 S. 7, täglich Hauptsaison
+  // (line "obersee"), außer 461/462/463/464 (Fußnote 3, line "ueberlingen-fn3")
+  // und 416 (Fußnote 5, nicht am 8.8., siehe exception()) ===
+  // Konstanz → Überlingen
+  {"no":401,"svc":"restaurant","line":"obersee","stops":[[0,"8:20","8:20"],[2,"8:50","8:50"],[1,"9:20","9:20"],[42,"9:40","9:40"],[43,"9:55","9:55"]]},
+  {"no":411,"svc":"restaurant","line":"obersee","stops":[[0,"9:40","9:40"],[2,"10:10","10:20"],[1,"10:40","10:45"],[41,"10:55","10:55"],[42,"11:15","11:15"],[43,"11:30","11:30"]]},
+  {"no":"4001e","svc":"snack","line":"obersee","stops":[[0,"11:15","11:15"],[1,"11:50","11:55"],[41,"12:10","12:10"]]},
+  {"no":461,"svc":"snack","line":"ueberlingen-fn3","stops":[[2,"11:35","11:35"],[1,"11:55","12:05"],[41,"12:20","12:20"],[42,"12:40","12:40"],[43,"12:55","12:55"]]},
+  {"no":403,"svc":"restaurant","line":"obersee","stops":[[0,"12:15","12:15"],[2,"12:45","12:55"],[1,"13:15","13:20"],[41,"13:35","13:35"],[42,"13:55","13:55"],[43,"14:10","14:10"]]},
+  {"no":"4003e","svc":"snack","line":"obersee","stops":[[1,"13:40","13:40"],[41,"13:55","13:55"]]},
+  {"no":463,"svc":"snack","line":"ueberlingen-fn3","stops":[[2,"14:30","14:30"],[41,"14:50","14:50"]]},
+  {"no":413,"svc":"restaurant","line":"obersee","stops":[[0,"13:55","13:55"],[2,"14:25","14:35"],[1,"14:55","15:05"],[41,"15:20","15:20"],[42,"15:40","15:40"],[43,"15:55","15:55"]]},
+  {"no":"4005e","svc":"snack","line":"obersee","stops":[[1,"14:35","14:35"],[41,"14:50","14:50"]]},
+  {"no":"4007e","svc":"snack","line":"obersee","stops":[[1,"16:00","16:00"],[41,"16:15","16:15"]]},
+  {"no":405,"svc":"restaurant","line":"obersee","stops":[[0,"16:20","16:20"],[2,"16:50","17:00"],[1,"17:20","17:25"],[41,"17:40","17:40"],[42,"18:00","18:00"],[43,"18:15","18:15"]]},
+  {"no":415,"svc":"restaurant","line":"obersee","stops":[[0,"18:05","18:05"],[2,"18:35","18:45"],[1,"19:05","19:05"],[41,"19:15","19:15"],[43,"19:35","19:35"]]},
+  // Überlingen → Konstanz
+  {"no":402,"svc":"restaurant","line":"obersee","stops":[[43,"10:05","10:05"],[42,"10:15","10:15"],[41,"10:35","10:35"],[1,"10:50","11:00"],[2,"11:20","11:35"],[0,"12:05","12:05"]]},
+  {"no":412,"svc":"restaurant","line":"obersee","stops":[[43,"11:40","11:40"],[42,"11:55","11:55"],[41,"12:15","12:15"],[1,"12:30","12:40"],[2,"13:00","13:10"],[0,"13:40","13:40"]]},
+  {"no":"4002e","svc":"snack","line":"obersee","stops":[[1,"13:15","13:15"],[2,"13:30","13:30"]]},
+  {"no":462,"svc":"snack","line":"ueberlingen-fn3","stops":[[43,"13:10","13:10"],[42,"13:20","13:20"],[41,"13:40","13:40"],[1,"13:55","14:00"],[2,"14:20","14:20"]]},
+  {"no":"4004e","svc":"snack","line":"obersee","stops":[[41,"14:10","14:10"],[1,"14:25","14:25"]]},
+  {"no":404,"svc":"restaurant","line":"obersee","stops":[[43,"14:20","14:20"],[42,"14:30","14:30"],[41,"14:50","14:50"],[1,"15:05","15:10"],[2,"15:30","15:40"],[0,"16:10","16:10"]]},
+  {"no":464,"svc":"snack","line":"ueberlingen-fn3","stops":[[41,"14:55","14:55"],[1,"15:10","15:15"],[2,"15:35","15:40"]]},
+  {"no":"4006e","svc":"snack","line":"obersee","stops":[[41,"15:30","15:30"],[1,"15:45","15:45"]]},
+  {"no":414,"svc":"restaurant","line":"obersee","stops":[[43,"16:05","16:05"],[42,"16:15","16:15"],[41,"16:35","16:35"],[1,"16:50","16:55"],[2,"17:15","17:25"],[0,"17:55","17:55"]]},
+  {"no":406,"svc":"restaurant","line":"obersee","stops":[[43,"18:25","18:25"],[42,"18:35","18:35"],[41,"19:10","19:10"],[2,"19:30","19:35"],[0,"20:05","20:05"]]},
+  {"no":416,"svc":"restaurant","line":"obersee","stops":[[43,"19:40","19:40"],[42,"19:50","19:50"],[2,"20:30","20:30"],[0,"21:00","21:00"]]}
 ];
 
 var WEEKDAYS = ["So","Mo","Di","Mi","Do","Fr","Sa"];
@@ -312,6 +340,7 @@ function exception(no,fromIdx,toIdx,date){
   if(date==="2026-08-08"){
     if(no===153&&toIdx===11) return {warn:"Am 8.8.: Umstieg in Lindau"};
     if(no===150&&fromIdx>=10&&toIdx<10) return {warn:"Am 8.8.: Umstieg in Lindau"};
+    if(no===416) return {removed:true};
   }
   return {};
 }
@@ -366,6 +395,15 @@ function courseValidOn(c,dObj,dStr){
     if(dStr<"2026-06-27"||dStr>"2026-09-13") return false;
     var w2=dObj.getDay();
     return w2===0||w2>=3;
+  }
+  if(c.line==="ueberlingen-fn3"){
+    // Konstanz-Überlingen Kurse 461/462/463/464 (Fußnote 3):
+    // 14.5.-3.7. nur Sa/So+Feiertag, 4.7.-13.9. Do-So
+    var FEIERTAGE=["2026-05-14","2026-05-24","2026-05-25","2026-06-04","2026-08-01"];
+    if(dStr<"2026-05-14"||dStr>"2026-09-13") return false;
+    var w3=dObj.getDay();
+    if(dStr<="2026-07-03") return w3===0||w3===6||FEIERTAGE.indexOf(dStr)!==-1;
+    return w3===0||w3===4||w3===5||w3===6;
   }
   return true; // obersee + sbs: täglich Hauptsaison (auch Romanshorn-Kreuzlingen-Meersburg
   // und Rorschach-Rheineck, die laut PDF bis 4.10. fahren - deckt sich mit SAISON_MAX=13.9.)
@@ -447,9 +485,10 @@ function svcTag(svc){return svc==="restaurant"?'<span class="lg-tag lg-tag--rest
 
 // Nur die wählbaren Haupthäfen (kleine Untersee-Haltestellen sind ausgeblendet,
 // bleiben aber in COURSES für Umstiegsberechnungen erhalten)
-var SELECTABLE = [0,1,2,3,4,5,6,7,8,9,10,11, 13,15, 24, 27, 28,29,30, 32,33,34,35,36,37,38, 39,40];
+var SELECTABLE = [0,1,2,3,4,5,6,7,8,9,10,11, 13,15, 24, 27, 28,29,30, 32,33,34,35,36,37,38, 39,40, 41,42,43];
 var SELECT_GROUPS = [
   ["Obersee & Bregenz", [0,1,2,3,4,5,6,7,8,9,10,11]],
+  ["Überlinger See", [41,42,43]],
   ["Untersee (Auswahl)", [13,15,24,27,39,40]],
   ["Schweizer Ufer (SBS)", [28,29,30,32,33,34,35,36,37,38]]
 ];
