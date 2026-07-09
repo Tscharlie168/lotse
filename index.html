@@ -290,7 +290,6 @@
   .foto-act{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:-2px 0 14px}
   .foto-act button{background:#eef5f7;border:1px solid #cfe0e6;border-radius:10px;color:var(--sea);font-weight:700;font-size:.98rem;padding:10px 14px;cursor:pointer}
   .foto-act button:active{background:var(--tap)}
-  .foto-h{font-size:1.25rem;margin:2px 2px 12px;font-weight:800}
   .day-head{background:#eef5f7;color:var(--ink);border:1px solid #cfe0e6;border-radius:16px;padding:18px 20px;margin-bottom:14px}
   .day-head .dat{font-size:1.3rem;font-weight:800}
   .day-head .moon{margin-top:6px;color:var(--ink-soft);font-size:1.02rem}
@@ -301,8 +300,14 @@
   .tip h3{color:#2f6b3a}
   .brain{background:#f0eef8;border:1px solid #d6cfe9}
   .brain h3{color:#4a3c7a}
-  .horo{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 4px 12px rgba(15,38,48,.04)}
-  .horo h3{margin:0 0 10px;font-size:1.12rem}
+  .namenstag{background:#fdeef2;border:1px solid #f3cbd9}
+  .namenstag h3{color:#7a3050}
+  .mond{background:#eef0f3;border:1px solid #d2d7de}
+  .mond h3{color:#3a4650}
+  .gedicht{background:#fdf0e6;border:1px solid #f0d2b0}
+  .gedicht h3{color:#7a4a1e}
+  .horo{background:#eef1fb;border:1px solid #ccd4ef;border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 4px 12px rgba(15,38,48,.04)}
+  .horo h3{margin:0 0 10px;font-size:1.12rem;color:#35408f}
   .sign-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
   .sign{background:#f6f8f9;border:1px solid var(--line);border-radius:12px;padding:10px 4px;cursor:pointer;text-align:center;font-size:.95rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px}
   .sign:active{background:var(--tap)}
@@ -325,6 +330,8 @@
   .wx .d b{display:block;font-size:.92rem}
   .wx .d .de{font-size:1.5rem;margin:2px 0}
   .wx .d small{color:var(--ink-soft)}
+  #wxHere .wx{background:#eaf6fb;border-color:#bfe0ef}
+  #wxHere .wx h3{margin:0 0 10px;font-size:1.12rem;color:#1f5f7a}
 
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   button:focus-visible,.row:focus-visible,.tile:focus-visible{outline:3px solid var(--buoy);outline-offset:2px}
@@ -473,7 +480,6 @@ try{
         <div id="neuigkeitenText" style="font-size:0.97rem;line-height:1.5;color:#444"></div>
         <button onclick="neuigkeitenSchliessen()" aria-label="Schließen" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.4rem;color:#888;cursor:pointer;line-height:1">×</button>
       </div>
-      <h2 class="foto-h">Foto des Tages</h2>
       <div id="fotoTag"></div>
 
       <button class="daybar" onclick="go('heute')">
@@ -1459,20 +1465,17 @@ try{
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
       <h2>Mein Tag</h2>
       <div class="day-head" id="dayHead"></div>
-      <div class="card-info"><h3>📖 Namenstag heute</h3><p id="namenstag"></p><p style="margin:6px 0 0;font-size:.85rem;color:var(--ink-soft)">Nach altem Kalenderbrauch &ndash; regional teils verschieden.</p></div>
+      <div class="card-info namenstag"><h3>📖 Namenstag heute</h3><p id="namenstag"></p><p style="margin:6px 0 0;font-size:.85rem;color:var(--ink-soft)">Nach altem Kalenderbrauch &ndash; regional teils verschieden.</p></div>
       <div class="horo" id="horo"></div>
       <div class="card-info quote"><h3>✨ Spruch des Tages</h3><p id="spruch"></p></div>
       <div class="card-info tip"><h3>🌿 Gesundheitstipp des Tages</h3><p id="tip"></p></div>
       <div class="card-info brain"><h3>🧠 Kleine Gehirnjogging-Übung</h3><p id="brain"></p></div>
 
-      <h2 style="margin-top:22px">Wetter hier</h2>
       <div id="wxHere"></div>
 
-      <h2 style="margin-top:22px;font-size:1.25rem">Mond heute</h2>
       <div class="card-info mond" id="mondBox"></div>
 
-      <h2 style="margin-top:22px;font-size:1.25rem">Gedicht des Tages</h2>
-      <div class="card-info"><div id="gedicht"></div></div>
+      <div class="card-info gedicht"><div id="gedicht"></div></div>
     </section>
   </main>
 </div>
@@ -2679,6 +2682,7 @@ function renderMond(){
     vollTxt='N\u00e4chster Vollmond: '+fullStr+' (in '+tageBisVoll+' Tag'+(tageBisVoll===1?'':'en')+')';
   }
   box.innerHTML=
+    '<h3>🌙 Mond heute</h3>'+
     '<div class="mond-top"><span class="mond-emo">'+mp.emoji+'</span>'+
     '<div><div class="mond-name">'+mp.name+'</div>'+
     '<div class="mond-sub">'+(richtung?richtung+' \u00b7 ':'')+'zu '+mp.illum+' % beleuchtet</div></div></div>'+
@@ -2793,7 +2797,7 @@ function renderHoro(){
   const box = document.getElementById('horo');
   const saved = getSign();
   if(saved===null || saved==='' || isNaN(saved)){
-    box.innerHTML = `<h3>Tageshoroskop – Ihr Sternzeichen wählen</h3><div class="sign-grid">` +
+    box.innerHTML = `<h3>🔮 Tageshoroskop – Ihr Sternzeichen wählen</h3><div class="sign-grid">` +
       SIGNS.map((s,i)=>`<button class="sign" onclick="chooseSign(${i})"><span class="sym">${s.sym}</span>${s.n}<small>${s.d}</small></button>`).join('') +
       `</div>`;
     return;
@@ -2801,7 +2805,7 @@ function renderHoro(){
   const i = parseInt(saved,10);
   const s = SIGNS[i];
   const doy = tagDesJahres(new Date());
-  box.innerHTML = `<div class="horo-card">
+  box.innerHTML = `<h3>🔮 Tageshoroskop</h3><div class="horo-card">
     <div class="top"><span class="sym">${s.sym}</span><div><b>${s.n}</b><small>${s.d}</small></div></div>
     <p>${horoText(i, doy)}</p>
     <button class="change" onclick="clearSign()">Anderes Sternzeichen wählen</button>
@@ -2860,7 +2864,8 @@ function renderGedicht(){
   const jz=jahreszeit(new Date().getMonth());
   const pool=GEDICHTE.filter(g=>!g.jz || g.jz===jz);
   const g=pool[tagDesJahres(new Date()) % pool.length];
-  box.innerHTML='<p class="gedicht-titel">'+lotseEsc(g.t)+'</p>'+
+  box.innerHTML='<h3>📜 Gedicht des Tages</h3>'+
+    '<p class="gedicht-titel">'+lotseEsc(g.t)+'</p>'+
     '<p class="gedicht-text">'+lotseEsc(g.v)+'</p>'+
     '<p class="gedicht-autor">'+lotseEsc(g.a)+'</p>';
 }
@@ -2925,6 +2930,7 @@ async function renderWx(box, lat, lon, label, isHome){
       daysHtml += `<div class="d"><b>${wd}</b><div class="de">${e}</div><small>${Math.round(dl.temperature_2m_min[i])}° / ${Math.round(dl.temperature_2m_max[i])}°</small></div>`;
     }
     box.innerHTML = `<div class="wx">
+      ${isHome ? '<h3>🌤️ Wetter hier</h3>' : ''}
       <p class="ort">${label}</p>
       <div class="now"><span class="e">${ce}</span><span class="t">${Math.round(cur.temperature_2m)}°</span><span style="color:var(--ink-soft)">${ct}</span></div>
       <p class="meta">Regenwahrscheinlichkeit heute: ${dl.precipitation_probability_max[0] ?? 0}%</p>
