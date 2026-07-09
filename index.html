@@ -148,8 +148,6 @@
   .row .main b{display:block;font-size:1.1rem;font-weight:700}
   .row .main small{color:var(--ink-soft);font-size:.92rem}
   .row .go{color:var(--sea);font-weight:800;font-size:.95rem;white-space:nowrap}
-  .row .ic-right{flex:0 0 auto;width:34px;height:26px;margin-left:10px;display:flex;align-items:center;justify-content:center}
-  .row .ic-right svg{width:100%;height:100%}
 
   .call{background:var(--alarm);border-color:var(--alarm-dark);color:#fff}
   .call:active{background:var(--alarm-dark)}
@@ -158,6 +156,10 @@
   .call.soft{background:var(--card);color:var(--ink);border-color:var(--line)}
   .call.soft .num{color:var(--sea);font-size:1.4rem}
   .call.soft .main small{color:var(--ink-soft)}
+  /* Auto unterwegs: eigener Akzent für die Pannenhilfe-Zeilen, per ID
+     beschränkt auf #panneNums, damit Notruf (gleiche .call.soft-Klasse
+     bei "weichen" Nummern) unberührt bleibt. */
+  #panneNums .call.soft{border-left:5px solid #5C6B84}
 
   .note{background:#fff7ec;border:1px solid #f0d9b6;border-radius:12px;padding:14px 16px;font-size:.95rem;color:#6b4b1e;margin:14px 0}
   .card-info{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
@@ -1411,11 +1413,13 @@ try{
 
       <h2 style="margin-top:24px">Mehr gesunde Rezepte</h2>
       <div class="rows">
-        <a class="row" href="https://eatsmarter.de/experten/dr-med-matthias-riedl" target="_blank" rel="noopener">
-          <div class="main"><b>Dr. Matthias Riedl (Ernährungs-Docs)</b><small>Ausführliche, gesunde Rezepte zum Nachkochen</small></div><div class="go">Öffnen ›</div>
+        <a class="row row-accent" href="https://eatsmarter.de/experten/dr-med-matthias-riedl" target="_blank" rel="noopener" style="--acc:#D97A2E">
+          <div class="main"><b>Dr. Matthias Riedl (Ernährungs-Docs)</b><small>Ausführliche, gesunde Rezepte zum Nachkochen</small></div>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
         </a>
-        <a class="row" href="https://ernaehrungsdoc-matthias-riedl.com/" target="_blank" rel="noopener">
-          <div class="main"><b>Dr. Riedl – offizielle Seite</b><small>Tipps & Wissen rund um gesunde Ernährung</small></div><div class="go">Öffnen ›</div>
+        <a class="row row-accent" href="https://ernaehrungsdoc-matthias-riedl.com/" target="_blank" rel="noopener" style="--acc:#B5541F">
+          <div class="main"><b>Dr. Riedl – offizielle Seite</b><small>Tipps & Wissen rund um gesunde Ernährung</small></div>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M2 11h18"/><path d="M11 2a15 15 0 0 1 4 9 15 15 0 0 1-4 9 15 15 0 0 1-4-9 15 15 0 0 1 4-9z"/></svg></span>
         </a>
       </div>
       <div class="note" style="margin-top:16px"><b>Ans Trinken denken.</b> Über den Tag verteilt etwa 1,5 Liter – Wasser, ungesüßter Tee oder Schorle. Ein gefülltes Glas in Sichtweite erinnert von selbst.</div>
@@ -2113,8 +2117,9 @@ function paintLand(){
       <a class="row call soft" href="tel:${n.num.replace(/\s/g,'')}">
         <div class="main"><b>${n.label}</b></div><div class="num">${n.num}</div>
       </a>`).join('') + (L.panneInfo ? `
-      <a class="row" href="${L.panneInfo.url}" target="_blank" rel="noopener">
-        <div class="main"><b>${L.panneInfo.club} – Hilfe online anfordern</b><small>Per App oder Internet, mit Standort</small></div><div class="go">Öffnen ›</div>
+      <a class="row row-accent" href="${L.panneInfo.url}" target="_blank" rel="noopener" style="--acc:#5C6B84">
+        <div class="main"><b>${L.panneInfo.club} – Hilfe online anfordern</b><small>Per App oder Internet, mit Standort</small></div>
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
       </a>` : '');
   }
   // Fahrplan: Verbindung von hier aus (mit Abfahrtszeiten) + landesweiter Planer
@@ -2722,37 +2727,64 @@ function wxText(code){
   return m[code] || ["",""];
 }
 const SIGNS = [
-  {n:"Widder",      sym:"♈", d:"21.3.–20.4.", t:["Heute steckt frischer Schwung in Ihnen.","Ihr Mut bringt heute etwas ins Rollen.","Sie packen heute an, was andere noch überlegen.","Ein Vorhaben, das Sie schon länger begleitet, kommt heute voran.","Ihre Tatkraft ist heute ansteckend.","Gehen Sie heute mit Zuversicht in den Tag – sie trägt Sie weit.","Heute ist ein guter Tag, um den ersten Schritt zu wagen."]},
-  {n:"Stier",       sym:"♉", d:"21.4.–20.5.", t:["Ihre Ruhe ist heute Ihre größte Stärke.","Heute genießen Sie die schönen Dinge mit allen Sinnen.","Beständigkeit zahlt sich heute aus.","Ein ruhiger Moment gehört heute unbedingt dazu.","Ihre Verlässlichkeit wird von anderen heute besonders geschätzt.","Heute darf es auch einmal etwas Schönes für Sie selbst sein.","Was Sie sich einmal vornehmen, halten Sie durch – heute mehr denn je."]},
-  {n:"Zwillinge",   sym:"♊", d:"21.5.–21.6.", t:["Heute sind Sie ein gern gehörter Gesprächspartner.","Ihre Neugier öffnet heute eine schöne Tür.","Ein guter Einfall begleitet Sie durch den Tag.","Heute kommen die besten Ideen oft im Gespräch.","Ihre Vielseitigkeit ist heute genau das Richtige.","Bleiben Sie offen – heute wartet vielleicht eine angenehme Überraschung.","Ihre Leichtigkeit im Umgang mit anderen ist heute ein echtes Geschenk."]},
-  {n:"Krebs",       sym:"♋", d:"22.6.–22.7.", t:["Ihr Gespür für andere wird heute geschätzt.","Heute tut Ihnen ein vertrautes Umfeld besonders gut.","Ihre Herzlichkeit wärmt heute auch andere.","Ein kurzer Rückzug lädt Sie heute auf.","Ihrer Feinfühligkeit können Sie heute voll vertrauen.","Etwas, das Ihnen am Herzen liegt, rückt heute näher.","Heute ist ein guter Tag für ein offenes, herzliches Gespräch."]},
-  {n:"Löwe",        sym:"♌", d:"23.7.–23.8.", t:["Ihre herzliche Art öffnet heute Türen.","Heute dürfen Sie ruhig im Mittelpunkt stehen.","Ihre gute Laune steckt heute andere an.","Heute strahlen Sie eine Wärme aus, die andere anzieht.","Ihr natürlicher Charme wirkt heute besonders.","Vertrauen Sie auf Ihre Stärke – sie trägt Sie heute weit.","Großzügigkeit kommt Ihnen heute leicht – und kommt gut an."]},
-  {n:"Jungfrau",    sym:"♍", d:"24.8.–23.9.", t:["Heute gelingt Ihnen, was Sie sorgfältig angehen.","Ihr Blick fürs Wesentliche hilft Ihnen heute.","Eine kleine Ordnung schafft heute große Erleichterung.","Ihre Sorgfalt zahlt sich heute aus.","Heute lösen Sie auch knifflige Dinge mit Ruhe und Bedacht.","Ihr guter Überblick ist heute gefragter denn je.","Vertrauen Sie heute Ihrem klaren Kopf."]},
-  {n:"Waage",       sym:"♎", d:"24.9.–23.10.", t:["Heute finden Sie leicht das rechte Maß.","Ihr Sinn für Harmonie tut heute allen gut.","Ein freundlicher Ausgleich gelingt Ihnen heute mühelos.","Ihre ausgleichende Art ist heute besonders wertvoll.","Heute kommt Schönheit und Leichtigkeit in Ihren Alltag.","Ihr Taktgefühl ist heute ein echtes Talent.","Wo andere streiten, finden Sie heute einen guten Mittelweg."]},
-  {n:"Skorpion",    sym:"♏", d:"24.10.–22.11.", t:["Ihre innere Kraft trägt Sie heute weit.","Heute vertrauen Sie zu Recht auf Ihr Gespür.","Was Sie heute beginnen, gehen Sie mit ganzem Herzen an.","Ihre Tiefe und Ihr Gespür öffnen heute eine besondere Tür.","Heute lohnt es sich, auf Ihre innere Stimme zu hören.","Was andere übersehen, entgeht Ihnen nicht.","Ihre Entschlossenheit macht heute den Unterschied."]},
-  {n:"Schütze",     sym:"♐", d:"23.11.–21.12.", t:["Heute lockt die Lust auf etwas Neues.","Ihr Optimismus ist heute ansteckend.","Ein Blick über den Tellerrand bringt heute Freude.","Ihre Begeisterung reißt heute andere mit.","Heute ist ein guter Tag für einen kleinen Ausflug im Kopf oder in der Wirklichkeit.","Frische Eindrücke tun Ihnen heute gut.","Ihr Weitblick ist heute Ihre besondere Stärke."]},
-  {n:"Steinbock",   sym:"♑", d:"22.12.–20.1.", t:["Heute kommen Sie mit Geduld gut voran.","Ihre Verlässlichkeit wird heute bemerkt.","Schritt für Schritt erreichen Sie heute Ihr Ziel.","Ausdauer ist heute Ihre stärkste Karte.","Ihr ruhiges Vorgehen macht sich heute bezahlt.","Heute ist ein guter Tag für alles, was Planung und Umsicht braucht.","Ihre Bodenständigkeit gibt anderen heute Halt."]},
-  {n:"Wassermann",  sym:"♒", d:"21.1.–19.2.", t:["Eine gute Idee begleitet Sie heute.","Heute dürfen Sie ruhig eigene Wege gehen.","Ihre Offenheit bringt heute schöne Begegnungen.","Ihr frischer Blick auf die Dinge überrascht heute angenehm.","Heute darf es ruhig auch mal ungewöhnlich sein.","Ihre Unabhängigkeit ist heute eine echte Stärke.","Manchmal denken Sie einfach weiter als andere – heute besonders."]},
-  {n:"Fische",      sym:"♓", d:"20.2.–20.3.", t:["Ihr Einfühlungsvermögen ist heute ein Geschenk.","Heute tut Ihnen ein ruhiger Moment besonders gut.","Ihre Fantasie schenkt Ihnen heute schöne Augenblicke.","Heute spüren Sie feiner als andere, was gebraucht wird.","Lassen Sie sich heute von etwas Schönem bewegen.","Ihre Sensibilität ist heute eine Stärke, kein Makel.","Manchmal genügt ein stilles Lächeln – und Sie wissen, wann."]}
+  {n:"Widder",      sym:"♈", d:"21.3.–20.4.", el:"feuer", t:["Heute steckt frischer Schwung in Ihnen.","Ihr Mut bringt heute etwas ins Rollen.","Sie packen heute an, was andere noch überlegen.","Ein Vorhaben, das Sie schon länger begleitet, kommt heute voran.","Ihre Tatkraft ist heute ansteckend.","Gehen Sie heute mit Zuversicht in den Tag – sie trägt Sie weit.","Heute ist ein guter Tag, um den ersten Schritt zu wagen."]},
+  {n:"Stier",       sym:"♉", d:"21.4.–20.5.", el:"erde", t:["Ihre Ruhe ist heute Ihre größte Stärke.","Heute genießen Sie die schönen Dinge mit allen Sinnen.","Beständigkeit zahlt sich heute aus.","Ein ruhiger Moment gehört heute unbedingt dazu.","Ihre Verlässlichkeit wird von anderen heute besonders geschätzt.","Heute darf es auch einmal etwas Schönes für Sie selbst sein.","Was Sie sich einmal vornehmen, halten Sie durch – heute mehr denn je."]},
+  {n:"Zwillinge",   sym:"♊", d:"21.5.–21.6.", el:"luft", t:["Heute sind Sie ein gern gehörter Gesprächspartner.","Ihre Neugier öffnet heute eine schöne Tür.","Ein guter Einfall begleitet Sie durch den Tag.","Heute kommen die besten Ideen oft im Gespräch.","Ihre Vielseitigkeit ist heute genau das Richtige.","Bleiben Sie offen – heute wartet vielleicht eine angenehme Überraschung.","Ihre Leichtigkeit im Umgang mit anderen ist heute ein echtes Geschenk."]},
+  {n:"Krebs",       sym:"♋", d:"22.6.–22.7.", el:"wasser", t:["Ihr Gespür für andere wird heute geschätzt.","Heute tut Ihnen ein vertrautes Umfeld besonders gut.","Ihre Herzlichkeit wärmt heute auch andere.","Ein kurzer Rückzug lädt Sie heute auf.","Ihrer Feinfühligkeit können Sie heute voll vertrauen.","Etwas, das Ihnen am Herzen liegt, rückt heute näher.","Heute ist ein guter Tag für ein offenes, herzliches Gespräch."]},
+  {n:"Löwe",        sym:"♌", d:"23.7.–23.8.", el:"feuer", t:["Ihre herzliche Art öffnet heute Türen.","Heute dürfen Sie ruhig im Mittelpunkt stehen.","Ihre gute Laune steckt heute andere an.","Heute strahlen Sie eine Wärme aus, die andere anzieht.","Ihr natürlicher Charme wirkt heute besonders.","Vertrauen Sie auf Ihre Stärke – sie trägt Sie heute weit.","Großzügigkeit kommt Ihnen heute leicht – und kommt gut an."]},
+  {n:"Jungfrau",    sym:"♍", d:"24.8.–23.9.", el:"erde", t:["Heute gelingt Ihnen, was Sie sorgfältig angehen.","Ihr Blick fürs Wesentliche hilft Ihnen heute.","Eine kleine Ordnung schafft heute große Erleichterung.","Ihre Sorgfalt zahlt sich heute aus.","Heute lösen Sie auch knifflige Dinge mit Ruhe und Bedacht.","Ihr guter Überblick ist heute gefragter denn je.","Vertrauen Sie heute Ihrem klaren Kopf."]},
+  {n:"Waage",       sym:"♎", d:"24.9.–23.10.", el:"luft", t:["Heute finden Sie leicht das rechte Maß.","Ihr Sinn für Harmonie tut heute allen gut.","Ein freundlicher Ausgleich gelingt Ihnen heute mühelos.","Ihre ausgleichende Art ist heute besonders wertvoll.","Heute kommt Schönheit und Leichtigkeit in Ihren Alltag.","Ihr Taktgefühl ist heute ein echtes Talent.","Wo andere streiten, finden Sie heute einen guten Mittelweg."]},
+  {n:"Skorpion",    sym:"♏", d:"24.10.–22.11.", el:"wasser", t:["Ihre innere Kraft trägt Sie heute weit.","Heute vertrauen Sie zu Recht auf Ihr Gespür.","Was Sie heute beginnen, gehen Sie mit ganzem Herzen an.","Ihre Tiefe und Ihr Gespür öffnen heute eine besondere Tür.","Heute lohnt es sich, auf Ihre innere Stimme zu hören.","Was andere übersehen, entgeht Ihnen nicht.","Ihre Entschlossenheit macht heute den Unterschied."]},
+  {n:"Schütze",     sym:"♐", d:"23.11.–21.12.", el:"feuer", t:["Heute lockt die Lust auf etwas Neues.","Ihr Optimismus ist heute ansteckend.","Ein Blick über den Tellerrand bringt heute Freude.","Ihre Begeisterung reißt heute andere mit.","Heute ist ein guter Tag für einen kleinen Ausflug im Kopf oder in der Wirklichkeit.","Frische Eindrücke tun Ihnen heute gut.","Ihr Weitblick ist heute Ihre besondere Stärke."]},
+  {n:"Steinbock",   sym:"♑", d:"22.12.–20.1.", el:"erde", t:["Heute kommen Sie mit Geduld gut voran.","Ihre Verlässlichkeit wird heute bemerkt.","Schritt für Schritt erreichen Sie heute Ihr Ziel.","Ausdauer ist heute Ihre stärkste Karte.","Ihr ruhiges Vorgehen macht sich heute bezahlt.","Heute ist ein guter Tag für alles, was Planung und Umsicht braucht.","Ihre Bodenständigkeit gibt anderen heute Halt."]},
+  {n:"Wassermann",  sym:"♒", d:"21.1.–19.2.", el:"luft", t:["Eine gute Idee begleitet Sie heute.","Heute dürfen Sie ruhig eigene Wege gehen.","Ihre Offenheit bringt heute schöne Begegnungen.","Ihr frischer Blick auf die Dinge überrascht heute angenehm.","Heute darf es ruhig auch mal ungewöhnlich sein.","Ihre Unabhängigkeit ist heute eine echte Stärke.","Manchmal denken Sie einfach weiter als andere – heute besonders."]},
+  {n:"Fische",      sym:"♓", d:"20.2.–20.3.", el:"wasser", t:["Ihr Einfühlungsvermögen ist heute ein Geschenk.","Heute tut Ihnen ein ruhiger Moment besonders gut.","Ihre Fantasie schenkt Ihnen heute schöne Augenblicke.","Heute spüren Sie feiner als andere, was gebraucht wird.","Lassen Sie sich heute von etwas Schönem bewegen.","Ihre Sensibilität ist heute eine Stärke, kein Makel.","Manchmal genügt ein stilles Lächeln – und Sie wissen, wann."]}
 ];
-const HORO_IMPULS = [
-  "Heute liegt etwas Gutes in der Luft – halten Sie die Augen offen.",
-  "Ein Lächeln zur rechten Zeit öffnet heute manche Tür.",
-  "Vertrauen Sie auf Ihr gutes Gespür.",
-  "Kleine Freuden zählen heute doppelt.",
-  "Sie haben mehr Kraft, als Sie gerade glauben.",
-  "Heute ist ein guter Tag, um Danke zu sagen.",
-  "Geduld zahlt sich heute aus.",
-  "Lassen Sie sich von Kleinigkeiten nicht aus der Ruhe bringen.",
-  "Heute darf etwas leichter gehen als gedacht.",
-  "Ihre Gelassenheit ist heute Ihre stille Stärke.",
-  "Ein Anruf oder ein Wiedersehen bringt heute Freude.",
-  "Heute lohnt es sich, neugierig zu bleiben.",
-  "Etwas lange Aufgeschobenes gelingt heute leicht.",
-  "Die Sonne meint es heute gut mit Ihnen – innen wie außen.",
-  "Heute ist ein Tag zum Genießen, nicht zum Hetzen.",
-  "Ein gutes Wort von Ihnen wirkt heute Wunder."
-];
+/* Impuls-Sätze nach Element statt einem einzigen Topf für alle 12 Zeichen –
+   so klingt z. B. ein Wasserzeichen (gefühlvoll) spürbar anders als ein
+   Feuerzeichen (energiegeladen), auch im zweiten Satz des Horoskops. */
+const HORO_IMPULS = {
+  feuer:[
+    "Ihre Energie heute steckt andere an – nutzen Sie den Schwung.",
+    "Ein mutiger erster Schritt bringt heute mehr als langes Abwägen.",
+    "Heute darf es ruhig etwas lebendiger zugehen als sonst.",
+    "Ihre Begeisterung ist heute ansteckend – lassen Sie sie wirken.",
+    "Vertrauen Sie heute auf Ihren ersten Impuls.",
+    "Ein spontaner Ausflug oder Anruf bringt heute frischen Wind.",
+    "Ihre Offenheit öffnet heute manche Tür, die sonst verschlossen bliebe.",
+    "Heute ist ein guter Tag, um einfach anzufangen, statt lange zu planen."
+  ],
+  erde:[
+    "Schritt für Schritt kommen Sie heute sicher ans Ziel.",
+    "Ihre Verlässlichkeit wird heute von anderen besonders geschätzt.",
+    "Heute zahlt sich Geduld mehr aus als Eile.",
+    "Ein vertrauter, ruhiger Ablauf tut Ihnen heute gut.",
+    "Ihre Bodenständigkeit gibt heute auch anderen Halt.",
+    "Was Sie heute sorgfältig angehen, gelingt Ihnen gut.",
+    "Heute ist ein guter Tag, um etwas Angefangenes fertig zu machen.",
+    "Beständigkeit ist heute Ihre stille Stärke."
+  ],
+  luft:[
+    "Ein gutes Gespräch bringt heute mehr als erwartet.",
+    "Ihre Neugier führt Sie heute auf eine interessante Spur.",
+    "Heute kommen die besten Ideen im Austausch mit anderen.",
+    "Ihr Gespür für Ausgleich ist heute besonders gefragt.",
+    "Ein Anruf oder Brief an einen guten Bekannten tut heute gut.",
+    "Heute lohnt sich ein Blick über den gewohnten Tellerrand.",
+    "Ihre Leichtigkeit im Umgang mit anderen ist heute ein Geschenk.",
+    "Ein neuer Gedanke begleitet Sie heute den ganzen Tag."
+  ],
+  wasser:[
+    "Ihr Gespür für andere wird heute besonders geschätzt.",
+    "Ein ruhiger, vertrauter Moment tut Ihnen heute gut.",
+    "Vertrauen Sie heute auf Ihre innere Stimme.",
+    "Ihre Herzlichkeit wärmt heute auch andere.",
+    "Heute ist ein guter Tag für ein offenes, ehrliches Gespräch.",
+    "Ihre Fantasie schenkt Ihnen heute einen schönen Moment.",
+    "Was Ihnen am Herzen liegt, rückt heute ein Stück näher.",
+    "Ihre Feinfühligkeit ist heute eine echte Stärke."
+  ]
+};
 /* Konkreter Tagestipp im Horoskop – nach Jahreszeit getrennt, damit der
    Vorschlag immer zur aktuellen Zeit passt. Die neutralen Impulse (HORO_IMPULS)
    und die Sternzeichen-Eigenschaften bleiben ganzjährig. */
@@ -2801,9 +2833,10 @@ const HORO_TIPP_SAISON = {
 function horoText(idx, doy){
   const s = SIGNS[idx];
   const trait = s.t[doy % s.t.length];
-  const imp = HORO_IMPULS[(doy*3 + idx) % HORO_IMPULS.length];
+  const impPool = HORO_IMPULS[s.el];
+  const imp = impPool[(doy*3 + idx) % impPool.length];
   const tips = HORO_TIPP_SAISON[jahreszeit(new Date().getMonth())];
-  const tip = tips[(doy*7 + idx*2) % tips.length];
+  const tip = tips[(doy*7 + idx) % tips.length];
   return trait + " " + imp + " " + tip;
 }
 let signMem = null;
@@ -4609,9 +4642,14 @@ function betrugSuche(){
 function paintBetrug(){
   renderVertraut();
   var L=LAENDER[STATE.land], stellen=(L && L.betrug) || [];
-  var arrow='<span class="ic-right"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg></span>';
-  document.getElementById('betrugStellen').innerHTML=stellen.map(function(s){
-    return '<a class="row" href="'+s.url+'" target="_blank" rel="noopener"><div class="main"><b>'+s.b+'</b><small>'+s.s+'</small></div>'+arrow+'</a>';
+  var STELLEN_ICONS=[
+    {acc:'#1FA98C', svg:'<path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/><path d="m9 12 2 2 4-4"/>'},
+    {acc:'#4A78D8', svg:'<path d="M12 2l2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.6 5-.7z"/>'},
+    {acc:'#8B5CD6', svg:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 0 1 4.7 1.1c0 1.6-2.2 2-2.2 3.2"/><path d="M12 17h.01"/>'}
+  ];
+  document.getElementById('betrugStellen').innerHTML=stellen.map(function(s,i){
+    var ic=STELLEN_ICONS[i%STELLEN_ICONS.length];
+    return '<a class="row row-accent" href="'+s.url+'" target="_blank" rel="noopener" style="--acc:'+ic.acc+'"><div class="main"><b>'+s.b+'</b><small>'+s.s+'</small></div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+ic.svg+'</svg></span></a>';
   }).join('')+'<div class="note" style="margin-top:10px">Angezeigt f\u00fcr '+(L?L.name:'')+'. Das Land stellt sich automatisch nach Ihrem Standort ein.</div>';
 }
 
