@@ -2512,7 +2512,7 @@ function renderNear(used, items, cat, stepIdx){
   const expandBtn = naechsteStufe ? `<button class="big-btn" style="margin-top:14px" onclick="findNear('${cat}',${stepIdx+1})">Suchradius auf ca. ${Math.round(naechsteStufe/1000)} km vergrößern</button>` : '';
   document.getElementById('resBody').innerHTML = hint + `<div class="rows">`+items.map(i=>`
     <a class="row" href="https://www.google.com/maps/dir/?api=1&destination=${i.la},${i.lo}" target="_blank" rel="noopener">
-      <div class="main"><b>${i.name}</b><small>${i.m<1000 ? i.m+' m entfernt' : (i.m<10000 ? (i.m/1000).toFixed(1).replace('.',',')+' km entfernt' : 'ca. '+Math.round(i.m/1000)+' km entfernt')}</small></div>
+      <div class="main"><b>${i.name}</b><small>${i.brand ? i.brand+' · ' : ''}${i.m<1000 ? i.m+' m entfernt' : (i.m<10000 ? (i.m/1000).toFixed(1).replace('.',',')+' km entfernt' : 'ca. '+Math.round(i.m/1000)+' km entfernt')}</small></div>
       <div class="go">Weg zeigen ›</div>
     </a>`).join('')+`</div>` + expandBtn;
 }
@@ -2569,7 +2569,8 @@ async function findNear(cat, stepArg){
       items = d.elements.map(el=>{
         const la = el.lat ?? el.center?.lat, lo = el.lon ?? el.center?.lon;
         if(la==null) return null;
-        return {name:(el.tags && el.tags.name) || c.n, la, lo, m:dist(la,lo)};
+        const brand = el.tags && el.tags.brand ? el.tags.brand.replace(/;/g, ', ') : null;
+        return {name:(el.tags && el.tags.name) || c.n, brand, la, lo, m:dist(la,lo)};
       }).filter(Boolean).sort((a,b)=>a.m-b.m).slice(0,12);
       if(items.length) break;   // gefunden – nicht weiter aufdrehen
     }
