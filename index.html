@@ -538,9 +538,14 @@ try{
           <span class="lbl">Fahrplan &amp; Bus</span>
         </button>
 
-        <button class="tile home-tile" onclick="go('motorrad')" style="--acc:#4A4A57">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M7.5 15.3c1.3-3 3.1-4.6 5.1-4.6c2 0 3.3 1.1 3.9 2.9l2 4"/><path d="M16.6 11.2l2.8-1.9"/></svg></span>
-          <span class="lbl">Motorrad</span>
+        <button class="tile home-tile" onclick="go('webcams')" style="--acc:#C9469B">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="3.2"/><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/></svg></span>
+          <span class="lbl">Webcams</span>
+        </button>
+
+        <button class="tile home-tile" onclick="go('outdoor')" style="--acc:#2E7D5B">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19l5-8 3 4.5L15 8l6 11z"/><circle cx="18" cy="5.5" r="1.5"/></svg></span>
+          <span class="lbl">Outdoor</span>
         </button>
 
         <button class="tile home-tile" onclick="go('fahrrad')" style="--acc:#3CA35A">
@@ -553,6 +558,11 @@ try{
           <span class="lbl">Auto unterwegs</span>
         </button>
 
+        <button class="tile home-tile" onclick="go('motorrad')" style="--acc:#4A4A57">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M7.5 15.3c1.3-3 3.1-4.6 5.1-4.6c2 0 3.3 1.1 3.9 2.9l2 4"/><path d="M16.6 11.2l2.8-1.9"/></svg></span>
+          <span class="lbl">Motorrad</span>
+        </button>
+
         <button class="tile home-tile" onclick="go('gemeinschaft')" style="--acc:#E8825C">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M15 14.2a4.5 4.5 0 0 1 5.5 4.3"/></svg></span>
           <span class="lbl">Gemeinschaft</span>
@@ -561,11 +571,6 @@ try{
         <button class="tile home-tile" onclick="go('unterhaltung')" style="--acc:#D6467F">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01"/><path d="M8.5 14.5a4 4 0 0 0 7 0"/></svg></span>
           <span class="lbl">Unterhaltung</span>
-        </button>
-
-        <button class="tile home-tile" onclick="go('webcams')" style="--acc:#C9469B">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="3.2"/><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/></svg></span>
-          <span class="lbl">Webcams</span>
         </button>
 
         <button class="tile home-tile" onclick="go('kochen')" style="--acc:#D97A2E">
@@ -1489,6 +1494,42 @@ try{
       <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
     </section>
 
+    <!-- OUTDOOR & NATUR -->
+    <section class="view" id="v-outdoor">
+      <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
+      <p style="color:var(--ink-soft);margin:0 0 14px">Aussicht genießen, rasten, die Natur entdecken – hier finden Sie Ziele in Ihrer Nähe.</p>
+
+      <h2 style="margin-top:6px;font-size:1.25rem">In der Nähe</h2>
+      <div class="cats">
+        <button class="cat cat-accent" style="--acc:#4FA8D8" onclick="findNear('aussicht','outdoor')"><span style="font-size:1.7rem">🔭</span>Aussichtspunkt</button>
+        <button class="cat cat-accent" style="--acc:#B5541F" onclick="findNear('rastplatz','outdoor')"><span style="font-size:1.7rem">🧺</span>Rastplatz</button>
+        <button class="cat cat-accent" style="--acc:#3CA35A" onclick="findNear('naturschutz','outdoor')"><span style="font-size:1.7rem">🌿</span>Naturschutzgebiet</button>
+      </div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Empfohlene Apps</h2>
+      <div class="rows">
+        <a class="row row-accent" href="https://www.peakfinder.com/" target="_blank" rel="noopener" style="--acc:#7A5CC9">
+          <div class="main"><b>PeakFinder</b><small>Gipfel und Berge erkennen</small></div>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19l5-9 3.5 5L15 8l6 11z"/></svg></span>
+        </a>
+        <a class="row row-accent" href="https://www.bodensee.eu/de/was-erleben/unterwegs-am-bodensee/reiserouten/bodenseerundweg_touroute1350" target="_blank" rel="noopener" style="--acc:#1F6B3F">
+          <div class="main"><b>Bodensee-Rundwanderweg</b><small>Offizielle Streckenplanung</small></div>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19c4-8 8 2 12-6" stroke-dasharray="1 4"/><circle cx="18" cy="6" r="2"/></svg></span>
+        </a>
+        <a class="row row-accent" href="https://www.komoot.com/" target="_blank" rel="noopener" style="--acc:#3CA35A">
+          <div class="main"><b>Komoot</b><small>Individuelle Tourenplanung</small></div>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+        </a>
+        <a class="row row-accent" href="https://www.outdooractive.com/" target="_blank" rel="noopener" style="--acc:#0F5C86">
+          <div class="main"><b>Outdooractive</b><small>Individuelle Tourenplanung</small></div>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 19 21 12 17 5 21 12 2z"/></svg></span>
+        </a>
+      </div>
+
+      <div class="ext-note"><span>🔗</span><span>Hier öffnen sich fremde Internetseiten in einem neuen Fenster. Dort gelten die Cookie- und Datenschutzregeln des jeweiligen Anbieters – nicht die von Lotse.</span></div>
+      <button class="back" onclick="lotseZurueck()" style="margin-top:20px">‹ Zurück</button>
+    </section>
+
     <!-- SUCHEN -->
     <section class="view" id="v-suchen">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
@@ -2302,7 +2343,10 @@ const CAT = {
   bibliothek:{q:'["amenity"="library"]', t:"Büchereien in der Nähe", n:"Bücherei", steps:[3000,10000,25000]},
   schwimmbad:{q:['["leisure"="swimming_pool"]','["amenity"="public_bath"]'], t:"Schwimmbäder in der Nähe", n:"Schwimmbad", steps:[3000,10000,25000]},
   bakery:{q:'["shop"="bakery"]', t:"Bäckereien in der Nähe", n:"Bäckerei", steps:[1500,5000,12000]},
-  lebensmittel:{q:['["shop"="supermarket"]','["shop"="convenience"]'], t:"Lebensmittel in der Nähe", n:"Lebensmittelgeschäft", steps:[1500,5000,12000]}
+  lebensmittel:{q:['["shop"="supermarket"]','["shop"="convenience"]'], t:"Lebensmittel in der Nähe", n:"Lebensmittelgeschäft", steps:[1500,5000,12000]},
+  aussicht:{q:'["tourism"="viewpoint"]', t:"Aussichtspunkte in der Nähe", n:"Aussichtspunkt", steps:[3000,10000,25000]},
+  rastplatz:{q:['["tourism"="picnic_site"]','["leisure"="picnic_table"]'], t:"Rastplätze in der Nähe", n:"Rastplatz", steps:[3000,10000,25000]},
+  naturschutz:{q:'["leisure"="nature_reserve"]', t:"Naturschutzgebiete in der Nähe", n:"Naturschutzgebiet", steps:[5000,15000,30000]}
 };
 function dist(la,lo){
   const R=6371000,r=Math.PI/180;
