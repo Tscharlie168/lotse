@@ -4772,7 +4772,13 @@ function parkSave(){
     parkSaveAll(a);
     renderParken(); parkBadge();
     parkOrtNachladen(t, lat, lon);
-  }, function(){ var box=document.getElementById('parkListe'); if(box) box.innerHTML='<div class="note">Standort nicht verf\u00fcgbar \u2013 bitte die Standort-Freigabe erlauben.</div>'; },
+  }, function(err){
+    var box=document.getElementById('parkListe'); if(!box) return;
+    var msg = (err && err.code===1)
+      ? 'Standort-Freigabe fehlt \u2013 bitte in den iPhone/Android-Einstellungen f\u00fcr diese Seite erlauben.'
+      : 'Standort konnte gerade nicht ermittelt werden. Bitte erneut versuchen.';
+    box.innerHTML='<div class="note">'+msg+'</div>';
+  },
   {enableHighAccuracy:true, timeout:10000, maximumAge:0});
 }
 function parkRoute(i){ var p=parkLoad()[i]; if(p) window.open('https://www.google.com/maps/dir/?api=1&destination='+p.lat+','+p.lon+'&travelmode=walking','_blank','noopener'); }
@@ -4888,8 +4894,11 @@ function woBinIch(boxId){
           '<div class="wo-h">Quelle: OpenStreetMap – kleine Abweichungen möglich. Im Zweifel zusätzlich die Umgebung beschreiben.</div></div>';
       })
       .catch(function(){ box.innerHTML='<div class="note">Adresse gerade nicht abrufbar (Internet nötig). Ihre Position für die Leitstelle: <b>'+koord+'</b></div>'; });
-  },function(){
-    box.innerHTML='<div class="note">Standort nicht verfügbar – bitte die Standort-Freigabe erlauben.</div>';
+  },function(err){
+    var msg = (err && err.code===1)
+      ? 'Standort-Freigabe fehlt – bitte in den iPhone/Android-Einstellungen für diese Seite erlauben.'
+      : 'Standort konnte gerade nicht ermittelt werden. Bitte erneut versuchen.';
+    box.innerHTML='<div class="note">'+msg+'</div>';
   },{enableHighAccuracy:true,timeout:12000,maximumAge:30000});
 }
 
