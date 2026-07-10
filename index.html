@@ -498,6 +498,10 @@ try{
   <main>
     <!-- HEIM -->
     <section class="view active" id="v-home">
+      <div id="pinnedHelfer" style="display:none;margin-bottom:14px">
+        <div class="cats" id="pinnedHelferList"></div>
+      </div>
+
       <div class="install-banner" id="installBanner" style="display:none">
         <span class="ib-text">Lotse fest aufs Handy legen?</span>
         <button class="ib-btn" onclick="bannerAction()">Zeigen</button>
@@ -514,11 +518,6 @@ try{
         <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1d6e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></span>
         <span class="lbl">Mein Tag</span>
       </button>
-
-      <div id="pinnedHelfer" style="display:none">
-        <h2 style="margin:16px 0 10px;font-size:1.1rem">Ihre Favoriten</h2>
-        <div class="cats" id="pinnedHelferList"></div>
-      </div>
 
       <div class="grid">
         <button class="tile home-tile" id="tileWerkzeuge" onclick="go('werkzeuge')" style="position:relative;--acc:#4A78D8">
@@ -689,7 +688,6 @@ try{
           <span class="helfer-pin" data-pin-id="hilfe" onclick="event.stopPropagation();helferPinToggle('hilfe')" role="button" aria-label="Als Favorit anheften"></span>
         </button>
       </div>
-      <div class="note">Tippen Sie auf einen Helfer.</div>
       <div class="note">Tippen Sie auf den Punkt oben rechts an einer Kachel, um sie als Favorit oben auf dem Startbildschirm anzuheften.</div>
       <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
     </section>
