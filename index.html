@@ -538,9 +538,9 @@ try{
           <span class="lbl">Fahrplan &amp; Bus</span>
         </button>
 
-        <button class="tile home-tile" onclick="go('webcams')" style="--acc:#C9469B">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="3.2"/><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/></svg></span>
-          <span class="lbl">Webcams</span>
+        <button class="tile home-tile" onclick="go('motorrad')" style="--acc:#4A4A57">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M7.5 15.3c1.3-3 3.1-4.6 5.1-4.6c2 0 3.3 1.1 3.9 2.9l2 4"/><path d="M16.6 11.2l2.8-1.9"/></svg></span>
+          <span class="lbl">Motorrad</span>
         </button>
 
         <button class="tile home-tile" onclick="go('fahrrad')" style="--acc:#3CA35A">
@@ -561,6 +561,11 @@ try{
         <button class="tile home-tile" onclick="go('unterhaltung')" style="--acc:#D6467F">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01"/><path d="M8.5 14.5a4 4 0 0 0 7 0"/></svg></span>
           <span class="lbl">Unterhaltung</span>
+        </button>
+
+        <button class="tile home-tile" onclick="go('webcams')" style="--acc:#C9469B">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="3.2"/><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/></svg></span>
+          <span class="lbl">Webcams</span>
         </button>
 
         <button class="tile home-tile" onclick="go('kochen')" style="--acc:#D97A2E">
@@ -1362,6 +1367,94 @@ try{
       <button class="back" onclick="lotseZurueck()" style="margin-top:20px">‹ Zurück</button>
     </section>
 
+    <!-- MOTORRAD & UNTERWEGS -->
+    <section class="view" id="v-motorrad">
+      <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
+
+      <h2 style="margin-top:6px;font-size:1.25rem">Pannenhilfe rufen</h2>
+      <div class="rows" id="panneNumsMoto"></div>
+      <div class="note">Diese Nummern gehören den Automobilclubs. Für Mitglieder ist die Hilfe meist kostenlos, sonst wird sie nach Aufwand berechnet. <b>Bei einem Unfall oder Verletzten zählt der Notruf 112.</b></div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Meine Mitgliedsnummer</h2>
+      <div id="mitgliedBoxMoto"></div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Wo bin ich?</h2>
+      <p style="color:var(--ink-soft);margin:0 0 12px">Die Pannenhilfe fragt zuerst, wo Sie stehen. Dieser Knopf zeigt Ihren Standort – groß zum Vorlesen.</p>
+      <button class="big-btn" onclick="woBinIch('woBoxMoto')">📍 Meinen Standort anzeigen</button>
+      <div id="woBoxMoto"></div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Was tun bei einer Panne?</h2>
+      <p style="color:var(--ink-soft);margin:0 0 14px">Tippen Sie auf ein Thema, dann klappt die Anleitung auf.</p>
+
+      <details class="fa" open>
+        <summary>① Sicher anhalten und absichern</summary>
+        <div class="fa-body">
+          <ol>
+            <li><b>Warnblinker</b> bzw. Warnlicht einschalten – sofort, sobald etwas nicht stimmt.</li>
+            <li>Möglichst <b>weit rechts heranfahren</b>, auf stabilem, ebenem Untergrund, damit der Seitenständer sicher steht.</li>
+            <li><b>Warnweste noch sitzend überziehen</b>, bevor Sie absteigen.</li>
+            <li>Auf der <b>vom Verkehr abgewandten Seite</b> absteigen und das Motorrad sichern.</li>
+            <li><b>Warndreieck</b> aufstellen: innerorts ca. 50 m, Landstraße ca. 100 m, Autobahn ca. 150–200 m hinter dem Fahrzeug.</li>
+            <li>Sich selbst <b>weit weg von der Fahrbahn</b> in Sicherheit bringen – als Motorradfahrer sind Sie auf dem Seitenstreifen besonders gut sichtbar zu halten und besonders gefährdet.</li>
+          </ol>
+          <p class="fa-key">Bei Gefahr, einem Unfall oder Verletzten zuerst den <b>Notruf 112</b>.</p>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>② Nach einem Sturz</summary>
+        <div class="fa-body">
+          <ol>
+            <li>Erst <b>sich selbst und andere in Sicherheit bringen</b>, bevor Sie sich um das Motorrad kümmern.</li>
+            <li>Ein liegendes Motorrad kann <b>Kraftstoff oder Öl verlieren</b> – Rutsch- und Brandgefahr. Wenn möglich und ohne sich selbst zu gefährden, das Motorrad zügig aufrichten oder von der Fahrbahn wegschieben.</li>
+            <li>Bei Unsicherheit oder eigener Verletzung: <b>nicht selbst hantieren</b>, sondern warten und den Bereich weiträumig kennzeichnen bzw. absichern.</li>
+          </ol>
+          <p class="fa-key">Bei einem Sturz mit Verletzung zuerst den <b>Notruf 112</b>.</p>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>③ Was die Pannenhilfe wissen will</summary>
+        <div class="fa-body">
+          <p>Legen Sie sich das kurz zurecht, dann geht es schneller:</p>
+          <ol>
+            <li><b>Wo</b> stehen Sie? Ort und Straße, auf der Autobahn die <b>Kilometer-Angabe</b> und die Fahrtrichtung.</li>
+            <li><b>Welches Motorrad</b> – Marke, Modell und Kennzeichen.</li>
+            <li><b>Was</b> ist passiert (z. B. Reifen, Motor springt nicht an, Batterie leer)?</li>
+            <li>Wenn vorhanden, die <b>Mitgliedsnummer</b> Ihres Clubs bereithalten.</li>
+          </ol>
+        </div>
+      </details>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Passstraßen &amp; Bergstrecken</h2>
+      <p style="color:var(--ink-soft);margin:0 0 12px">Vor einer Passfahrt lohnt ein Blick auf die aktuelle Lage – Wintersperren, Baustellen oder Sperrungen ändern sich kurzfristig.</p>
+      <div class="rows">
+        <a class="row row-accent" href="https://www.alpenpaesse.de/verkehrsinfo" target="_blank" rel="noopener" style="--acc:#3C7A5C">
+          <div class="main"><b>Alpenpässe – Verkehrsinfo</b><small>Tagesaktuelle Übersicht über Befahrbarkeit und Wintersperren, filterbar nach Land/Region</small></div>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19l5-9 3.5 5L15 8l6 11z"/></svg></span>
+        </a>
+        <a class="row row-accent" href="https://www.tirol.gv.at/verkehr/verkehrsinformation-routenauskunft/" target="_blank" rel="noopener" style="--acc:#5C6B84">
+          <div class="main"><b>Land Tirol – Verkehrsinformation</b><small>U. a. für den Fernpass</small></div>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 19 21 12 17 5 21 12 2z"/></svg></span>
+        </a>
+        <a class="row row-accent" href="https://vorarlberg.at/-/evis-echtzeit-verkehrsinformationssystem" target="_blank" rel="noopener" style="--acc:#2B8CC9">
+          <div class="main"><b>Land Vorarlberg – Echtzeit-Verkehrsinfo</b><small>U. a. für Arlberg und Flexenpass</small></div>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="14" rx="3"/><circle cx="12" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="9.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="13" r="1" fill="currentColor" stroke="none"/><path d="M12 16v6"/></svg></span>
+        </a>
+      </div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Mit der Fähre über den See</h2>
+      <div class="rows">
+        <a class="row row-accent" href="javascript:void(0)" onclick="openAutofaehre()" style="--acc:#2BA6C9">
+          <div class="main"><b>Autofähre Konstanz–Meersburg</b><small>Motorräder kommen wie Fahrräder meist ohne Wartezeit direkt an Bord.</small></div>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15h18l-1.3 3.4a1.5 1.5 0 0 1-1.4 1H5.7a1.5 1.5 0 0 1-1.4-1L3 15z"/><path d="M6 12h12"/><path d="M7.5 12l1.3-2.6A1.3 1.3 0 0 1 10 8.6h4a1.3 1.3 0 0 1 1.2.8L16.5 12"/></svg></span>
+        </a>
+      </div>
+
+      <div class="ext-note"><span>🔗</span><span>Hier öffnen sich fremde Internetseiten in einem neuen Fenster. Dort gelten die Cookie- und Datenschutzregeln des jeweiligen Anbieters – nicht die von Lotse.</span></div>
+      <button class="back" onclick="lotseZurueck()" style="margin-top:20px">‹ Zurück</button>
+    </section>
+
     <!-- GEMEINSCHAFT ERLEBEN -->
     <section class="view" id="v-gemeinschaft">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
@@ -2072,6 +2165,7 @@ function zeigeView(name){
   if(name==='betrug') paintBetrug();
   if(name==='auto') renderMitglied();
   if(name==='fahrrad') renderMitgliedRad();
+  if(name==='motorrad') renderMitgliedMoto();
   if(name==='kochen') updatePortionUI();
   if(name==='vorlesen') renderVorlesen();
   if(name==='gemeinschaft') renderGemeinschaft();
@@ -2145,10 +2239,8 @@ function paintLand(){
       <div class="main"><b>${n.label}</b></div><div class="num">${n.num}</div>
     </a>`).join('');
   // Pannenhilfe (kein Notfall-Rot – bewusst andere Optik als 112/110)
-  const panneBox = document.getElementById('panneNums');
-  if(panneBox){
-    const P = L.panne || [];
-    panneBox.innerHTML = P.map(n=>`
+  // Gleiche Automobilclub-Daten für "Auto" und "Motorrad" – keine Duplizierung, nur zwei Ziel-Boxen
+  const panneHTML = P=>P.map(n=>`
       <a class="row call soft" href="tel:${n.num.replace(/\s/g,'')}">
         <div class="main"><b>${n.label}</b></div><div class="num">${n.num}</div>
       </a>`).join('') + (L.panneInfo ? `
@@ -2156,7 +2248,10 @@ function paintLand(){
         <div class="main"><b>${L.panneInfo.club} – Hilfe online anfordern</b><small>Per App oder Internet, mit Standort</small></div>
         <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
       </a>` : '');
-  }
+  const panneBox = document.getElementById('panneNums');
+  if(panneBox) panneBox.innerHTML = panneHTML(L.panne || []);
+  const panneBoxMoto = document.getElementById('panneNumsMoto');
+  if(panneBoxMoto) panneBoxMoto.innerHTML = panneHTML(L.panne || []);
   // Fahrplan: Verbindung von hier aus (mit Abfahrtszeiten) + landesweiter Planer
   document.getElementById('fahrRows').innerHTML = `
     <a class="row row-accent" href="javascript:void(0)" onclick="planRoute()" style="--acc:#4A78D8">
@@ -4646,6 +4741,32 @@ function renderMitgliedRad(){
       '<div class="row call soft"><div class="main"><b>Meine ADFC-Nummer</b></div><div class="num">'+lotseEsc(v.nr)+'</div></div>'+
       '<button class="flink" onclick="mitgliedRadForm()">Nummer \u00e4ndern</button>';
   } else { mitgliedRadForm(); }
+}
+/* ---------- Automobilclub-Mitgliedsnummer f\u00fcr Motorrad (eigener Speicher, nur auf diesem Ger\u00e4t) ---------- */
+function mitgliedMotoLoad(){ try{ return JSON.parse(localStorage.getItem('lotse_mitglied_moto')); }catch(e){ return null; } }
+function mitgliedMotoForm(){
+  var box=document.getElementById('mitgliedBoxMoto'); if(!box) return;
+  var v=mitgliedMotoLoad()||{};
+  box.innerHTML=
+    '<div class="vertraut-set">'+
+    '<div class="note">Hinterlegen Sie Ihre Mitgliedsnummer (z. B. ADAC oder \u00d6AMTC), damit Sie sie beim Pannenruf gleich zur Hand haben. Bleibt nur auf diesem Ger\u00e4t.</div>'+
+    '<input id="mgNrMoto" type="text" inputmode="numeric" placeholder="Automobilclub-Mitgliedsnummer" value="'+lotseEsc(v.nr||'')+'">'+
+    '<button class="big-btn" onclick="mitgliedMotoSave()">Speichern</button></div>';
+}
+function mitgliedMotoSave(){
+  var n=(document.getElementById('mgNrMoto').value||'').trim();
+  if(!n){ alert('Bitte eine Mitgliedsnummer eingeben.'); return; }
+  try{ localStorage.setItem('lotse_mitglied_moto', JSON.stringify({nr:n})); }catch(e){}
+  renderMitgliedMoto();
+}
+function renderMitgliedMoto(){
+  var box=document.getElementById('mitgliedBoxMoto'); if(!box) return;
+  var v=mitgliedMotoLoad();
+  if(v && v.nr){
+    box.innerHTML=
+      '<div class="row call soft"><div class="main"><b>Meine Mitgliedsnummer</b></div><div class="num">'+lotseEsc(v.nr)+'</div></div>'+
+      '<button class="flink" onclick="mitgliedMotoForm()">Nummer \u00e4ndern</button>';
+  } else { mitgliedMotoForm(); }
 }
 /* ====================== Gemeinschaft erleben ====================== */
 function gSuche(was){
