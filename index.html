@@ -179,16 +179,18 @@
   .helfer-cat svg{color:var(--acc,var(--sea));flex:0 0 auto}
   .helfer-cat span{font-weight:700}
   .helfer-cat span:first-child{flex:1;min-width:0}
-  /* Anheft-Punkt: kleiner Kreis oben rechts in der Ecke, genau wie die
-     Anzahl-Punkte bei Merkzettel/Wo geparkt – liegt außerhalb des
-     Textflusses (kein Zeilenumbruch), färbt sich bei aktivem Favorit.
-     Eigenes stopPropagation im onclick, damit Favoriten auch oben auf
-     dem Lotse-Startbildschirm erscheinen können. */
-  .helfer-pin{position:absolute;top:8px;right:8px;width:15px;height:15px;
-    border-radius:50%;border:2px solid var(--line);cursor:pointer;z-index:2}
-  .helfer-pin.on{background-color:#E8A61C;border-color:#E8A61C}
+  /* Anheft-Stern: kleiner Kreis oben rechts in der Ecke (gleiche Stelle wie
+     die Anzahl-Punkte bei Merkzettel/Wo geparkt), liegt außerhalb des
+     Textflusses (kein Zeilenumbruch). Zeigt ☆/★, färbt sich bei aktivem
+     Favorit. Eigenes stopPropagation im onclick, damit Favoriten auch oben
+     auf dem Lotse-Startbildschirm erscheinen können. */
+  .helfer-pin{position:absolute;top:6px;right:6px;width:18px;height:18px;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:.78rem;line-height:1;border:1.5px solid var(--line);
+    color:var(--line);cursor:pointer;z-index:2}
+  .helfer-pin.on{background-color:#E8A61C;border-color:#E8A61C;color:#fff}
   /* Bei Kacheln mit zusätzlichem Anzahl-Punkt (Merkzettel, Sprachnotiz,
-     Wo geparkt) rückt der Anheft-Punkt nach links, damit beide nicht
+     Wo geparkt) rückt der Anheft-Stern nach links, damit beide nicht
      übereinander liegen. */
   .helfer-pin-l{right:30px}
   /* "In der Nähe": dünne farbige Umrandung um die ganze Kachel, Rest
@@ -4051,6 +4053,7 @@ function markHelferPinButtons(){
   document.querySelectorAll('.helfer-pin').forEach(function(el){
     var on=pins.indexOf(el.getAttribute('data-pin-id'))>=0;
     el.classList.toggle('on', on);
+    el.textContent = on ? '★' : '☆';
     el.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
 }
