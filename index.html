@@ -806,6 +806,10 @@ try{
             <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17V5l10-2v12"/><circle cx="6.5" cy="17" r="2.5"/><circle cx="16.5" cy="15" r="2.5"/></svg></span>
             <span class="lbl">Lied raten</span><span class="sub">Titel erraten</span>
           </button>
+          <button class="tile spiel-tile" style="--acc:#B08D2B" onclick="spielOeffnen('gemaelde')">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="15" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 15l-5-5L5 19"/></svg></span>
+            <span class="lbl">Gem&auml;lde raten</span><span class="sub">Wer hat's gemalt?</span>
+          </button>
           <button class="tile spiel-tile" style="--acc:#D8483A" onclick="openTetris()">
             <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/><rect x="14" y="9" width="5" height="5"/><rect x="9" y="14" width="5" height="5"/></svg></span>
             <span class="lbl">Tetris</span><span class="sub">Der Klassiker</span>
@@ -903,6 +907,21 @@ try{
           </div>
         </div>
         <button class="big-btn" id="muStartBtn" onclick="musikRunde()">Spiel starten</button>
+      </div>
+
+      <div class="spielblock" id="sp-gemaelde">
+        <button class="back" onclick="spieleMenu()">&lsaquo; Zur&uuml;ck zu den Spielen</button>
+        <h2 style="margin-top:6px;font-size:1.4rem">Gem&auml;lde raten</h2>
+        <div class="rezept-card">
+          <p style="color:var(--ink-soft);margin:0 0 10px">Schauen Sie sich das Gem&auml;lde an und raten Sie, wer es gemalt hat. (Braucht Internet.)</p>
+          <div id="gemBild" style="display:none;text-align:center;margin-bottom:10px">
+            <img id="gemImg" alt="Gem&auml;lde zum Erraten" style="max-width:100%;max-height:320px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.15)">
+          </div>
+          <p id="gemStatus" style="font-size:1.1rem;line-height:1.4;margin-bottom:10px"></p>
+          <div id="gemOpt" class="merk-liste"></div>
+          <p id="gemInfo" style="margin:12px 0 0;line-height:1.5"></p>
+        </div>
+        <button class="big-btn" id="gemStartBtn" onclick="gemRunde()">Spiel starten</button>
       </div>
     </section>
 
@@ -3970,6 +3989,7 @@ function renderUnterhaltung(){
   if(document.getElementById('krFrage') && !document.getElementById('krFrage').textContent) krNeu();
   if(document.getElementById('wrWort') && !document.getElementById('wrWort').innerHTML) wrNeu();
   if(typeof musikInit==='function') musikInit();
+  if(typeof gemInit==='function') gemInit();
   if(typeof spieleMenu==='function') spieleMenu();
 }
 
@@ -4205,6 +4225,92 @@ function musikInit(){
   if(st) st.textContent=''; if(opt) opt.innerHTML=''; if(inf) inf.textContent='';
   if(rp) rp.style.display='none'; if(sb) sb.textContent='Spiel starten';
   musikOpts=[]; musikLoesung=null; musikUrl=null;
+}
+
+/* ====================== Gemälde raten (Metropolitan Museum of Art API) ====================== */
+var GEM_BILDER=[
+  {id:436535, titel:'Weizenfeld mit Zypressen', maler:'Vincent van Gogh'},
+  {id:436532, titel:'Selbstbildnis mit Strohhut', maler:'Vincent van Gogh'},
+  {id:437394, titel:'Aristoteles mit einer Homer-Büste', maler:'Rembrandt van Rijn'},
+  {id:437398, titel:'Flora', maler:'Rembrandt van Rijn'},
+  {id:437881, titel:'Junge Frau mit Wasserkrug', maler:'Johannes Vermeer'},
+  {id:437879, titel:'Studie einer jungen Frau', maler:'Johannes Vermeer'},
+  {id:438815, titel:'Madame Charpentier mit ihren Kindern', maler:'Pierre-Auguste Renoir'},
+  {id:437430, titel:'Am Meeresstrand', maler:'Pierre-Auguste Renoir'},
+  {id:435868, titel:'Die Kartenspieler', maler:'Paul Cézanne'},
+  {id:435882, titel:'Stillleben mit Äpfeln und Primeltopf', maler:'Paul Cézanne'},
+  {id:436139, titel:'Tänzerinnen an der Stange', maler:'Edgar Degas'},
+  {id:438817, titel:'Die Tanzklasse', maler:'Edgar Degas'},
+  {id:437654, titel:'Zirkusvorstellung', maler:'Georges Seurat'},
+  {id:436545, titel:'Der Junge in Rot', maler:'Francisco de Goya'},
+  {id:435839, titel:'Piazza San Marco', maler:'Canaletto'},
+  {id:459106, titel:'Prinzessin de Broglie', maler:'Jean-Auguste-Dominique Ingres'},
+  {id:436703, titel:'Madame Leblanc', maler:'Jean-Auguste-Dominique Ingres'},
+  {id:438821, titel:'Ia Orana Maria', maler:'Paul Gauguin'},
+  {id:436002, titel:'Frau mit Papagei', maler:'Gustave Courbet'},
+  {id:435844, titel:'Die Musikanten', maler:'Caravaggio'},
+  {id:440723, titel:'Der Bashi-Bozuk', maler:'Jean-Léon Gérôme'},
+  {id:437299, titel:'Der Jalais-Hügel bei Pontoise', maler:'Camille Pissarro'},
+  {id:438822, titel:'Das Mahl des Löwen', maler:'Henri Rousseau'},
+  {id:11417, titel:'Washington überquert den Delaware', maler:'Emanuel Leutze'},
+  {id:436948, titel:'Junge mit Degen', maler:'Édouard Manet'},
+  {id:459087, titel:'Christus trägt das Kreuz', maler:'El Greco'},
+  {id:12127, titel:'Madame X', maler:'John Singer Sargent'},
+  {id:436095, titel:'Der Waggon dritter Klasse', maler:'Honoré Daumier'},
+  {id:437900, titel:'Bildnis der Comtesse de la Châtre', maler:'Élisabeth Vigée Le Brun'},
+  {id:436435, titel:'Bildnis der Grace Dalrymple Elliott', maler:'Thomas Gainsborough'},
+  {id:10554, titel:'Watson und der Hai', maler:'John Singleton Copley'},
+  {id:436658, titel:'Bildnis Hermann von Wedigh III.', maler:'Hans Holbein der Jüngere'}
+];
+var GEM_NAMEN=['Vincent van Gogh','Rembrandt van Rijn','Johannes Vermeer','Pierre-Auguste Renoir','Paul Cézanne','Edgar Degas','Georges Seurat','Francisco de Goya','Canaletto','Jean-Auguste-Dominique Ingres','Paul Gauguin','Gustave Courbet','Caravaggio','Jean-Léon Gérôme','Camille Pissarro','Henri Rousseau','Emanuel Leutze','Édouard Manet','El Greco','John Singer Sargent','Honoré Daumier','Élisabeth Vigée Le Brun','Thomas Gainsborough','John Singleton Copley','Hans Holbein der Jüngere','Leonardo da Vinci','Michelangelo','Raffael','Tizian','Sandro Botticelli','Peter Paul Rubens','Diego Velázquez','Albrecht Dürer','Claude Monet','Pablo Picasso','Salvador Dalí','Gustav Klimt','Wassily Kandinsky','Frida Kahlo','Henri Matisse','Edvard Munch'];
+var gemIdx=-1, gemLoesung=null, gemOpts=[];
+function gemPickIdx(){ var n; do{ n=Math.floor(Math.random()*GEM_BILDER.length); }while(GEM_BILDER.length>1 && n===gemIdx); return n; }
+function gemRunde(){ gemVersuch(0); }
+function gemVersuch(versuch){
+  var st=document.getElementById('gemStatus'), opt=document.getElementById('gemOpt'), inf=document.getElementById('gemInfo');
+  var sb=document.getElementById('gemStartBtn'), bild=document.getElementById('gemBild'), img=document.getElementById('gemImg');
+  if(!st) return;
+  if(versuch>=4){ opt.innerHTML=''; inf.textContent=''; if(bild) bild.style.display='none'; st.textContent='Konnte gerade kein Gemälde vom Museum laden – das liegt nicht an Ihrem Internet. Bitte noch einmal auf „Nächstes Gemälde“ tippen.'; if(sb) sb.textContent='Nochmal versuchen'; return; }
+  inf.textContent=''; opt.innerHTML=''; if(bild) bild.style.display='none';
+  st.textContent='Gemälde wird geladen …';
+  if(sb) sb.textContent='Nächstes Gemälde';
+  gemIdx=gemPickIdx();
+  var w=GEM_BILDER[gemIdx];
+  fetch('https://collectionapi.metmuseum.org/public/collection/v1/objects/'+w.id).then(function(r){ return r.json(); }).then(function(d){
+    var bildUrl=d && (d.primaryImageSmall || d.primaryImage);
+    if(!bildUrl){ gemVersuch(versuch+1); return; }
+    gemLoesung=w;
+    if(img) img.src=bildUrl;
+    if(bild) bild.style.display='';
+    st.textContent='Wer hat dieses Gemälde gemalt?';
+    var falsch=GEM_NAMEN.filter(function(n){ return n!==w.maler; });
+    mischen(falsch);
+    gemOpts=[w.maler, falsch[0], falsch[1], falsch[2]];
+    mischen(gemOpts);
+    opt.innerHTML=gemOpts.map(function(o,i){ return '<button onclick="gemTipp('+i+')" style="text-align:left;background:#eef5f7;color:var(--sea);border:1px solid #cfe0e6;border-radius:12px;padding:14px;font-size:1.05rem;font-weight:700;cursor:pointer;font-family:inherit">'+lotseEsc(o)+'</button>'; }).join('');
+  }).catch(function(){ gemVersuch(versuch+1); });
+}
+function gemTipp(i){
+  if(!gemOpts.length || !gemLoesung) return;
+  var gewaehlt=gemOpts[i]; if(gewaehlt===undefined) return;
+  var richtig = gewaehlt===gemLoesung.maler;
+  var btns=document.getElementById('gemOpt').querySelectorAll('button');
+  for(var j=0;j<btns.length;j++){
+    btns[j].disabled=true;
+    if(gemOpts[j]===gemLoesung.maler){ btns[j].style.background='#1e8f4e'; btns[j].style.color='#fff'; btns[j].style.borderColor='#1e8f4e'; }
+    else if(j===i){ btns[j].style.background='var(--alarm)'; btns[j].style.color='#fff'; btns[j].style.borderColor='var(--alarm)'; }
+  }
+  var inf=document.getElementById('gemInfo');
+  inf.textContent=(richtig?'Richtig! ':'Leider falsch. ')+'Das Gemälde „'+gemLoesung.titel+'“ stammt von '+gemLoesung.maler+'.';
+  inf.style.color=(richtig?'#1e8f4e':'var(--ink)');
+}
+function gemInit(){
+  var st=document.getElementById('gemStatus'), opt=document.getElementById('gemOpt'), inf=document.getElementById('gemInfo');
+  var sb=document.getElementById('gemStartBtn'), bild=document.getElementById('gemBild');
+  if(st) st.textContent=''; if(opt) opt.innerHTML=''; if(inf) inf.textContent='';
+  if(bild) bild.style.display='none';
+  if(sb) sb.textContent='Spiel starten';
+  gemOpts=[]; gemLoesung=null; gemIdx=-1;
 }
 
 /* ====================== Produkt scannen (Barcode + Open Food Facts) ====================== */
