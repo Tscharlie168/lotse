@@ -650,7 +650,7 @@ try{
         </button>
         <button class="cat helfer-cat" id="catParken" onclick="go('parken')" style="--acc:#5C7488;position:relative">
           <span>Wo geparkt?</span>
-          <span id="parkBadgeEl" style="display:none;position:absolute;top:6px;right:6px;background:#43a047;color:#fff;font-size:0.85rem;font-weight:700;width:18px;height:18px;border-radius:9px;line-height:18px;text-align:center">●</span>
+          <span id="parkBadgeEl" style="display:none;position:absolute;top:6px;right:6px;background:#43a047;color:#fff;font-size:0.7rem;font-weight:700;min-width:18px;height:18px;border-radius:9px;line-height:18px;text-align:center;padding:0 4px"></span>
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l1.6-4.8A2 2 0 0 1 8.5 7h7a2 2 0 0 1 1.9 1.2L19 13"/><path d="M4 13h16v4H4z"/><circle cx="7.5" cy="17.5" r="1.4"/><circle cx="16.5" cy="17.5" r="1.4"/></svg>
         </button>
         <button class="cat helfer-cat" onclick="go('hilfe')" style="--acc:#E8825C">
@@ -967,15 +967,9 @@ try{
     <section class="view" id="v-parken">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Wo habe ich geparkt?</h2>
-      <div id="parkInfo" class="park-info"></div>
       <button class="big-btn" onclick="parkSave()">Standort jetzt merken</button>
-      <div id="parkActions" style="display:none;margin-top:4px">
-        <div class="btn-reihe">
-          <button onclick="parkRoute()">Zum Auto (Karte)</button>
-          <button onclick="parkDel()">L&ouml;schen</button>
-        </div>
-      </div>
-      <div class="note">Beim Aussteigen &bdquo;Standort merken&ldquo; tippen. Sp&auml;ter zeigt &bdquo;Zum Auto&ldquo; den Weg zur&uuml;ck in der Karten-App.</div>
+      <div class="note" style="margin:10px 0 18px">Beim Aussteigen &bdquo;Standort merken&ldquo; tippen &ndash; auch mehrfach, z.&nbsp;B. an mehreren Tagen. Jeder gemerkte Standort bleibt einzeln gespeichert, bis Sie ihn l&ouml;schen.</div>
+      <div id="parkListe"></div>
     </section>
 
     <!-- TASCHENLAMPE -->
@@ -3995,13 +3989,14 @@ function merkBadge(){
 }
 function parkBadge(){
   var b=document.getElementById('parkBadgeEl'); if(!b) return;
-  b.style.display=parkLoad() ? 'inline-block' : 'none';
+  var n=parkLoad().length;
+  if(n>0){ b.textContent=n; b.style.display='inline-block'; } else { b.style.display='none'; }
   werkzeugeBadgeUpdate();
 }
 function werkzeugeBadgeUpdate(){
   var b=document.getElementById('werkzeugeBadge'); if(!b) return;
   var merkHat=merkLoad().filter(function(x){return !x.d;}).length>0;
-  var parkHat=!!parkLoad();
+  var parkHat=parkLoad().length>0;
   if(merkHat||parkHat){ b.style.display='inline-block'; return; }
   // Sprachnotiz async prüfen
   snDbOpen().then(function(db){
@@ -4667,27 +4662,41 @@ function bcLookup(code){
 }
 
 /* --- Wo habe ich geparkt? --- */
-function parkLoad(){ try{ return JSON.parse(localStorage.getItem('lotse_park')); }catch(e){ return null; } }
+/* Mehrere gemerkte Standorte als Liste, neueste zuerst. Altes Einzel-Format
+   (ein Objekt statt eines Arrays) wird beim ersten Laden automatisch umgewandelt. */
+function parkLoad(){
+  try{
+    var raw=JSON.parse(localStorage.getItem('lotse_park'));
+    if(!raw) return [];
+    if(Array.isArray(raw)) return raw;
+    if(raw.lat){ var arr=[raw]; parkSaveAll(arr); return arr; }
+    return [];
+  }catch(e){ return []; }
+}
+function parkSaveAll(arr){ try{ localStorage.setItem('lotse_park', JSON.stringify(arr)); }catch(e){} }
 function renderParken(){
-  var p=parkLoad(), info=document.getElementById('parkInfo'), act=document.getElementById('parkActions');
-  if(p && p.lat){
+  var a=parkLoad(), box=document.getElementById('parkListe'); if(!box) return;
+  if(!a.length){ box.innerHTML='<div class="note">Noch kein Standort gemerkt.</div>'; return; }
+  function z(n){ return (n<10?'0':'')+n; }
+  box.innerHTML=a.map(function(p,i){
     var d=new Date(p.t);
-    function z(n){ return (n<10?'0':'')+n; }
-    info.innerHTML='Gemerkt am <b>'+z(d.getDate())+'.'+z(d.getMonth()+1)+'.</b> um <b>'+z(d.getHours())+':'+z(d.getMinutes())+' Uhr</b>.';
-    act.style.display='block';
-  } else { info.innerHTML='Noch kein Standort gemerkt.'; act.style.display='none'; }
+    return '<div class="card-info"><p style="margin:0">Geparkt am <b>'+z(d.getDate())+'.'+z(d.getMonth()+1)+'.</b> um <b>'+z(d.getHours())+':'+z(d.getMinutes())+' Uhr</b></p>'+
+      '<div class="btn-reihe" style="margin-top:10px"><button onclick="parkRoute('+i+')">Zum Auto (Karte)</button><button onclick="parkDel('+i+')">L\u00f6schen</button></div></div>';
+  }).join('');
 }
 function parkSave(){
   if(!navigator.geolocation){ alert('Standort wird nicht unterstuetzt.'); return; }
-  document.getElementById('parkInfo').textContent='Standort wird ermittelt \u2026';
+  var box=document.getElementById('parkListe'); if(box) box.innerHTML='<div class="note">Standort wird ermittelt \u2026</div>';
   navigator.geolocation.getCurrentPosition(function(pos){
-    try{ localStorage.setItem('lotse_park', JSON.stringify({lat:pos.coords.latitude, lon:pos.coords.longitude, t:Date.now()})); }catch(e){}
+    var a=parkLoad();
+    a.unshift({lat:pos.coords.latitude, lon:pos.coords.longitude, t:Date.now()});
+    parkSaveAll(a);
     renderParken(); parkBadge();
-  }, function(){ document.getElementById('parkInfo').textContent='Standort nicht verfuegbar. Bitte Ortungs-Erlaubnis pruefen.'; },
+  }, function(){ var box=document.getElementById('parkListe'); if(box) box.innerHTML='<div class="note">Standort nicht verfuegbar. Bitte Ortungs-Erlaubnis pruefen.</div>'; },
   {enableHighAccuracy:true, timeout:10000, maximumAge:0});
 }
-function parkRoute(){ var p=parkLoad(); if(p) window.open('https://www.google.com/maps/dir/?api=1&destination='+p.lat+','+p.lon+'&travelmode=walking','_blank','noopener'); }
-function parkDel(){ try{ localStorage.removeItem('lotse_park'); }catch(e){} renderParken(); parkBadge(); }
+function parkRoute(i){ var p=parkLoad()[i]; if(p) window.open('https://www.google.com/maps/dir/?api=1&destination='+p.lat+','+p.lon+'&travelmode=walking','_blank','noopener'); }
+function parkDel(i){ var a=parkLoad(); a.splice(i,1); parkSaveAll(a); renderParken(); parkBadge(); }
 
 /* --- Taschenlampe --- */
 var lampStream=null, lampTrack=null, lampAn=false;
