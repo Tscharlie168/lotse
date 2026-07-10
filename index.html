@@ -1526,6 +1526,57 @@ try{
         </a>
       </div>
 
+      <h2 style="margin-top:22px;font-size:1.25rem">Notruf</h2>
+      <div class="rows" id="notrufNumsOutdoor"></div>
+      <div class="note">In der Natur kann es länger dauern, bis Hilfe eintrifft. Rufen Sie im Zweifel lieber einmal zu viel den <b>Notruf 112</b>.</div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Wo bin ich?</h2>
+      <p style="color:var(--ink-soft);margin:0 0 12px">Gerade im Gelände ist der genaue Standort schwer zu beschreiben. Dieser Knopf zeigt ihn an – groß zum Vorlesen.</p>
+      <button class="big-btn" onclick="woBinIch('woBoxOutdoor')">📍 Meinen Standort anzeigen</button>
+      <div id="woBoxOutdoor"></div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Was tun bei einem Notfall im Freien?</h2>
+      <p style="color:var(--ink-soft);margin:0 0 14px">Tippen Sie auf ein Thema, dann klappt die Anleitung auf.</p>
+
+      <details class="fa" open>
+        <summary>① Ruhe bewahren und Hilfe holen</summary>
+        <div class="fa-body">
+          <ol>
+            <li>Nicht in Panik geraten – erst <b>durchatmen</b>, dann handeln.</li>
+            <li>Sich selbst und andere in <b>Sicherheit bringen</b> (z. B. weg von Steilkante, Wasser, Wetter).</li>
+            <li>Standort merken oder mit dem Knopf <b>„Meinen Standort anzeigen"</b> bestimmen.</li>
+            <li>Bei Verletzung, Erschöpfung oder Orientierungslosigkeit: <b>Notruf 112</b> wählen – er kann oft auch dann funktionieren, wenn das eigene Netz keinen Empfang hat.</li>
+            <li>Wenn möglich, an Ort und Stelle bleiben und auf Rückruf oder Rettung warten, statt planlos weiterzulaufen.</li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>② Wenn jemand verletzt ist</summary>
+        <div class="fa-body">
+          <ol>
+            <li><b>Ruhig bleiben</b>, bei der Person bleiben und sie beruhigen.</li>
+            <li>Bei Verdacht auf Bruch oder schwere Verletzung: <b>nicht unnötig bewegen</b>.</li>
+            <li>Vor Wind, Nässe und Kälte schützen (Jacke, Rettungsdecke).</li>
+            <li>Sofort den <b>Notruf 112</b> wählen – die Leitstelle sagt am Telefon genau, was zu tun ist.</li>
+          </ol>
+          <p class="fa-key">Genaue Erste-Hilfe-Schritte (z. B. stabile Seitenlage, Wiederbelebung) finden Sie auf der Seite „Notruf &amp; Erste Hilfe" – am besten schon vorher einmal in Ruhe durchlesen.</p>
+          <button class="flink" onclick="go('notruf')">Zur Seite „Notruf &amp; Erste Hilfe"</button>
+        </div>
+      </details>
+
+      <details class="fa">
+        <summary>③ Was der Notruf wissen will</summary>
+        <div class="fa-body">
+          <ol>
+            <li><b>Wo</b> befinden Sie sich genau? (Standort-Knopf oben, markante Punkte wie Wegweiser, Gipfel, Hütte)</li>
+            <li><b>Was</b> ist passiert?</li>
+            <li><b>Wie viele</b> Personen sind betroffen?</li>
+            <li>Warten Sie am Telefon, bis die Leitstelle das Gespräch beendet.</li>
+          </ol>
+        </div>
+      </details>
+
       <div class="ext-note"><span>🔗</span><span>Hier öffnen sich fremde Internetseiten in einem neuen Fenster. Dort gelten die Cookie- und Datenschutzregeln des jeweiligen Anbieters – nicht die von Lotse.</span></div>
       <button class="back" onclick="lotseZurueck()" style="margin-top:20px">‹ Zurück</button>
     </section>
@@ -2266,11 +2317,14 @@ function paintLand(){
     (STATE.located ? L.name : "Hier tippen und Ort wählen");
   document.getElementById('ort').textContent = STATE.ort;
   document.getElementById('dot').classList.toggle('off', !(STATE.located || STATE.manuell));
-  // Notrufnummern
-  document.getElementById('notrufNums').innerHTML = L.notruf.map(n=>`
+  // Notrufnummern – gleiche Daten für die zentrale Notruf-Seite und "Outdoor", keine Duplizierung
+  const notrufHTML = L.notruf.map(n=>`
     <a class="row call ${n.soft?'soft':''}" href="tel:${n.num.replace(/\s/g,'')}">
       <div class="main"><b>${n.label}</b></div><div class="num">${n.num}</div>
     </a>`).join('');
+  document.getElementById('notrufNums').innerHTML = notrufHTML;
+  const notrufBoxOutdoor = document.getElementById('notrufNumsOutdoor');
+  if(notrufBoxOutdoor) notrufBoxOutdoor.innerHTML = notrufHTML;
   // Pannenhilfe (kein Notfall-Rot – bewusst andere Optik als 112/110)
   // Gleiche Automobilclub-Daten für "Auto" und "Motorrad" – keine Duplizierung, nur zwei Ziel-Boxen
   const panneHTML = P=>P.map(n=>`
