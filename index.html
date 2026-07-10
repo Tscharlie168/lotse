@@ -4763,7 +4763,7 @@ function parkOrtNachladen(t, lat, lon){
     }).catch(function(){});
 }
 function parkSave(){
-  if(!navigator.geolocation){ alert('Standort wird nicht unterstuetzt.'); return; }
+  if(!navigator.geolocation){ alert('Standort wird nicht unterst\u00fctzt.'); return; }
   var box=document.getElementById('parkListe'); if(box) box.innerHTML='<div class="note">Standort wird ermittelt \u2026</div>';
   navigator.geolocation.getCurrentPosition(function(pos){
     var lat=pos.coords.latitude, lon=pos.coords.longitude, t=Date.now();
@@ -4772,7 +4772,7 @@ function parkSave(){
     parkSaveAll(a);
     renderParken(); parkBadge();
     parkOrtNachladen(t, lat, lon);
-  }, function(){ var box=document.getElementById('parkListe'); if(box) box.innerHTML='<div class="note">Standort nicht verfuegbar. Bitte Ortungs-Erlaubnis pruefen.</div>'; },
+  }, function(){ var box=document.getElementById('parkListe'); if(box) box.innerHTML='<div class="note">Standort nicht verf\u00fcgbar \u2013 bitte die Standort-Freigabe erlauben.</div>'; },
   {enableHighAccuracy:true, timeout:10000, maximumAge:0});
 }
 function parkRoute(i){ var p=parkLoad()[i]; if(p) window.open('https://www.google.com/maps/dir/?api=1&destination='+p.lat+','+p.lon+'&travelmode=walking','_blank','noopener'); }
