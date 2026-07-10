@@ -1210,9 +1210,12 @@ try{
         <button class="cat cat-accent" style="--acc:#3CA35A" onclick="findNear('atm')"><span style="font-size:1.7rem">🏧</span>Geldautomat</button>
         <button class="cat cat-accent" style="--acc:#B5541F" onclick="findNear('hofladen')"><span style="font-size:1.7rem">🏡</span>Hofladen</button>
         <button class="cat cat-accent" style="--acc:#1FA98C" onclick="findNear('lebensmittel')"><span style="font-size:1.7rem">🛒</span>Lebensmittel</button>
+        <button class="cat cat-accent" style="--acc:#E8825C" onclick="findNear('rastplatz')"><span style="font-size:1.7rem">🥪</span>Rastplatz</button>
         <button class="cat cat-accent" style="--acc:#8B5CD6" onclick="findNear('sights')"><span style="font-size:1.7rem">🏰</span>Sehenswürdigkeit</button>
         <button class="cat cat-accent" style="--acc:#5C7488" onclick="findNear('bench')"><span style="font-size:1.7rem">🪑</span>Sitzbank</button>
+        <button class="cat cat-accent" style="--acc:#6FA85C" onclick="findNear('supermarkt')"><span style="font-size:1.7rem">🏪</span>Supermarkt</button>
         <button class="cat cat-accent" style="--acc:#2F8FA0" onclick="findNear('toilets')"><span style="font-size:1.7rem">🚻</span>Toilette</button>
+        <button class="cat cat-accent" style="--acc:#E0592E" onclick="findNear('touristinfo')"><span style="font-size:1.7rem">ℹ️</span>Tourist-Info</button>
         <button class="cat cat-accent" style="--acc:#4FA8D8" onclick="findNear('water')"><span style="font-size:1.7rem">🚰</span>Trinkwasser</button>
         <button class="cat cat-accent" style="--acc:#C9469B" onclick="findNear('automat')"><span style="font-size:1.7rem">🧺</span>Verkaufsautomat</button>
       </div>
@@ -1502,7 +1505,6 @@ try{
       <h2 style="margin-top:6px;font-size:1.25rem">In der Nähe</h2>
       <div class="cats">
         <button class="cat cat-accent" style="--acc:#4FA8D8" onclick="findNear('aussicht','outdoor')"><span style="font-size:1.7rem">🔭</span>Aussichtspunkt</button>
-        <button class="cat cat-accent" style="--acc:#B5541F" onclick="findNear('rastplatz','outdoor')"><span style="font-size:1.7rem">🧺</span>Rastplatz</button>
         <button class="cat cat-accent" style="--acc:#3CA35A" onclick="findNear('naturschutz','outdoor')"><span style="font-size:1.7rem">🌿</span>Naturschutzgebiet</button>
       </div>
 
@@ -1515,14 +1517,6 @@ try{
         <a class="row row-accent" href="https://www.bodensee.eu/de/was-erleben/unterwegs-am-bodensee/reiserouten/bodenseerundweg_touroute1350" target="_blank" rel="noopener" style="--acc:#1F6B3F">
           <div class="main"><b>Bodensee-Rundwanderweg</b><small>Offizielle Streckenplanung</small></div>
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19c4-8 8 2 12-6" stroke-dasharray="1 4"/><circle cx="18" cy="6" r="2"/></svg></span>
-        </a>
-        <a class="row row-accent" href="https://www.komoot.com/" target="_blank" rel="noopener" style="--acc:#3CA35A">
-          <div class="main"><b>Komoot</b><small>Individuelle Tourenplanung</small></div>
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
-        </a>
-        <a class="row row-accent" href="https://www.outdooractive.com/" target="_blank" rel="noopener" style="--acc:#0F5C86">
-          <div class="main"><b>Outdooractive</b><small>Individuelle Tourenplanung</small></div>
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 19 21 12 17 5 21 12 2z"/></svg></span>
         </a>
       </div>
 
@@ -2400,7 +2394,9 @@ const CAT = {
   lebensmittel:{q:['["shop"="supermarket"]','["shop"="convenience"]'], t:"Lebensmittel in der Nähe", n:"Lebensmittelgeschäft", steps:[1500,5000,12000]},
   aussicht:{q:'["tourism"="viewpoint"]', t:"Aussichtspunkte in der Nähe", n:"Aussichtspunkt", steps:[3000,10000,25000]},
   rastplatz:{q:['["tourism"="picnic_site"]','["leisure"="picnic_table"]'], t:"Rastplätze in der Nähe", n:"Rastplatz", steps:[3000,10000,25000]},
-  naturschutz:{q:'["leisure"="nature_reserve"]', t:"Naturschutzgebiete in der Nähe", n:"Naturschutzgebiet", steps:[5000,15000,30000]}
+  naturschutz:{q:'["leisure"="nature_reserve"]', t:"Naturschutzgebiete in der Nähe", n:"Naturschutzgebiet", steps:[5000,15000,30000]},
+  supermarkt:{q:'["shop"="supermarket"]', t:"Supermärkte in der Nähe", n:"Supermarkt", steps:[1500,5000,12000]},
+  touristinfo:{q:'["tourism"="information"]["information"="office"]', t:"Tourist-Informationen in der Nähe", n:"Tourist-Info", steps:[3000,10000,25000]}
 };
 function dist(la,lo){
   const R=6371000,r=Math.PI/180;
