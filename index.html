@@ -2426,21 +2426,27 @@ async function overpassQuery(ql, timeoutMs){
 /* Kurzer Zwischenspeicher pro Kategorie + Standort, damit „zurück und nochmal" sofort da ist */
 const NEAR_CACHE = {};
 
-function renderNear(used, items){
+function renderNear(used, items, cat, stepIdx){
   const hint = used>=8000 ? `<div class="note">Im näheren Umkreis war nichts eingetragen – das Nächste liegt etwas weiter weg.</div>` : '';
+  const c = CAT[cat];
+  const naechsteStufe = c && typeof stepIdx==='number' && stepIdx < c.steps.length-1 ? c.steps[stepIdx+1] : null;
+  const expandBtn = naechsteStufe ? `<button class="big-btn" style="margin-top:14px" onclick="findNear('${cat}',${stepIdx+1})">Suchradius auf ca. ${Math.round(naechsteStufe/1000)} km vergrößern</button>` : '';
   document.getElementById('resBody').innerHTML = hint + `<div class="rows">`+items.map(i=>`
     <a class="row" href="https://www.google.com/maps/dir/?api=1&destination=${i.la},${i.lo}" target="_blank" rel="noopener">
       <div class="main"><b>${i.name}</b><small>${i.m<1000 ? i.m+' m entfernt' : (i.m<10000 ? (i.m/1000).toFixed(1).replace('.',',')+' km entfernt' : 'ca. '+Math.round(i.m/1000)+' km entfernt')}</small></div>
       <div class="go">Weg zeigen ›</div>
-    </a>`).join('')+`</div>`;
+    </a>`).join('')+`</div>` + expandBtn;
 }
 
-async function findNear(cat){
+async function findNear(cat, stepArg){
   const c = CAT[cat];
+  // stepArg ist nur bei manueller Radius-Vergrößerung eine Zahl; ältere Aufrufe übergeben
+  // hier teils noch einen (ungenutzten) Ansichts-Namen als zweites Argument – der wird ignoriert.
+  const start = typeof stepArg==='number' ? stepArg : 0;
   go('results');
   document.getElementById('resTitle').textContent = c.t;
   const resBody = document.getElementById('resBody');
-  resBody.innerHTML = `<div class="status"><div class="spin"></div>Suche in Ihrer Umgebung…</div>`;
+  resBody.innerHTML = `<div class="status"><div class="spin"></div>${start>0 ? 'Suchradius wird vergrößert…' : 'Suche in Ihrer Umgebung…'}</div>`;
 
   // Nach ein paar Sekunden ohne Ergebnis freundlich um Geduld bitten
   let patience = null;
@@ -2452,20 +2458,20 @@ async function findNear(cat){
   };
 
   // Frische Treffer der letzten 5 Minuten sofort anzeigen (kein neuer Server-Aufruf)
-  const key = cat+'|'+STATE.lat.toFixed(3)+'|'+STATE.lon.toFixed(3);
+  const key = cat+'|'+start+'|'+STATE.lat.toFixed(3)+'|'+STATE.lon.toFixed(3);
   const cached = NEAR_CACHE[key];
   if(cached && (Date.now()-cached.ts) < 300000){
-    renderNear(cached.used, cached.items);
+    renderNear(cached.used, cached.items, cat, cached.stepIdx);
     return;
   }
 
   try{
-    let items = [], used = 0;
-    for(let i=0;i<c.steps.length;i++){
+    let items = [], used = 0, stepIdx = start;
+    for(let i=start;i<c.steps.length;i++){
       const radius = c.steps[i];
-      used = radius;
+      used = radius; stepIdx = i;
       // Beim Vergrößern des Umkreises kurz Bescheid geben
-      if(i>0){
+      if(i>start){
         resBody.innerHTML = `<div class="status"><div class="spin"></div>In unmittelbarer Nähe war nichts eingetragen – ich vergrößere den Suchradius auf ${Math.round(radius/1000)} km…</div>`;
       }
       armPatience(); // Geduld-Hinweis (neu) für diese Such-Stufe
@@ -2494,8 +2500,8 @@ async function findNear(cat){
       resBody.innerHTML = `<div class="status">Im Umkreis von ${km} km ist nichts in der Karte eingetragen.<br>Das heißt nicht, dass es nichts gibt – nur, dass es bei OpenStreetMap noch fehlt.</div>`;
       return;
     }
-    NEAR_CACHE[key] = {used, items, ts:Date.now()};
-    renderNear(used, items);
+    NEAR_CACHE[key] = {used, items, stepIdx, ts:Date.now()};
+    renderNear(used, items, cat, stepIdx);
   }catch(e){
     resBody.innerHTML = `<div class="status">Das hat gerade nicht geklappt.<br>Bitte Internet prüfen und erneut versuchen.</div>`;
   }finally{
