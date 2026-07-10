@@ -4680,18 +4680,34 @@ function renderParken(){
   function z(n){ return (n<10?'0':'')+n; }
   box.innerHTML=a.map(function(p,i){
     var d=new Date(p.t);
-    return '<div class="card-info"><p style="margin:0">Geparkt am <b>'+z(d.getDate())+'.'+z(d.getMonth()+1)+'.</b> um <b>'+z(d.getHours())+':'+z(d.getMinutes())+' Uhr</b></p>'+
+    return '<div class="card-info"><p style="margin:0">Geparkt am <b>'+z(d.getDate())+'.'+z(d.getMonth()+1)+'.</b> um <b>'+z(d.getHours())+':'+z(d.getMinutes())+' Uhr</b>'+(p.ort?'<br>'+lotseEsc(p.ort):'')+'</p>'+
       '<div class="btn-reihe" style="margin-top:10px"><button onclick="parkRoute('+i+')">Zum Auto (Karte)</button><button onclick="parkDel('+i+')">L\u00f6schen</button></div></div>';
   }).join('');
+}
+/* Adresse bzw. Parkhaus-Name im Hintergrund nachladen (gleiche Quelle wie "Wo bin ich?"),
+   damit "Standort merken" nicht auf die Internetantwort warten muss. */
+function parkOrtNachladen(t, lat, lon){
+  fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&accept-language=de&zoom=18&lat='+lat+'&lon='+lon)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var a=d.address||{};
+      var ort=(d.name||'').trim() || ((a.road||a.pedestrian||a.square||'')+' '+(a.house_number||'')).trim();
+      if(!ort) return;
+      var arr=parkLoad(), i=arr.findIndex(function(p){ return p.t===t; });
+      if(i<0) return;
+      arr[i].ort=ort; parkSaveAll(arr); renderParken();
+    }).catch(function(){});
 }
 function parkSave(){
   if(!navigator.geolocation){ alert('Standort wird nicht unterstuetzt.'); return; }
   var box=document.getElementById('parkListe'); if(box) box.innerHTML='<div class="note">Standort wird ermittelt \u2026</div>';
   navigator.geolocation.getCurrentPosition(function(pos){
+    var lat=pos.coords.latitude, lon=pos.coords.longitude, t=Date.now();
     var a=parkLoad();
-    a.unshift({lat:pos.coords.latitude, lon:pos.coords.longitude, t:Date.now()});
+    a.unshift({lat:lat, lon:lon, t:t, ort:null});
     parkSaveAll(a);
     renderParken(); parkBadge();
+    parkOrtNachladen(t, lat, lon);
   }, function(){ var box=document.getElementById('parkListe'); if(box) box.innerHTML='<div class="note">Standort nicht verfuegbar. Bitte Ortungs-Erlaubnis pruefen.</div>'; },
   {enableHighAccuracy:true, timeout:10000, maximumAge:0});
 }
