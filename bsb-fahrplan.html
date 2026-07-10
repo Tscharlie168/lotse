@@ -36,8 +36,23 @@ select,input,button{font-family:inherit;}
 .lg-field>span{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:12px;font-weight:600;color:var(--muted);}
 .lg-field select,.lg-field input{appearance:none;-webkit-appearance:none;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:12px;font-size:15px;font-weight:500;color:var(--ink);width:100%;}
 .lg-field select:focus,.lg-field input:focus{outline:none;border-color:var(--azure);box-shadow:0 0 0 3px rgba(43,166,201,.18);}
+.lg-field-btn{appearance:none;-webkit-appearance:none;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:12px;font-size:15px;font-weight:500;color:var(--ink);width:100%;font-family:inherit;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;cursor:pointer;}
+.lg-field-btn:focus{outline:none;border-color:var(--azure);box-shadow:0 0 0 3px rgba(43,166,201,.18);}
+.lg-field-chev{flex:0 0 auto;color:var(--muted);font-size:13px;}
 .lg-swap{flex:0 0 auto;width:44px;height:46px;border:none;border-radius:10px;background:var(--blue);color:#fff;font-size:20px;cursor:pointer;transition:.15s;}
 .lg-swap:hover{background:var(--navy);}
+
+.lg-picker-backdrop{position:fixed;inset:0;background:rgba(10,34,51,.45);z-index:200;display:flex;align-items:flex-end;justify-content:center;}
+.lg-picker-panel{background:#fff;width:100%;max-width:480px;max-height:78vh;overflow-y:auto;border-radius:18px 18px 0 0;padding:14px 16px 22px;box-shadow:0 -4px 24px rgba(16,58,90,.25);}
+.lg-picker-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:8px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;}
+.lg-picker-title{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:19px;font-weight:700;color:var(--navy);}
+.lg-picker-close{border:none;background:none;font-size:24px;line-height:1;color:var(--muted);padding:4px 8px;cursor:pointer;}
+.lg-picker-group{border-radius:12px;padding:9px 9px 5px;margin-top:12px;}
+.lg-picker-group:first-of-type{margin-top:4px;}
+.lg-picker-group-label{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:700;padding:0 5px;margin-bottom:4px;}
+.lg-picker-opt{display:block;width:100%;text-align:left;border:none;background:transparent;border-radius:8px;padding:11px 10px;font-size:14px;font-weight:500;color:var(--ink);cursor:pointer;transition:.15s;}
+.lg-picker-opt:hover,.lg-picker-opt:active{background:rgba(10,34,51,.08);}
+.lg-picker-opt.is-sel{font-weight:700;}
 
 .lg-controls{display:flex;align-items:flex-end;gap:8px;margin-top:12px;}
 .lg-field--date{flex:0 0 auto;min-width:160px;}
@@ -477,7 +492,7 @@ function planJourneys(fromIdx,toIdx,dStr){
 }
 
 // ---- state ----
-var state={tab:"planer",from:6,to:11,date:defaultDate(),open:null,favs:[],locStatus:null,schweizDest:null,schweizRet:null};
+var state={tab:"planer",from:6,to:11,date:defaultDate(),open:null,favs:[],locStatus:null,schweizDest:null,schweizRet:null,picker:null};
 try{var f=localStorage.getItem("lgg-favs");if(f)state.favs=JSON.parse(f);}catch(e){}
 function saveFavs(){try{localStorage.setItem("lgg-favs",JSON.stringify(state.favs));}catch(e){}}
 
@@ -492,6 +507,31 @@ var SELECT_GROUPS = [
   ["Untersee (Auswahl)", [13,15,24,27,39,40]],
   ["Schweizer Ufer (SBS)", [28,29,30,32,33,34,35,36,37,38]]
 ];
+// Farbschema pro Gruppe (Hintergrund/Label) für den Hafen-Auswahldialog, gleiche Reihenfolge wie SELECT_GROUPS
+var SELECT_GROUP_COLORS = [
+  {bg:"#E3F2FA", label:"#0F5C86"},
+  {bg:"#E9F5EC", label:"#1F6B3F"},
+  {bg:"#FBF0E0", label:"#8C5A16"},
+  {bg:"#F3E9F5", label:"#7A3E82"}
+];
+function pickerHTML(){
+  if(!state.picker) return "";
+  var sel=state.picker==="from"?state.from:state.to;
+  var title=state.picker==="from"?"Von":"Nach";
+  var h='<div class="lg-picker-backdrop" id="lg-picker-backdrop"><div class="lg-picker-panel" id="lg-picker-panel">';
+  h+='<div class="lg-picker-head"><span class="lg-picker-title">'+title+'</span><button type="button" class="lg-picker-close" id="lg-picker-close" aria-label="Schließen">&times;</button></div>';
+  for(var g=0;g<SELECT_GROUPS.length;g++){
+    var grp=SELECT_GROUPS[g],col=SELECT_GROUP_COLORS[g];
+    h+='<div class="lg-picker-group" style="background:'+col.bg+'"><div class="lg-picker-group-label" style="color:'+col.label+'">'+grp[0]+'</div>';
+    for(var j=0;j<grp[1].length;j++){
+      var i=grp[1][j],isSel=(i===sel);
+      h+='<button type="button" class="lg-picker-opt'+(isSel?" is-sel":"")+'" data-port="'+i+'">'+(isSel?"&#10003; ":"")+PORTS[i]+'</button>';
+    }
+    h+='</div>';
+  }
+  h+='</div></div>';
+  return h;
+}
 function selectOptions(sel){var h="";for(var g=0;g<SELECT_GROUPS.length;g++){var grp=SELECT_GROUPS[g];h+='<optgroup label="'+grp[0]+'">';for(var j=0;j<grp[1].length;j++){var i=grp[1][j];h+='<option value="'+i+'"'+(i===sel?" selected":"")+'>'+PORTS[i]+'</option>';}h+='</optgroup>';}return h;}
 
 function journeyRow(r,i){
@@ -548,9 +588,9 @@ function planerHTML(){
   var special=state.date==="2026-07-18"?"Sondertag 18.7.":state.date==="2026-08-08"?"Sondertag 8.8.":null;
   var isFav=state.favs.some(function(x){return x.f===state.from&&x.t===state.to;});
   var h='<section class="lg-panel">';
-  h+='<div class="lg-route"><label class="lg-field"><span>Von</span><select id="lg-from">'+selectOptions(state.from)+'</select></label>';
+  h+='<div class="lg-route"><label class="lg-field"><span>Von</span><button type="button" class="lg-field-btn" data-picker-open="from">'+PORTS[state.from]+'<span class="lg-field-chev">&#9662;</span></button></label>';
   h+='<button class="lg-swap" id="lg-swap" aria-label="Richtung tauschen">&#8645;</button>';
-  h+='<label class="lg-field"><span>Nach</span><select id="lg-to">'+selectOptions(state.to)+'</select></label></div>';
+  h+='<label class="lg-field"><span>Nach</span><button type="button" class="lg-field-btn" data-picker-open="to">'+PORTS[state.to]+'<span class="lg-field-chev">&#9662;</span></button></label></div>';
   h+='<button class="lg-loc" id="lg-loc">&#128205; N&auml;chsten Hafen verwenden</button>';
   if(state.locStatus) h+='<div class="lg-loc-status">'+esc(state.locStatus)+'</div>';
   h+='<div class="lg-controls"><label class="lg-field lg-field--date"><span>Tag</span><input type="date" id="lg-date" min="2026-05-14" max="2026-09-13" value="'+state.date+'"></label>';
@@ -561,6 +601,7 @@ function planerHTML(){
   h+='<div class="lg-result-head"><span class="lg-result-route">'+PORTS[state.from]+' <em>&rarr;</em> '+PORTS[state.to]+'</span><span class="lg-result-day">'+dateLabel+'</span></div>';
   if(pastFiltered&&rows.length) h+='<div class="lg-loc-status">Vergangene Abfahrten f&uuml;r heute sind ausgeblendet.</div>';
   h+='<div class="lg-board">'+boardHTML(rows,pastFiltered?"past":null,state.from,state.to)+'</div></section>';
+  h+=pickerHTML();
   return h;
 }
 
@@ -798,10 +839,26 @@ function bind(){
   });
 
   if(state.tab!=="planer") return;
-  var from=document.getElementById("lg-from"),to=document.getElementById("lg-to"),date=document.getElementById("lg-date");
-  from.addEventListener("change",function(){state.from=+this.value;state.open=null;render();});
-  to.addEventListener("change",function(){state.to=+this.value;state.open=null;render();});
+  var date=document.getElementById("lg-date");
   date.addEventListener("change",function(){if(this.value){state.date=this.value;state.open=null;render();}});
+  document.querySelectorAll("[data-picker-open]").forEach(function(b){
+    b.addEventListener("click",function(){state.picker=this.getAttribute("data-picker-open");render();});
+  });
+  var pBackdrop=document.getElementById("lg-picker-backdrop");
+  if(pBackdrop){
+    pBackdrop.addEventListener("click",function(){state.picker=null;render();});
+    var pPanel=document.getElementById("lg-picker-panel");
+    if(pPanel) pPanel.addEventListener("click",function(e){e.stopPropagation();});
+    var pClose=document.getElementById("lg-picker-close");
+    if(pClose) pClose.addEventListener("click",function(){state.picker=null;render();});
+    document.querySelectorAll("[data-port]").forEach(function(b){
+      b.addEventListener("click",function(){
+        var idx=+this.getAttribute("data-port");
+        if(state.picker==="from") state.from=idx; else if(state.picker==="to") state.to=idx;
+        state.picker=null;state.open=null;render();
+      });
+    });
+  }
   var dayNext=document.getElementById("lg-daynext");
   if(dayNext) dayNext.addEventListener("click",function(){
     var d=new Date(state.date+"T12:00:00");d.setDate(d.getDate()+1);
@@ -837,7 +894,7 @@ document.querySelectorAll(".lg-tabs button").forEach(function(btn){
   btn.addEventListener("click",function(){
     document.querySelectorAll(".lg-tabs button").forEach(function(b){b.classList.remove("is-active");});
     this.classList.add("is-active");
-    state.tab=this.getAttribute("data-tab");state.open=null;render();
+    state.tab=this.getAttribute("data-tab");state.open=null;state.picker=null;render();
   });
 });
 
