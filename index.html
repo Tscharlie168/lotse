@@ -1203,21 +1203,66 @@ try{
     <section class="view" id="v-nearby">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
       <div class="cats">
-        <button class="cat cat-accent" style="--acc:#D8524A" onclick="findNear('pharmacy')"><span style="font-size:1.7rem">💊</span>Apotheke</button>
-        <button class="cat cat-accent" style="--acc:#C08A2E" onclick="findNear('bakery')"><span style="font-size:1.7rem">🥨</span>Bäckerei</button>
-        <button class="cat cat-accent" style="--acc:#4A78D8" onclick="findNear('busstop')"><span style="font-size:1.7rem">🚏</span>Bushaltestelle</button>
-        <button class="cat cat-accent" style="--acc:#8B5E3C" onclick="findNear('cafe')"><span style="font-size:1.7rem">☕</span>Café</button>
-        <button class="cat cat-accent" style="--acc:#3CA35A" onclick="findNear('atm')"><span style="font-size:1.7rem">🏧</span>Geldautomat</button>
-        <button class="cat cat-accent" style="--acc:#B5541F" onclick="findNear('hofladen')"><span style="font-size:1.7rem">🏡</span>Hofladen</button>
-        <button class="cat cat-accent" style="--acc:#1FA98C" onclick="findNear('lebensmittel')"><span style="font-size:1.7rem">🛒</span>Lebensmittel</button>
-        <button class="cat cat-accent" style="--acc:#E8825C" onclick="findNear('rastplatz')"><span style="font-size:1.7rem">🥪</span>Rastplatz</button>
-        <button class="cat cat-accent" style="--acc:#8B5CD6" onclick="findNear('sights')"><span style="font-size:1.7rem">🏰</span>Sehenswürdigkeit</button>
-        <button class="cat cat-accent" style="--acc:#5C7488" onclick="findNear('bench')"><span style="font-size:1.7rem">🪑</span>Sitzbank</button>
-        <button class="cat cat-accent" style="--acc:#6FA85C" onclick="findNear('supermarkt')"><span style="font-size:1.7rem">🏪</span>Supermarkt</button>
-        <button class="cat cat-accent" style="--acc:#2F8FA0" onclick="findNear('toilets')"><span style="font-size:1.7rem">🚻</span>Toilette</button>
-        <button class="cat cat-accent" style="--acc:#E0592E" onclick="findNear('touristinfo')"><span style="font-size:1.7rem">ℹ️</span>Tourist-Info</button>
-        <button class="cat cat-accent" style="--acc:#4FA8D8" onclick="findNear('water')"><span style="font-size:1.7rem">🚰</span>Trinkwasser</button>
-        <button class="cat cat-accent" style="--acc:#C9469B" onclick="findNear('automat')"><span style="font-size:1.7rem">🧺</span>Verkaufsautomat</button>
+        <button class="cat helfer-cat" style="--acc:#D8524A" onclick="findNear('pharmacy')">
+          <span>Apotheke</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+        </button>
+        <button class="cat helfer-cat" style="--acc:#C08A2E" onclick="findNear('bakery')">
+          <span>Bäckerei</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12c0-4 3.5-7 8-7s8 3 8 7-3.5 5-8 5-8-1-8-5z"/><path d="M8.5 9c.6 1 .6 2 0 3M15.5 9c-.6 1-.6 2 0 3"/></svg>
+        </button>
+        <button class="cat helfer-cat" style="--acc:#4A78D8" onclick="findNear('busstop')">
+          <span>Bus&shy;haltestelle</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="10" rx="3"/><path d="M4 11h16"/><circle cx="8" cy="18" r="1.5"/><circle cx="16" cy="18" r="1.5"/></svg>
+        </button>
+        <button class="cat helfer-cat" style="--acc:#8B5E3C" onclick="findNear('cafe')">
+          <span>Café</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V9z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 5c0 1-1 1-1 2M12 5c0 1-1 1-1 2"/></svg>
+        </button>
+        <button class="cat helfer-cat" style="--acc:#3CA35A" onclick="findNear('atm')">
+          <span>Geldautomat</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="10" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9v.01M18 15v.01"/></svg>
+        </button>
+        <button class="cat helfer-cat" style="--acc:#B5541F" onclick="findNear('hofladen')">
+          <span>Hofladen</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg>
+        </button>
+        <button class="cat helfer-cat" style="--acc:#1FA98C" onclick="findNear('lebensmittel')">
+          <span>Lebensmittel</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6.5"/></svg>
+        </button>
+        <button class="cat helfer-cat" style="--acc:#E8825C" onclick="findNear('rastplatz')">
+          <span>Rastplatz</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16l-2 9H6z"/><path d="M9 10a3 3 0 0 1 6 0"/><path d="M4 10l-1-3M20 10l1-3"/></svg>
+        </button>
+        <button class="cat helfer-cat" style="--acc:#8B5CD6" onclick="findNear('sights')">
+          <span>Sehens&shy;würdigkeit</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.2-5.4 3.2 1.3-6-4.6-4.1 6.1-.6z"/></svg>
+        </button>
+        <button class="cat helfer-cat" style="--acc:#5C7488" onclick="findNear('bench')">
+          <span>Sitzbank</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M6 12V9h12v3M6 12v6M18 12v6"/></svg>
+        </button>
+        <button class="cat helfer-cat" style="--acc:#6FA85C" onclick="findNear('supermarkt')">
+          <span>Supermarkt</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9l1.5-5h13L20 9"/><path d="M5 9v10h14V9"/><path d="M9 19v-4a3 3 0 0 1 6 0v4"/></svg>
+        </button>
+        <button class="cat helfer-cat" style="--acc:#2F8FA0" onclick="findNear('toilets')">
+          <span>Toilette</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2"/><circle cx="15" cy="12" r="1" fill="currentColor" stroke="none"/></svg>
+        </button>
+        <button class="cat helfer-cat" style="--acc:#E0592E" onclick="findNear('touristinfo')">
+          <span>Tourist-Info</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="8" r="0.6" fill="currentColor" stroke="none"/><path d="M12 11v5"/></svg>
+        </button>
+        <button class="cat helfer-cat" style="--acc:#4FA8D8" onclick="findNear('water')">
+          <span>Trinkwasser</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/></svg>
+        </button>
+        <button class="cat helfer-cat" style="--acc:#C9469B" onclick="findNear('automat')">
+          <span>Verkaufs&shy;automat</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h3M13 7h3M8 11h3M13 11h3"/><rect x="8" y="15" width="8" height="4" rx="1"/></svg>
+        </button>
       </div>
       <a class="row" style="margin-top:16px" href="https://www.aponet.de/apotheke/notdienstsuche" target="_blank" rel="noopener">
         <span style="font-size:1.7rem;flex:0 0 auto">🌙</span>
