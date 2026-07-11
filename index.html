@@ -978,6 +978,7 @@ try{
           <p id="gemStatus" style="font-size:1.1rem;line-height:1.4;margin-bottom:10px"></p>
           <div id="gemOpt" class="merk-liste"></div>
           <p id="gemInfo" style="margin:12px 0 0;line-height:1.5"></p>
+          <div id="gemLernInfo" style="display:none;margin-top:12px;padding:14px;background:#f7f3ea;border:1px solid #e6ddc8;border-radius:12px;font-size:0.97rem;line-height:1.6"></div>
         </div>
         <button class="big-btn" id="gemStartBtn" onclick="gemRunde()">Spiel starten</button>
       </div>
@@ -4708,6 +4709,13 @@ var GEM_BILDER=[
   {id:436658, titel:'Bildnis Hermann von Wedigh III.', maler:'Hans Holbein der Jüngere'}
 ];
 var GEM_NAMEN=['Vincent van Gogh','Rembrandt van Rijn','Johannes Vermeer','Pierre-Auguste Renoir','Paul Cézanne','Edgar Degas','Georges Seurat','Francisco de Goya','Canaletto','Jean-Auguste-Dominique Ingres','Paul Gauguin','Gustave Courbet','Caravaggio','Jean-Léon Gérôme','Camille Pissarro','Henri Rousseau','Emanuel Leutze','Édouard Manet','El Greco','John Singer Sargent','Honoré Daumier','Élisabeth Vigée Le Brun','Thomas Gainsborough','John Singleton Copley','Hans Holbein der Jüngere','Leonardo da Vinci','Michelangelo','Raffael','Tizian','Sandro Botticelli','Peter Paul Rubens','Diego Velázquez','Albrecht Dürer','Claude Monet','Pablo Picasso','Salvador Dalí','Gustav Klimt','Wassily Kandinsky','Frida Kahlo','Henri Matisse','Edvard Munch'];
+var GEM_NATION_DE={'German American':'deutsch-amerikanisch','Dutch':'niederländisch','French':'französisch','Spanish':'spanisch','Italian':'italienisch','American':'amerikanisch','Greek':'griechisch','British':'britisch','Flemish':'flämisch','English':'englisch','German':'deutsch'};
+function gemBioDe(bio){
+  if(!bio) return '';
+  var keys=Object.keys(GEM_NATION_DE).sort(function(a,b){ return b.length-a.length; });
+  for(var i=0;i<keys.length;i++){ if(bio.indexOf(keys[i]+',')===0) return GEM_NATION_DE[keys[i]]+bio.slice(keys[i].length); }
+  return bio;
+}
 var gemIdx=-1, gemLoesung=null, gemOpts=[];
 function gemPickIdx(){ var n; do{ n=Math.floor(Math.random()*GEM_BILDER.length); }while(GEM_BILDER.length>1 && n===gemIdx); return n; }
 function gemRunde(){ gemVersuch(0); }
@@ -4717,6 +4725,7 @@ function gemVersuch(versuch){
   if(!st) return;
   if(versuch>=4){ opt.innerHTML=''; inf.textContent=''; if(bild) bild.style.display='none'; st.textContent='Konnte gerade kein Gemälde vom Museum laden – das liegt nicht an Ihrem Internet. Bitte noch einmal auf „Nächstes Gemälde“ tippen.'; if(sb) sb.textContent='Nochmal versuchen'; return; }
   inf.textContent=''; opt.innerHTML=''; if(bild) bild.style.display='none';
+  var li=document.getElementById('gemLernInfo'); if(li){ li.style.display='none'; li.innerHTML=''; }
   st.textContent='Gemälde wird geladen …';
   if(sb) sb.textContent='Nächstes Gemälde';
   gemIdx=gemPickIdx();
@@ -4724,7 +4733,7 @@ function gemVersuch(versuch){
   fetch('https://collectionapi.metmuseum.org/public/collection/v1/objects/'+w.id).then(function(r){ return r.json(); }).then(function(d){
     var bildUrl=d && (d.primaryImageSmall || d.primaryImage);
     if(!bildUrl){ gemVersuch(versuch+1); return; }
-    gemLoesung=w;
+    gemLoesung={ id:w.id, titel:w.titel, maler:w.maler, bio:(d.artistDisplayBio||''), jahr:(d.objectDate||''), technik:(d.medium||''), url:(d.objectURL||'') };
     if(img) img.src=bildUrl;
     if(bild) bild.style.display='';
     st.textContent='Wer hat dieses Gemälde gemalt?';
@@ -4748,11 +4757,21 @@ function gemTipp(i){
   var inf=document.getElementById('gemInfo');
   inf.textContent=(richtig?'Richtig! ':'Leider falsch. ')+'Das Gemälde „'+gemLoesung.titel+'“ stammt von '+gemLoesung.maler+'.';
   inf.style.color=(richtig?'#1e8f4e':'var(--ink)');
+  var li=document.getElementById('gemLernInfo');
+  if(li){
+    var teile=[];
+    if(gemLoesung.bio) teile.push('<b>'+lotseEsc(gemLoesung.maler)+':</b> '+lotseEsc(gemBioDe(gemLoesung.bio)));
+    var werk=[]; if(gemLoesung.jahr) werk.push(lotseEsc(gemLoesung.jahr)); if(gemLoesung.technik) werk.push(lotseEsc(gemLoesung.technik));
+    if(werk.length) teile.push('<b>Das Werk:</b> „'+lotseEsc(gemLoesung.titel)+'“, '+werk.join(', '));
+    if(gemLoesung.url) teile.push('<a href="'+gemLoesung.url+'" target="_blank" rel="noopener" style="color:var(--sea);font-weight:700">Mehr im Metropolitan Museum &rarr;</a>');
+    if(teile.length){ li.innerHTML=teile.join('<br><br>'); li.style.display=''; }
+  }
 }
 function gemInit(){
   var st=document.getElementById('gemStatus'), opt=document.getElementById('gemOpt'), inf=document.getElementById('gemInfo');
-  var sb=document.getElementById('gemStartBtn'), bild=document.getElementById('gemBild');
+  var sb=document.getElementById('gemStartBtn'), bild=document.getElementById('gemBild'), li=document.getElementById('gemLernInfo');
   if(st) st.textContent=''; if(opt) opt.innerHTML=''; if(inf) inf.textContent='';
+  if(li){ li.style.display='none'; li.innerHTML=''; }
   if(bild) bild.style.display='none';
   if(sb) sb.textContent='Spiel starten';
   gemOpts=[]; gemLoesung=null; gemIdx=-1;
