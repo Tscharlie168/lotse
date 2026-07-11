@@ -876,6 +876,10 @@ try{
             <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><rect x="14" y="14" width="7" height="7" rx="1.2"/><circle cx="17.5" cy="17.5" r="2.1" fill="currentColor" stroke="none"/></svg></span>
             <span class="lbl">Minesweeper</span><span class="sub">Minen aufsp&uuml;ren</span>
           </button>
+          <button class="tile spiel-tile" style="--acc:#C9A227" onclick="openSokoban()">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="8" height="8" rx="1.2"/><circle cx="18" cy="17" r="3"/><path d="M13 13l3-3M13 6h5v5"/></svg></span>
+            <span class="lbl">Kistenschieben</span><span class="sub">Denkspiel</span>
+          </button>
         </div>
         <button class="back" onclick="lotseZurueck()" style="margin-top:20px">&lsaquo; Zur&uuml;ck</button>
       </div>
@@ -2414,6 +2418,7 @@ function openAutofaehre(){
 /* ---------- Tetris (eigene Seite) ---------- */
 function openTetris(){ location.href = 'tetris.html'; }
 function openMinesweeper(){ location.href = 'minesweeper.html'; }
+function openSokoban(){ location.href = 'sokoban.html'; }
 
 /* ---------- Unterhaltung: Kachel-Menü / einzelnes Spiel öffnen ---------- */
 function spielOeffnen(id){
