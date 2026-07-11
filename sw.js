@@ -1,6 +1,8 @@
-/* Lotse – Service Worker (v18) – Stand: 11. Juli 2026
+/* Lotse – Service Worker (v19) – Stand: 11. Juli 2026
+   Neu gegenüber v18:
+   - Spiel "Stau lösen" wieder entfernt (zu einfach).
    Neu gegenüber v17:
-   - Unterhaltung: neues Spiel "Stau lösen" (stau.html), außerdem drei
+   - Unterhaltung: neues Spiel "Kistenschieben" (sokoban.html), drei
      schwierigere Kistenschieben-Level.
    Neu gegenüber v16:
    - Unterhaltung: neues Spiel "Kistenschieben" (sokoban.html).
@@ -44,7 +46,7 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v68';
+const CACHE = 'lotse-v69';
 const SHELL = [
   './',
   './index.html',
@@ -53,7 +55,6 @@ const SHELL = [
   './tetris.html',
   './minesweeper.html',
   './sokoban.html',
-  './stau.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
@@ -88,8 +89,7 @@ self.addEventListener('fetch', e => {
       url.pathname.endsWith('/autofaehre.html')   ? './autofaehre.html'   :
       url.pathname.endsWith('/tetris.html')       ? './tetris.html'       :
       url.pathname.endsWith('/minesweeper.html')  ? './minesweeper.html'  :
-      url.pathname.endsWith('/sokoban.html')      ? './sokoban.html'      :
-      url.pathname.endsWith('/stau.html')         ? './stau.html'         : './index.html';
+      url.pathname.endsWith('/sokoban.html')      ? './sokoban.html'      : './index.html';
     // zuerst Netz (frischer Stand), bei Offline die passende Kopie
     e.respondWith(
       fetch(req).then(resp => {
