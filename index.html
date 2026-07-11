@@ -401,6 +401,7 @@
   .merk-item.done .txt{text-decoration:line-through;color:var(--ink-soft)}
   .merk-item .txt{flex:1;font-size:1.1rem;text-align:left;cursor:pointer;word-break:break-word}
   .merk-item .del{flex:0 0 auto;background:none;border:0;color:var(--ink-soft);font-size:1.5rem;cursor:pointer;padding:0 4px;line-height:1}
+  .merk-item .share{flex:0 0 auto;background:none;border:0;color:var(--sea);font-size:1.3rem;cursor:pointer;padding:0 6px;line-height:1}
   .merk-leer{color:var(--ink-soft);text-align:center;padding:24px 8px}
   /* --- Vorlesen --- */
   .vor-text{width:100%;min-height:160px;border:1px solid var(--line);border-radius:14px;padding:14px;font-size:1.15rem;font-family:inherit;color:var(--ink);resize:vertical;line-height:1.5;box-sizing:border-box}
@@ -818,7 +819,7 @@ try{
     <section class="view" id="v-foto">
       <button class="back" onclick="lotseZurueck()">&lsaquo; Zur&uuml;ck</button>
       <h2>Schnappschuss</h2>
-      <p style="color:var(--ink-soft);margin:0 0 14px">Machen Sie einen Schnappschuss &ndash; zum Beispiel von einem Medikament, einem Zettel oder einer Parkscheibe. Sie k&ouml;nnen auch mehrere aufnehmen. Sie bleiben nur auf diesem Ger&auml;t und werden nicht in der Fotos-App des Handys gespeichert.</p>
+      <p style="color:var(--ink-soft);margin:0 0 14px">Machen Sie einen Schnappschuss &ndash; zum Beispiel von einem Medikament, einem Zettel oder einer Parkscheibe. Sie k&ouml;nnen auch mehrere aufnehmen. Sie bleiben nur auf diesem Ger&auml;t und werden nicht in der Fotos-App des Handys gespeichert &ndash; &uuml;ber &bdquo;Teilen&ldquo; (📤) k&ouml;nnen Sie einen Schnappschuss bei Bedarf trotzdem weitergeben oder in die Fotos-App sichern.</p>
       <label class="big-btn" for="fotoInput" style="display:block;box-sizing:border-box">&#128247; Schnappschuss aufnehmen</label>
       <input type="file" id="fotoInput" accept="image/*" capture="environment" style="display:none" onchange="fotoUpload(event)">
       <div id="fotoStatus" class="note" style="margin-top:10px"></div>
@@ -4311,6 +4312,7 @@ function renderFotos(){
       return '<div class="merk-item">'+
         '<img src="'+url+'" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:10px;flex:0 0 auto">'+
         '<div class="txt">Schnappschuss vom '+fotoZeitText(o.t)+'</div>'+
+        '<button class="share" onclick="fotoShare('+o.id+')" aria-label="Teilen oder in Fotos speichern">📤</button>'+
         '<button class="del" onclick="fotoDel('+o.id+')" aria-label="Löschen">×</button>'+
       '</div>';
     }).join('');
@@ -4319,6 +4321,28 @@ function renderFotos(){
 function fotoDel(id){
   if(!confirm('Diesen Schnappschuss löschen?')) return;
   fotoDbDel(id).then(function(){ renderFotos(); fotoBadge(); werkzeugeBadgeUpdate(); });
+}
+/* Teilen-Dialog des Geräts öffnen (dort auch "In Fotos sichern" möglich),
+   sonst Download als Ausweichlösung. */
+function fotoShare(id){
+  fotoDbOpen().then(function(db){
+    var req=db.transaction('fotos','readonly').objectStore('fotos').get(id);
+    req.onsuccess=function(){
+      var o=req.result; if(!o||!o.blob) return;
+      var typ=o.blob.type||'image/jpeg';
+      var ext=typ.indexOf('png')>=0?'png':(typ.indexOf('webp')>=0?'webp':'jpg');
+      var datei;
+      try{ datei=new File([o.blob], 'schnappschuss-'+id+'.'+ext, {type:typ}); }catch(e){ datei=o.blob; }
+      if(navigator.canShare && navigator.canShare({files:[datei]})){
+        navigator.share({files:[datei], title:'Schnappschuss'}).catch(function(){});
+        return;
+      }
+      var url=URL.createObjectURL(o.blob);
+      var a=document.createElement('a'); a.href=url; a.download='schnappschuss-'+id+'.'+ext;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 30000);
+    };
+  });
 }
 function fotoBadge(){
   var b=document.getElementById('fotoBadgeEl'); if(!b) return;
