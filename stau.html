@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0E3553">
+<title>Stau l&ouml;sen</title>
+<style>
+:root{--ink:#0A2233;--navy:#103A5A;--blue:#15679E;--azure:#2BA6C9;--sky:#EAF2F8;--paper:#F4F8FB;--line:#D8E5EF;--muted:#5C7488;--floor:#EAF2F8;}
+*{box-sizing:border-box;}
+html,body{margin:0;height:100%;}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--paper);line-height:1.5;-webkit-font-smoothing:antialiased;touch-action:manipulation;user-select:none;-webkit-user-select:none;}
+.app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;}
+
+.head{position:relative;background:linear-gradient(160deg,#0E3553 0%,#15679E 100%);color:#fff;padding:16px 18px 20px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:#0A2233;text-decoration:none;font-weight:600;font-size:15px;letter-spacing:.03em;text-transform:uppercase;background:#7FD5EA;border:1.5px solid #62D0E8;border-radius:999px;padding:9px 16px;cursor:pointer;}
+.back:active{background:#62D0E8;}
+.head h1{font-weight:800;font-size:28px;line-height:1;margin:12px 0 0;letter-spacing:.02em;}
+
+.wrap{flex:1;display:flex;flex-direction:column;align-items:center;padding:12px;gap:10px;}
+
+.levelrow{width:100%;max-width:400px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+.levelbtn{flex:0 0 auto;width:38px;height:38px;border:1.5px solid var(--line);background:#fff;color:var(--navy);border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;}
+.levelbtn.on{background:var(--blue);border-color:var(--blue);color:#fff;}
+
+.hud{width:100%;max-width:400px;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.stat{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 10px;text-align:center;}
+.stat span{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);}
+.stat b{font-size:20px;color:var(--navy);font-variant-numeric:tabular-nums;}
+
+.boardwrap{position:relative;}
+#boardBg{display:grid;background:var(--floor);border:2px solid var(--line);border-radius:8px;box-shadow:0 6px 18px rgba(16,58,90,.15);position:relative;}
+.gridcell{border:1px solid #DCE9F2;}
+.exitmark{position:absolute;display:flex;align-items:center;justify-content:center;color:#1e8f4e;font-weight:900;}
+.veh{position:absolute;border-radius:8px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12);cursor:pointer;transition:left .12s,top .12s;}
+.veh.sel{outline:3px solid #F4C430;outline-offset:1px;}
+.veh.target{background:#E14B3E;}
+
+.over{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(244,248,251,.94);border-radius:8px;text-align:center;padding:16px;}
+.over.show{display:flex;}
+.over h2{margin:0;font-size:24px;color:var(--navy);}
+.over p{margin:0;font-size:15px;color:var(--muted);}
+.over .weiter{border:0;border-radius:999px;padding:12px 22px;font-size:16px;font-weight:700;background:var(--blue);color:#fff;cursor:pointer;}
+
+.pad{width:100%;max-width:260px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:8px;}
+.padbtn{border:0;border-radius:12px;background:#fff;border:1.5px solid var(--line);color:var(--navy);font-size:22px;font-weight:700;cursor:pointer;min-height:54px;}
+.padbtn:active{background:var(--sky);}
+.padbtn:disabled{opacity:.35;cursor:default;}
+.padempty{visibility:hidden;}
+
+.actrow{width:100%;max-width:400px;display:flex;gap:8px;}
+.actbtn{flex:1;border:1.5px solid var(--line);background:#fff;color:var(--navy);border-radius:12px;padding:12px 6px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;min-height:46px;}
+.tip{max-width:400px;font-size:12.5px;color:var(--muted);text-align:center;margin:0;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="head">
+    <button class="back" onclick="zurueck()">&lsaquo; Zur&uuml;ck</button>
+    <h1>Stau l&ouml;sen</h1>
+  </header>
+
+  <div class="wrap">
+    <div class="levelrow" id="levelrow"></div>
+
+    <div class="hud">
+      <div class="stat"><span>Level</span><b id="levelNr">1</b></div>
+      <div class="stat"><span>Z&uuml;ge</span><b id="zuege">0</b></div>
+    </div>
+
+    <div class="boardwrap">
+      <div id="boardBg"></div>
+      <div class="over" id="over">
+        <h2>Geschafft! 🎉</h2>
+        <p id="overText"></p>
+        <button class="weiter" id="weiterBtn" onclick="naechstesLevel()">N&auml;chstes Level</button>
+      </div>
+    </div>
+
+    <div class="pad">
+      <div class="padempty"></div>
+      <button class="padbtn" id="pUp" onclick="versuchZug(-1,0)" aria-label="Nach oben">&#9650;</button>
+      <div class="padempty"></div>
+      <button class="padbtn" id="pLeft" onclick="versuchZug(0,-1)" aria-label="Nach links">&#9664;</button>
+      <div class="padempty"></div>
+      <button class="padbtn" id="pRight" onclick="versuchZug(0,1)" aria-label="Nach rechts">&#9654;</button>
+      <div class="padempty"></div>
+      <button class="padbtn" id="pDown" onclick="versuchZug(1,0)" aria-label="Nach unten">&#9660;</button>
+      <div class="padempty"></div>
+    </div>
+
+    <div class="actrow">
+      <button class="actbtn" onclick="rueckgaengig()">&#8630; R&uuml;ckg&auml;ngig</button>
+      <button class="actbtn" onclick="ladeLevel(aktuellesLevel)">&#8635; Neu starten</button>
+    </div>
+    <p class="tip">Auto antippen zum Ausw&auml;hlen, dann mit den Pfeilen schieben. Das rote Auto muss ganz nach rechts zur L&uuml;cke hinaus.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+var GRID=6, EXIT_ROW=2;
+var FARBEN=['#4A78D8','#1FA98C','#8B5CD6','#E8A61C','#3CA35A','#D6467F','#5C7488'];
+
+var LEVELS=[
+[ {r:2,c:0,len:2,horiz:true}, {r:2,c:3,len:2,horiz:false} ],
+[ {r:2,c:0,len:2,horiz:true}, {r:0,c:3,len:3,horiz:false}, {r:3,c:4,len:3,horiz:false} ],
+[ {r:2,c:0,len:2,horiz:true}, {r:0,c:2,len:3,horiz:false}, {r:0,c:4,len:2,horiz:false}, {r:2,c:4,len:2,horiz:false}, {r:5,c:3,len:3,horiz:true} ],
+[ {r:2,c:0,len:2,horiz:true}, {r:1,c:2,len:2,horiz:false}, {r:0,c:2,len:2,horiz:true}, {r:3,c:4,len:2,horiz:false} ],
+[ {r:2,c:0,len:2,horiz:true}, {r:1,c:2,len:2,horiz:false}, {r:2,c:3,len:3,horiz:false}, {r:0,c:4,len:2,horiz:false}, {r:2,c:5,len:2,horiz:false} ]
+];
+
+var aktuellesLevel=0, fahrzeuge=[], ausgewaehlt=-1, zuege=0, historie=[], spielAktiv=false, cell=0;
+var boardBg=document.getElementById('boardBg');
+
+function baueLevelKnoepfe(){
+  var row=document.getElementById('levelrow');
+  row.innerHTML=LEVELS.map(function(_,i){
+    return '<button class="levelbtn" id="lvlBtn'+i+'" onclick="ladeLevel('+i+')">'+(i+1)+'</button>';
+  }).join('');
+}
+
+function ladeLevel(idx){
+  aktuellesLevel=idx;
+  fahrzeuge=LEVELS[idx].map(function(v,i){ return {r:v.r,c:v.c,len:v.len,horiz:v.horiz,id:i}; });
+  ausgewaehlt=-1; zuege=0; historie=[]; spielAktiv=true;
+  document.getElementById('levelNr').textContent=(idx+1);
+  document.getElementById('zuege').textContent='0';
+  document.getElementById('over').classList.remove('show');
+  for(var i=0;i<LEVELS.length;i++){ var b=document.getElementById('lvlBtn'+i); if(b) b.classList.toggle('on', i===idx); }
+  zeichneRahmen();
+  malenAlle();
+  updatePad();
+}
+
+function zeichneRahmen(){
+  var maxW=Math.min(window.innerWidth*0.94, 380);
+  cell=Math.max(38, Math.min(60, Math.floor(maxW/GRID)));
+  boardBg.style.width=(cell*GRID)+'px';
+  boardBg.style.height=(cell*GRID)+'px';
+  boardBg.style.gridTemplateColumns='repeat('+GRID+', '+cell+'px)';
+  boardBg.style.gridTemplateRows='repeat('+GRID+', '+cell+'px)';
+  boardBg.innerHTML='';
+  for(var r=0;r<GRID;r++){ for(var c=0;c<GRID;c++){
+    var d=document.createElement('div'); d.className='gridcell';
+    boardBg.appendChild(d);
+  }}
+  var exitEl=document.createElement('div');
+  exitEl.className='exitmark';
+  exitEl.style.left=(GRID*cell)+'px'; exitEl.style.top=(EXIT_ROW*cell)+'px';
+  exitEl.style.width=Math.round(cell*0.5)+'px'; exitEl.style.height=cell+'px';
+  exitEl.style.fontSize=Math.round(cell*0.5)+'px';
+  exitEl.textContent='▶';
+  boardBg.appendChild(exitEl);
+}
+
+function malenAlle(){
+  var alte=boardBg.querySelectorAll('.veh'); alte.forEach(function(e){ e.remove(); });
+  fahrzeuge.forEach(function(v,i){
+    var d=document.createElement('div');
+    d.className='veh'+(i===0?' target':'')+(i===ausgewaehlt?' sel':'');
+    d.style.background = i===0 ? '' : FARBEN[(i-1)%FARBEN.length];
+    d.style.left=(v.c*cell+3)+'px';
+    d.style.top=(v.r*cell+3)+'px';
+    d.style.width=((v.horiz?v.len*cell:cell)-6)+'px';
+    d.style.height=((v.horiz?cell:v.len*cell)-6)+'px';
+    d.onclick=(function(idx){ return function(){ waehle(idx); }; })(i);
+    boardBg.appendChild(d);
+  });
+}
+
+function waehle(i){
+  if(!spielAktiv) return;
+  ausgewaehlt = (ausgewaehlt===i) ? -1 : i;
+  malenAlle();
+  updatePad();
+}
+
+function updatePad(){
+  var v = ausgewaehlt>=0 ? fahrzeuge[ausgewaehlt] : null;
+  document.getElementById('pUp').disabled = !v || v.horiz;
+  document.getElementById('pDown').disabled = !v || v.horiz;
+  document.getElementById('pLeft').disabled = !v || !v.horiz;
+  document.getElementById('pRight').disabled = !v || !v.horiz;
+}
+
+function zellenBelegt(exceptIdx){
+  var s={};
+  fahrzeuge.forEach(function(v,i){
+    if(i===exceptIdx) return;
+    for(var k=0;k<v.len;k++){
+      var r=v.horiz?v.r:v.r+k, c=v.horiz?v.c+k:v.c;
+      s[r+','+c]=true;
+    }
+  });
+  return s;
+}
+
+function versuchZug(dr,dc){
+  if(!spielAktiv || ausgewaehlt<0) return;
+  var v=fahrzeuge[ausgewaehlt];
+  if(v.horiz && dr!==0) return;
+  if(!v.horiz && dc!==0) return;
+  var nr=v.r+dr, nc=v.c+dc;
+  if(nr<0||nc<0) return;
+  if(v.horiz && nc+v.len>GRID) return;
+  if(!v.horiz && nr+v.len>GRID) return;
+  var belegt=zellenBelegt(ausgewaehlt);
+  for(var k=0;k<v.len;k++){
+    var r=v.horiz?nr:nr+k, c=v.horiz?nc+k:nc;
+    if(belegt[r+','+c]) return;
+  }
+  historie.push(fahrzeuge.map(function(f){ return {r:f.r,c:f.c,len:f.len,horiz:f.horiz,id:f.id}; }));
+  v.r=nr; v.c=nc;
+  zuege++;
+  document.getElementById('zuege').textContent=zuege;
+  malenAlle();
+  pruefeGewonnen();
+}
+
+function pruefeGewonnen(){
+  var x=fahrzeuge[0];
+  if(x.horiz && x.r===EXIT_ROW && (x.c+x.len)>=GRID){
+    spielAktiv=false;
+    document.getElementById('overText').textContent='Level '+(aktuellesLevel+1)+' in '+zuege+' Zügen gelöst.';
+    document.getElementById('weiterBtn').style.display = (aktuellesLevel<LEVELS.length-1) ? '' : 'none';
+    document.getElementById('over').classList.add('show');
+  }
+}
+
+function rueckgaengig(){
+  if(!historie.length) return;
+  fahrzeuge=historie.pop();
+  zuege=Math.max(0,zuege-1);
+  document.getElementById('zuege').textContent=zuege;
+  spielAktiv=true;
+  ausgewaehlt=-1;
+  document.getElementById('over').classList.remove('show');
+  malenAlle();
+  updatePad();
+}
+
+function naechstesLevel(){
+  if(aktuellesLevel<LEVELS.length-1) ladeLevel(aktuellesLevel+1);
+}
+
+document.addEventListener('keydown',function(e){
+  var map={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
+  if(map[e.key]){ e.preventDefault(); versuchZug(map[e.key][0],map[e.key][1]); }
+});
+
+var tsx=0,tsy=0;
+boardBg.addEventListener('pointerdown',function(e){ tsx=e.clientX; tsy=e.clientY; });
+boardBg.addEventListener('pointerup',function(e){
+  var dx=e.clientX-tsx, dy=e.clientY-tsy, T=20;
+  if(Math.abs(dx)<T && Math.abs(dy)<T) return;
+  if(ausgewaehlt<0) return;
+  if(Math.abs(dx)>Math.abs(dy)) versuchZug(0, dx>0?1:-1);
+  else versuchZug(dy>0?1:-1, 0);
+});
+
+window.addEventListener('resize', function(){ zeichneRahmen(); malenAlle(); });
+
+function zurueck(){
+  if(history.length>1){ history.back(); } else { location.href='index.html'; }
+}
+
+baueLevelKnoepfe();
+ladeLevel(0);
+</script>
+</body>
+</html>
