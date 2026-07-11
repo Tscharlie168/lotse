@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0E3553">
+<title>Minesweeper</title>
+<style>
+:root{--ink:#0A2233;--navy:#103A5A;--blue:#15679E;--azure:#2BA6C9;--sky:#EAF2F8;--paper:#F4F8FB;--line:#D8E5EF;--muted:#5C7488;--cell:#EAF2F8;--cell-line:#C7D9E6;}
+*{box-sizing:border-box;}
+html,body{margin:0;height:100%;}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--paper);line-height:1.5;-webkit-font-smoothing:antialiased;touch-action:manipulation;user-select:none;-webkit-user-select:none;}
+.app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;}
+
+.head{position:relative;background:linear-gradient(160deg,#0E3553 0%,#15679E 100%);color:#fff;padding:16px 18px 20px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:#0A2233;text-decoration:none;font-weight:600;font-size:15px;letter-spacing:.03em;text-transform:uppercase;background:#7FD5EA;border:1.5px solid #62D0E8;border-radius:999px;padding:9px 16px;cursor:pointer;}
+.back:active{background:#62D0E8;}
+.head h1{font-weight:800;font-size:30px;line-height:1;margin:12px 0 0;letter-spacing:.02em;}
+.head h1 span{color:#62D0E8;}
+
+.wrap{flex:1;display:flex;flex-direction:column;align-items:center;padding:12px;gap:10px;}
+
+.hud{width:100%;max-width:400px;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.stat{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 10px;text-align:center;}
+.stat span{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);}
+.stat b{font-size:20px;color:var(--navy);font-variant-numeric:tabular-nums;}
+
+.diffrow{width:100%;max-width:400px;display:flex;gap:8px;}
+.diffbtn{flex:1;border:1.5px solid var(--line);background:#fff;color:var(--navy);border-radius:12px;padding:10px 4px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.diffbtn.on{background:var(--blue);border-color:var(--blue);color:#fff;}
+
+.moderow{width:100%;max-width:400px;display:flex;gap:8px;}
+.modebtn{flex:1;border:1.5px solid var(--line);background:#fff;color:var(--navy);border-radius:12px;padding:12px 4px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;min-height:48px;}
+.modebtn.on{background:#F4C430;border-color:#D9AC12;color:#3a2e00;}
+
+.boardwrap{position:relative;overflow-x:auto;max-width:100%;}
+#board{display:grid;gap:2px;background:var(--cell-line);border:2px solid var(--cell-line);border-radius:8px;padding:2px;box-shadow:0 6px 18px rgba(16,58,90,.15);}
+.c{display:flex;align-items:center;justify-content:center;background:var(--cell);border-radius:3px;font-weight:800;cursor:pointer;user-select:none;}
+.c.open{background:#fff;cursor:default;}
+.c.mine{background:#F5A0A0;}
+.c.mine.boom{background:var(--alarm,#e53935);}
+.c.flag{background:#FCEBB0;}
+.n1{color:#1565C0;} .n2{color:#2E8B3D;} .n3{color:#C62828;} .n4{color:#0D2E6E;}
+.n5{color:#8B1A1A;} .n6{color:#00838F;} .n7{color:#222;} .n8{color:#666;}
+
+.over{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(244,248,251,.92);border-radius:8px;text-align:center;padding:16px;}
+.over.show{display:flex;}
+.over h2{margin:0;font-size:24px;color:var(--navy);}
+.over p{margin:0;font-size:15px;color:var(--muted);}
+
+.start{width:100%;max-width:400px;border:0;border-radius:999px;padding:13px;font-size:17px;font-weight:700;background:#7cf7c7;color:#07110d;cursor:pointer;}
+.tip{max-width:400px;font-size:12.5px;color:var(--muted);text-align:center;margin:0;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="head">
+    <button class="back" onclick="zurueck()">&lsaquo; Zur&uuml;ck</button>
+    <h1>Mine<span>sweeper</span></h1>
+  </header>
+
+  <div class="wrap">
+    <div class="diffrow">
+      <button class="diffbtn" id="dLeicht" onclick="waehleSchwierigkeit('leicht')">Leicht</button>
+      <button class="diffbtn" id="dMittel" onclick="waehleSchwierigkeit('mittel')">Mittel</button>
+      <button class="diffbtn" id="dSchwer" onclick="waehleSchwierigkeit('schwer')">Schwer</button>
+    </div>
+
+    <div class="hud">
+      <div class="stat"><span>Minen &uuml;brig</span><b id="minenUebrig">0</b></div>
+      <div class="stat"><span>Zeit</span><b id="zeit">0</b></div>
+    </div>
+
+    <div class="moderow">
+      <button class="modebtn on" id="mAufdecken" onclick="setModus('auf')">&#128163; Aufdecken</button>
+      <button class="modebtn" id="mMarkieren" onclick="setModus('flag')">&#128681; Markieren</button>
+    </div>
+
+    <div class="boardwrap">
+      <div id="board"></div>
+      <div class="over" id="over">
+        <h2 id="overTitel">Verloren</h2>
+        <p id="overText"></p>
+      </div>
+    </div>
+
+    <button class="start" id="startBtn">Neues Spiel</button>
+    <p class="tip">&bdquo;Aufdecken&ldquo; antippen, dann auf ein Feld tippen. Zum Markieren einer vermuteten Mine auf &bdquo;Markieren&ldquo; wechseln und das Feld antippen.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+var DIFF={
+  leicht:{cols:8, rows:10, mines:10},
+  mittel:{cols:10, rows:14, mines:20},
+  schwer:{cols:12, rows:18, mines:35}
+};
+var schwierigkeit='leicht';
+var COLS, ROWS, MINES;
+var board, geoeffnet, aufgedeckt=0, minenGesamt=0, spielAktiv=false, gewonnen=false, ersterKlick=true;
+var modus='auf';
+var timerId=0, sekunden=0;
+var boardEl=document.getElementById('board');
+
+function waehleSchwierigkeit(s){
+  schwierigkeit=s;
+  document.getElementById('dLeicht').classList.toggle('on', s==='leicht');
+  document.getElementById('dMittel').classList.toggle('on', s==='mittel');
+  document.getElementById('dSchwer').classList.toggle('on', s==='schwer');
+  start();
+}
+function setModus(m){
+  modus=m;
+  document.getElementById('mAufdecken').classList.toggle('on', m==='auf');
+  document.getElementById('mMarkieren').classList.toggle('on', m==='flag');
+}
+
+function idx(r,c){ return r*COLS+c; }
+function nachbarn(r,c){
+  var res=[];
+  for(var dr=-1;dr<=1;dr++){ for(var dc=-1;dc<=1;dc++){
+    if(dr===0&&dc===0) continue;
+    var nr=r+dr, nc=c+dc;
+    if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS) res.push([nr,nc]);
+  }}
+  return res;
+}
+
+function neuesBrett(){
+  var cfg=DIFF[schwierigkeit];
+  COLS=cfg.cols; ROWS=cfg.rows; MINES=cfg.mines; minenGesamt=cfg.mines;
+  board=new Array(COLS*ROWS).fill(0);
+  geoeffnet=new Array(COLS*ROWS).fill(false);
+  window.markiert=new Array(COLS*ROWS).fill(false);
+  aufgedeckt=0; ersterKlick=true; gewonnen=false; spielAktiv=true;
+  sekunden=0; clearInterval(timerId);
+  updateHud();
+  document.getElementById('over').classList.remove('show');
+  document.getElementById('minenUebrig').textContent=MINES;
+}
+
+function minenLegen(excludeR,excludeC){
+  var verboten={}; nachbarn(excludeR,excludeC).concat([[excludeR,excludeC]]).forEach(function(p){ verboten[idx(p[0],p[1])]=true; });
+  var gelegt=0;
+  while(gelegt<MINES){
+    var r=(Math.random()*ROWS)|0, c=(Math.random()*COLS)|0, i=idx(r,c);
+    if(verboten[i] || board[i]===-1) continue;
+    board[i]=-1; gelegt++;
+  }
+  for(var r2=0;r2<ROWS;r2++){ for(var c2=0;c2<COLS;c2++){
+    var i2=idx(r2,c2); if(board[i2]===-1) continue;
+    var n=0; nachbarn(r2,c2).forEach(function(p){ if(board[idx(p[0],p[1])]===-1) n++; });
+    board[i2]=n;
+  }}
+}
+
+function zeichnenBrett(){
+  var maxW=Math.min(window.innerWidth*0.94, 400);
+  var cell=Math.max(20, Math.min(38, Math.floor(maxW/COLS)-2));
+  boardEl.style.gridTemplateColumns='repeat('+COLS+', '+cell+'px)';
+  var frag=document.createDocumentFragment();
+  boardEl.innerHTML='';
+  for(var r=0;r<ROWS;r++){ for(var c=0;c<COLS;c++){
+    var i=idx(r,c);
+    var d=document.createElement('div');
+    d.className='c'; d.style.width=cell+'px'; d.style.height=cell+'px'; d.style.fontSize=Math.max(12,cell*0.5)+'px';
+    d.dataset.r=r; d.dataset.c=c;
+    d.addEventListener('click', onZelleClick);
+    frag.appendChild(d);
+  }}
+  boardEl.appendChild(frag);
+  malenAlle();
+}
+
+function malenAlle(){
+  var kinder=boardEl.children;
+  for(var k=0;k<kinder.length;k++){
+    var d=kinder[k], r=+d.dataset.r, c=+d.dataset.c, i=idx(r,c);
+    d.className='c';
+    d.textContent='';
+    if(geoeffnet[i]){
+      d.classList.add('open');
+      if(board[i]===-1){ d.classList.add('mine'); d.textContent='\u{1F4A3}'; }
+      else if(board[i]>0){ d.classList.add('n'+board[i]); d.textContent=board[i]; }
+    } else if(window.markiert[i]){
+      d.classList.add('flag'); d.textContent='\u{1F6A9}';
+    }
+  }
+}
+
+function onZelleClick(e){
+  if(!spielAktiv) return;
+  var r=+e.currentTarget.dataset.r, c=+e.currentTarget.dataset.c, i=idx(r,c);
+  if(modus==='flag'){
+    if(geoeffnet[i]) return;
+    window.markiert[i]=!window.markiert[i];
+    var uebrig=MINES; for(var k=0;k<window.markiert.length;k++){ if(window.markiert[k]) uebrig--; }
+    document.getElementById('minenUebrig').textContent=uebrig;
+    malenAlle();
+    return;
+  }
+  if(geoeffnet[i] || window.markiert[i]) return;
+  if(ersterKlick){ minenLegen(r,c); ersterKlick=false; starteTimer(); }
+  if(board[i]===-1){ aufdecken(r,c); verloren(i); return; }
+  flutfuellen(r,c);
+  malenAlle();
+  pruefeGewonnen();
+}
+
+function aufdecken(r,c){ geoeffnet[idx(r,c)]=true; }
+
+function flutfuellen(r0,c0){
+  var stack=[[r0,c0]];
+  while(stack.length){
+    var p=stack.pop(), r=p[0], c=p[1], i=idx(r,c);
+    if(geoeffnet[i] || window.markiert[i]) continue;
+    geoeffnet[i]=true; aufgedeckt++;
+    if(board[i]===0){ nachbarn(r,c).forEach(function(np){ if(!geoeffnet[idx(np[0],np[1])]) stack.push(np); }); }
+  }
+}
+
+function pruefeGewonnen(){
+  var frei=COLS*ROWS-MINES;
+  if(aufgedeckt>=frei){
+    spielAktiv=false; gewonnen=true; clearInterval(timerId);
+    for(var i=0;i<board.length;i++){ if(board[i]===-1) window.markiert[i]=true; }
+    malenAlle();
+    document.getElementById('overTitel').textContent='Gewonnen! \u{1F389}';
+    document.getElementById('overText').textContent='Alle Minen gefunden in '+sekunden+' Sekunden.';
+    document.getElementById('over').classList.add('show');
+  }
+}
+
+function verloren(bumI){
+  spielAktiv=false; clearInterval(timerId);
+  for(var i=0;i<board.length;i++){ if(board[i]===-1) geoeffnet[i]=true; }
+  malenAlle();
+  var kinder=boardEl.children;
+  for(var k=0;k<kinder.length;k++){
+    var d=kinder[k], r=+d.dataset.r, c=+d.dataset.c;
+    if(idx(r,c)===bumI) d.classList.add('boom');
+  }
+  document.getElementById('overTitel').textContent='Leider verloren';
+  document.getElementById('overText').textContent='Eine Mine war darunter. Tippen Sie auf „Neues Spiel“.';
+  document.getElementById('over').classList.add('show');
+}
+
+function starteTimer(){
+  clearInterval(timerId);
+  timerId=setInterval(function(){ sekunden++; document.getElementById('zeit').textContent=sekunden; }, 1000);
+}
+function updateHud(){
+  document.getElementById('zeit').textContent=sekunden;
+  document.getElementById('minenUebrig').textContent=minenGesamt;
+}
+
+function start(){
+  neuesBrett();
+  zeichnenBrett();
+}
+document.getElementById('startBtn').addEventListener('click', start);
+window.addEventListener('resize', zeichnenBrett);
+
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden){ clearInterval(timerId); }
+  else if(spielAktiv && !ersterKlick){ starteTimer(); }
+});
+
+function zurueck(){
+  if(history.length>1){ history.back(); } else { location.href='index.html'; }
+}
+
+waehleSchwierigkeit('leicht');
+</script>
+</body>
+</html>

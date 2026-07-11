@@ -1,4 +1,6 @@
-/* Lotse – Service Worker (v15) – Stand: 3. Juli 2026
+/* Lotse – Service Worker (v16) – Stand: 11. Juli 2026
+   Neu gegenüber v15:
+   - Unterhaltung: neues Spiel "Minesweeper" (minesweeper.html).
    Neu gegenüber v14:
    - Kopfrechnen: Aufgaben mit 3-4 Zahlen und allen vier Grundrechenarten
      (Punkt vor Strich) statt nur kleinem Einmaleins.
@@ -37,13 +39,14 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v65';
+const CACHE = 'lotse-v66';
 const SHELL = [
   './',
   './index.html',
   './bsb-fahrplan.html',
   './autofaehre.html',
   './tetris.html',
+  './minesweeper.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
@@ -76,7 +79,8 @@ self.addEventListener('fetch', e => {
     const pageKey =
       url.pathname.endsWith('/bsb-fahrplan.html') ? './bsb-fahrplan.html' :
       url.pathname.endsWith('/autofaehre.html')   ? './autofaehre.html'   :
-      url.pathname.endsWith('/tetris.html')       ? './tetris.html'       : './index.html';
+      url.pathname.endsWith('/tetris.html')       ? './tetris.html'       :
+      url.pathname.endsWith('/minesweeper.html')  ? './minesweeper.html'  : './index.html';
     // zuerst Netz (frischer Stand), bei Offline die passende Kopie
     e.respondWith(
       fetch(req).then(resp => {
