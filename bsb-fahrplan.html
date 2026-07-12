@@ -187,19 +187,22 @@ select,input,button{font-family:inherit;}
 .lg-map-stand{font-size:12.5px;color:var(--muted);text-align:center;margin:0 0 14px;}
 .lg-schiff-item{background:#fff;border:1px solid var(--gold);box-shadow:0 0 0 2px rgba(185,132,43,.25);border-radius:12px;padding:12px 14px;text-align:center;}
 .lg-schiff-item b{color:var(--navy);font-size:16px;}
-.lg-flotte-toggle{width:100%;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 16px;font-size:14.5px;font-weight:700;color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;}
-.lg-flotte-toggle .lg-flotte-chev{color:var(--muted);font-size:11px;transition:transform .15s;transform:rotate(180deg);}
+.lg-flotte-toggle{width:100%;background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 18px;font-size:17px;font-weight:700;color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;}
+.lg-flotte-toggle .lg-flotte-chev{color:var(--muted);font-size:13px;transition:transform .15s;transform:rotate(180deg);}
 .lg-flotte-toggle.is-open .lg-flotte-chev{transform:rotate(0deg);}
 .lg-flotte{margin-top:14px;}
 .lg-flotte-reederei{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:16px;font-weight:700;color:var(--navy);margin:20px 0 8px;}
 .lg-flotte-reederei:first-child{margin-top:0;}
-.lg-flotte-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
-.lg-flotte-karte{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
-.lg-flotte-foto{width:100%;height:88px;object-fit:cover;display:block;background:var(--sky);}
-.lg-flotte-info{padding:8px 9px 9px;}
-.lg-flotte-name{font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:3px;}
-.lg-flotte-specs{font-size:11px;color:var(--muted);line-height:1.5;}
-.lg-flotte-credit{font-size:9px;color:var(--muted);opacity:.65;margin-top:4px;}
+.lg-flotte-liste{display:flex;flex-direction:column;gap:8px;}
+.lg-flotte-name-row{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 15px;font-size:14.5px;font-weight:600;color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;}
+.lg-flotte-name-row .lg-flotte-name-chev{color:var(--muted);font-size:11px;transition:transform .15s;}
+.lg-flotte-name-row.is-sel{border-color:var(--gold);box-shadow:0 0 0 2px rgba(185,132,43,.25);}
+.lg-flotte-name-row.is-sel .lg-flotte-name-chev{transform:rotate(180deg);color:var(--gold);}
+.lg-flotte-karte{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:-2px 0 4px;}
+.lg-flotte-foto{width:100%;height:170px;object-fit:cover;display:block;background:var(--sky);}
+.lg-flotte-info{padding:10px 13px 12px;}
+.lg-flotte-specs{font-size:13px;color:var(--muted);line-height:1.6;}
+.lg-flotte-credit{font-size:10px;color:var(--muted);opacity:.65;margin-top:6px;}
 .lg-map-empty{text-align:center;color:var(--muted);padding:30px 16px;}
 </style>
 </head>
@@ -996,6 +999,7 @@ var karteView=null; // aktueller viewBox-Ausschnitt (Zoom/Pan), null = zurueckge
 var karteMyPos=null; // {lat,lng} eigener Standort, falls ermittelt
 var karteLocStatus=null;
 var karteFlotteOffen=false;
+var karteFlotteSel=null;
 // Schweizer Anlegestellen, nur zur optischen Orientierung ("wo bin ich gerade")
 var REGION_SCHWEIZ={12:1,13:1,14:1,16:1,17:1,19:1,22:1,24:1,25:1,27:1,28:1,29:1,30:1,31:1,32:1,33:1,34:1,35:1,36:1,37:1,38:1};
 // Vereinfachte, aber echte Seeumrisse (aus OpenStreetMap-Daten abgeleitet, Douglas-Peucker-vereinfacht, [lat,lng]).
@@ -1076,20 +1080,25 @@ function flotteHTML(){
   FLOTTE_REEDEREI_ORDER.forEach(function(r){
     var schiffe=FLOTTE.filter(function(s){return s.reederei===r;});
     if(!schiffe.length) return;
-    h+='<div class="lg-flotte-reederei">'+esc(r)+'</div><div class="lg-flotte-grid">';
+    h+='<div class="lg-flotte-reederei">'+esc(r)+'</div><div class="lg-flotte-liste">';
     schiffe.forEach(function(s){
-      var laenge=(""+s.laenge).replace(".",",");
-      var specs=s.pers+" Pers. &middot; "+laenge+" m";
-      if(s.pkw) specs+=" &middot; "+s.pkw+" Pkw";
-      specs+="<br>Baujahr "+s.baujahr;
-      if(s.tiefgang) specs+=" &middot; Tiefgang "+((""+s.tiefgang).replace(".",","))+" m";
-      h+='<div class="lg-flotte-karte">'+
-        '<img class="lg-flotte-foto" src="'+s.foto+'" alt="'+esc(s.name)+'" loading="lazy">'+
-        '<div class="lg-flotte-info">'+
-        '<div class="lg-flotte-name">'+esc(s.name)+'</div>'+
-        '<div class="lg-flotte-specs">'+specs+'</div>'+
-        '<div class="lg-flotte-credit">Foto: '+esc(s.autor)+', Wikimedia Commons ('+esc(s.lizenz)+')</div>'+
-        '</div></div>';
+      var idx=FLOTTE.indexOf(s);
+      var sel=karteFlotteSel===idx;
+      h+='<button type="button" class="lg-flotte-name-row'+(sel?" is-sel":"")+'" data-flotte="'+idx+'">'+
+        '<span>'+esc(s.name)+'</span><span class="lg-flotte-name-chev">&#9660;</span></button>';
+      if(sel){
+        var laenge=(""+s.laenge).replace(".",",");
+        var specs=s.pers+" Pers. &middot; "+laenge+" m";
+        if(s.pkw) specs+=" &middot; "+s.pkw+" Pkw";
+        specs+="<br>Baujahr "+s.baujahr;
+        if(s.tiefgang) specs+=" &middot; Tiefgang "+((""+s.tiefgang).replace(".",","))+" m";
+        h+='<div class="lg-flotte-karte">'+
+          '<img class="lg-flotte-foto" src="'+s.foto+'" alt="'+esc(s.name)+'" loading="lazy">'+
+          '<div class="lg-flotte-info">'+
+          '<div class="lg-flotte-specs">'+specs+'</div>'+
+          '<div class="lg-flotte-credit">Foto: '+esc(s.autor)+', Wikimedia Commons ('+esc(s.lizenz)+')</div>'+
+          '</div></div>';
+      }
     });
     h+='</div>';
   });
@@ -1228,7 +1237,15 @@ function karteBindMap(){
   var flotteToggle=document.getElementById("lg-flotte-toggle");
   if(flotteToggle) flotteToggle.addEventListener("click",function(){
     karteFlotteOffen=!karteFlotteOffen;
+    if(!karteFlotteOffen) karteFlotteSel=null;
     render();
+  });
+  document.querySelectorAll("[data-flotte]").forEach(function(b){
+    b.addEventListener("click",function(){
+      var idx=+this.getAttribute("data-flotte");
+      karteFlotteSel=(karteFlotteSel===idx)?null:idx;
+      render();
+    });
   });
   var locateBtn=document.getElementById("lg-map-locate");
   if(locateBtn) locateBtn.addEventListener("click",function(){
@@ -1342,7 +1359,7 @@ function karteBindMap(){
 function render(){
   var main=document.getElementById("lg-main");
   if(karteTimer){ clearInterval(karteTimer); karteTimer=null; }
-  if(state.tab!=="karte"){ karteView=null; karteFlotteOffen=false; } // Zoom/Pan/Flotte beim Verlassen des Tabs zuruecksetzen
+  if(state.tab!=="karte"){ karteView=null; karteFlotteOffen=false; karteFlotteSel=null; } // Zoom/Pan/Flotte beim Verlassen des Tabs zuruecksetzen
   if(state.tab==="planer") main.innerHTML=planerHTML();
   else if(state.tab==="schweiz") main.innerHTML=schweizHTML();
   else if(state.tab==="karte"){
