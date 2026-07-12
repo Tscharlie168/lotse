@@ -161,19 +161,26 @@ select,input,button{font-family:inherit;}
 .lg-xfer{margin:9px 0 4px;padding:7px 11px;background:rgba(98,208,232,.16);border-radius:8px;font-size:13px;color:#CDEAF4;}
 .lg-leg-kurs{display:flex;align-items:center;gap:8px;margin:6px 0 4px;}
 
-.lg-map-wrap{background:#DCEEF5;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px;}
-.lg-map-wrap svg{display:block;width:100%;height:auto;}
-.lg-map-hafen{fill:#8FB9CC;}
-.lg-map-hafen-label{font-family:'Inter',sans-serif;font-size:6.5px;fill:var(--muted);}
-.lg-map-linie{stroke:#B7D6E2;stroke-width:1;fill:none;}
+.lg-map-wrap{background:#BEE1EE;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:10px;touch-action:none;}
+.lg-map-wrap svg{display:block;width:100%;height:340px;}
+.lg-map-see{stroke:none;}
+.lg-map-see--obersee{fill:#BEE1EE;}
+.lg-map-see--ueberlingen{fill:#9FD6DC;}
+.lg-map-see--untersee{fill:#CBE9D3;}
+.lg-map-hafen{fill:#6F97AC;}
+.lg-map-hafen--ch{fill:#D5473C;}
+.lg-map-hafen-label{font-family:'Inter',sans-serif;font-size:6.5px;fill:var(--navy);paint-order:stroke;stroke:#fff;stroke-width:2px;}
+.lg-map-linie{stroke:rgba(255,255,255,.65);stroke-width:1;fill:none;}
 .lg-map-schiff{cursor:pointer;}
-.lg-map-schiff path{fill:var(--red);stroke:#fff;stroke-width:.6;}
-.lg-map-schiff.is-sel path{fill:var(--gold);}
+.lg-map-schiff .lg-map-schiff-ring{fill:var(--red);stroke:#fff;stroke-width:.7;}
+.lg-map-schiff.is-sel .lg-map-schiff-ring{fill:var(--gold);}
+.lg-map-schiff .lg-map-schiff-hub{fill:#fff;}
+.lg-map-schiff .lg-map-schiff-spoke{stroke:#fff;stroke-width:1;}
 .lg-map-schiff .lg-map-hit{fill:transparent;}
+.lg-map-hint{font-size:11.5px;color:var(--muted);text-align:center;margin:0 0 8px;}
 .lg-map-stand{font-size:12.5px;color:var(--muted);text-align:center;margin:0 0 14px;}
-.lg-schiff-item{background:#fff;border:1px solid var(--gold);box-shadow:0 0 0 2px rgba(185,132,43,.25);border-radius:12px;padding:12px 14px;}
-.lg-schiff-item b{color:var(--navy);}
-.lg-schiff-item .lg-schiff-sub{font-size:13px;color:var(--muted);margin-top:2px;}
+.lg-schiff-item{background:#fff;border:1px solid var(--gold);box-shadow:0 0 0 2px rgba(185,132,43,.25);border-radius:12px;padding:12px 14px;text-align:center;}
+.lg-schiff-item b{color:var(--navy);font-size:16px;}
 .lg-map-empty{text-align:center;color:var(--muted);padding:30px 16px;}
 </style>
 </head>
@@ -957,6 +964,39 @@ function schiffePositionen(){
   return out;
 }
 var KARTE_LABEL_HAFEN=[0,2,5,10,11,12,27,28,30,39,43]; // Konstanz,Meersburg,FN,Lindau,Bregenz,Kreuzlingen,Schaffhausen,Romanshorn,Rorschach,Radolfzell,Überlingen
+// Grobe Zuordnung der Häfen zu den drei Seebecken, nur fürs stilisierte Kartenschema (keine exakte Küstenlinie)
+var REGION_OBERSEE=[0,2,3,4,5,6,7,8,9,10,11,12,28,29,30,31,32,33,34,35,36,37,38];
+var REGION_UEBERLINGER=[1,41,42,43]; // Mainau,Unteruhldingen,Dingelsdorf,Überlingen
+var REGION_UNTERSEE=[13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,39,40];
+var REGION_EXTRA_UEBERLINGER=[[47.735,9.14],[47.66,9.15]]; // Hilfspunkte fuer die Bucht Richtung Konstanz
+var REGION_EXTRA_UNTERSEE=[[47.71,8.80]]; // Hilfspunkt Richtung Schaffhausen
+// Schweizer Anlegestellen, nur zur optischen Orientierung ("wo bin ich gerade")
+var REGION_SCHWEIZ={12:1,13:1,14:1,16:1,17:1,19:1,22:1,24:1,25:1,27:1,28:1,29:1,30:1,31:1,32:1,33:1,34:1,35:1,36:1,37:1,38:1};
+function konvexeHuelle(pts){
+  var p=pts.slice().sort(function(a,b){return a[0]-b[0]||a[1]-b[1];});
+  function kreuz(o,a,b){return (a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);}
+  var lo=[];
+  for(var i=0;i<p.length;i++){
+    while(lo.length>=2&&kreuz(lo[lo.length-2],lo[lo.length-1],p[i])<=0) lo.pop();
+    lo.push(p[i]);
+  }
+  var up=[];
+  for(var i=p.length-1;i>=0;i--){
+    while(up.length>=2&&kreuz(up[up.length-2],up[up.length-1],p[i])<=0) up.pop();
+    up.push(p[i]);
+  }
+  up.pop(); lo.pop();
+  return lo.concat(up);
+}
+function huellePolster(huelle,polster){
+  var cx=0,cy=0;
+  huelle.forEach(function(p){cx+=p[0];cy+=p[1];});
+  cx/=huelle.length; cy/=huelle.length;
+  return huelle.map(function(p){
+    var dx=p[0]-cx,dy=p[1]-cy,len=Math.hypot(dx,dy)||1;
+    return [p[0]+dx/len*polster,p[1]+dy/len*polster];
+  });
+}
 function karteBounds(){
   var latMin=90,latMax=-90,lngMin=180,lngMax=-180;
   for(var i=0;i<COORDS.length;i++){
@@ -977,6 +1017,15 @@ function karteHTML(){
     var y=PAD+(b.latMax-lat)*scale;
     return [x,y];
   }
+  function regionPfad(idxListe,extra,polster){
+    var pts=idxListe.map(function(i){return xy(COORDS[i][0],COORDS[i][1]);});
+    if(extra) extra.forEach(function(ll){pts.push(xy(ll[0],ll[1]));});
+    var huelle=huellePolster(konvexeHuelle(pts),polster);
+    return "M"+huelle.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join("L")+"Z";
+  }
+  var seeBg='<path class="lg-map-see lg-map-see--obersee" d="'+regionPfad(REGION_OBERSEE,null,16)+'"/>'+
+    '<path class="lg-map-see lg-map-see--ueberlingen" d="'+regionPfad(REGION_UEBERLINGER,REGION_EXTRA_UEBERLINGER,14)+'"/>'+
+    '<path class="lg-map-see lg-map-see--untersee" d="'+regionPfad(REGION_UNTERSEE,REGION_EXTRA_UNTERSEE,14)+'"/>';
   // Routenlinien: alle direkt aufeinanderfolgenden Haltepaare aus allen Kursen, einmalig
   var seen={}, lines="";
   for(var i=0;i<COURSES.length;i++){
@@ -991,7 +1040,8 @@ function karteHTML(){
   var dots="";
   for(var h=0;h<PORTS.length;h++){
     var pp=xy(COORDS[h][0],COORDS[h][1]);
-    dots+='<circle class="lg-map-hafen" cx="'+pp[0].toFixed(1)+'" cy="'+pp[1].toFixed(1)+'" r="2.2"/>';
+    var chCls=REGION_SCHWEIZ[h]?" lg-map-hafen--ch":"";
+    dots+='<circle class="lg-map-hafen'+chCls+'" cx="'+pp[0].toFixed(1)+'" cy="'+pp[1].toFixed(1)+'" r="2.2"/>';
     if(KARTE_LABEL_HAFEN.indexOf(h)!==-1){
       dots+='<text class="lg-map-hafen-label" x="'+(pp[0]+4).toFixed(1)+'" y="'+(pp[1]+2.5).toFixed(1)+'">'+esc(PORTS[h])+'</text>';
     }
@@ -1003,11 +1053,17 @@ function karteHTML(){
     var sel=state.schiffSel===idx?" is-sel":"";
     boote+='<g class="lg-map-schiff'+sel+'" data-schiffidx="'+idx+'" transform="translate('+pp[0].toFixed(1)+','+pp[1].toFixed(1)+')">'+
       '<circle class="lg-map-hit" cx="0" cy="0" r="7"/>'+
-      '<path d="M-5,3 L5,3 L3.5,-2.5 L-3.5,-2.5 Z"/></g>';
+      '<circle class="lg-map-schiff-ring" r="4.6"/>'+
+      '<line class="lg-map-schiff-spoke" x1="0" y1="-4.6" x2="0" y2="-1.4"/>'+
+      '<line class="lg-map-schiff-spoke" x1="0" y1="4.6" x2="0" y2="1.4"/>'+
+      '<line class="lg-map-schiff-spoke" x1="-4.6" y1="0" x2="-1.4" y2="0"/>'+
+      '<line class="lg-map-schiff-spoke" x1="4.6" y1="0" x2="1.4" y2="0"/>'+
+      '<circle class="lg-map-schiff-hub" r="1.4"/></g>';
   });
   var h2='<section class="lg-panel">'+
-    '<div class="lg-lead">Welche Schiffe sind laut Fahrplan gerade unterwegs? Nur Kurse aus diesem Fahrplan (BSB/SBS/VL/URh) — keine Live-Ortung, sondern aus den Fahrzeiten berechnet. Tippe auf ein Schiff für Details.</div>'+
-    '<div class="lg-map-wrap"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">'+lines+dots+boote+'</svg></div>'+
+    '<div class="lg-lead">Welche Schiffe sind laut Fahrplan gerade unterwegs? Nur Kurse aus diesem Fahrplan (BSB/SBS/VL/URh) — keine Live-Ortung, sondern aus den Fahrzeiten berechnet.</div>'+
+    '<div class="lg-map-wrap"><svg viewBox="'+(karteView?karteView.x.toFixed(1)+" "+karteView.y.toFixed(1)+" "+karteView.w.toFixed(1)+" "+karteView.h.toFixed(1):"0 0 "+W+" "+H)+'" preserveAspectRatio="xMidYMid meet">'+seeBg+lines+dots+boote+'</svg></div>'+
+    '<p class="lg-map-hint">Mit dem Finger verschieben, mit zwei Fingern zoomen. Tippen zeigt Start &amp; Ziel.</p>'+
     '<p class="lg-map-stand" id="lg-karte-stand"></p>';
   if(!schiffe.length){
     h2+='<div class="lg-map-empty">Gerade ist kein Kurs aus dem Fahrplan unterwegs.</div>';
@@ -1017,8 +1073,7 @@ function karteHTML(){
       h2+='<div class="lg-map-empty">'+schiffe.length+' Schiff'+(schiffe.length===1?"":"e")+' gerade unterwegs &mdash; tippe auf ein Symbol auf der Karte.</div>';
     }else{
       var sh=schiffe[sel];
-      h2+='<div class="lg-schiff-item"><b>Kurs '+esc(sh.no)+'</b> '+svcTag(sh.svc)+
-        '<div class="lg-schiff-sub">'+esc(sh.von)+' &rarr; '+esc(sh.bis)+' &middot; '+esc(sh.status)+'</div></div>';
+      h2+='<div class="lg-schiff-item"><b>'+esc(sh.von)+' &rarr; '+esc(sh.bis)+'</b></div>';
     }
   }
   h2+='</section>';
@@ -1041,18 +1096,119 @@ function hinweiseHTML(){
 }
 
 var karteTimer=null;
+var KARTE_BASIS={x:0,y:0,w:440,h:320};
+var karteView=null; // aktueller viewBox-Ausschnitt (Zoom/Pan), null = zurueckgesetzt auf Vollansicht
 function karteStandText(){
   var el=document.getElementById("lg-karte-stand");
   if(!el) return;
   var n=new Date();
   el.textContent="Stand: "+pad2(n.getHours())+":"+pad2(n.getMinutes())+" Uhr · aktualisiert sich von selbst";
 }
+var KARTE_MIN_W=70; // groesster Zoom (kleinster Ausschnitt)
+function karteKlemmen(v){
+  v.w=Math.max(KARTE_MIN_W,Math.min(KARTE_BASIS.w,v.w));
+  v.h=v.w*KARTE_BASIS.h/KARTE_BASIS.w;
+  if(v.x<0)v.x=0; if(v.y<0)v.y=0;
+  if(v.x>KARTE_BASIS.w-v.w)v.x=KARTE_BASIS.w-v.w;
+  if(v.y>KARTE_BASIS.h-v.h)v.y=KARTE_BASIS.h-v.h;
+  return v;
+}
+function karteBindMap(){
+  var svg=document.querySelector(".lg-map-wrap svg");
+  if(!svg||!karteView) return;
+  function svgPunkt(clientX,clientY){
+    var rect=svg.getBoundingClientRect();
+    return {x:karteView.x+(clientX-rect.left)/rect.width*karteView.w,
+      y:karteView.y+(clientY-rect.top)/rect.height*karteView.h};
+  }
+  function anwenden(){
+    svg.setAttribute("viewBox",karteView.x.toFixed(1)+" "+karteView.y.toFixed(1)+" "+karteView.w.toFixed(1)+" "+karteView.h.toFixed(1));
+  }
+  var pts={},downPt=null,downView=null,dragged=false,downTime=0,pinchDist=0,pinchView=null,pinchMid=null;
+  svg.addEventListener("pointerdown",function(e){
+    svg.setPointerCapture(e.pointerId);
+    pts[e.pointerId]={x:e.clientX,y:e.clientY};
+    var ids=Object.keys(pts);
+    if(ids.length===1){
+      downPt={x:e.clientX,y:e.clientY}; downView={x:karteView.x,y:karteView.y,w:karteView.w,h:karteView.h};
+      dragged=false; downTime=Date.now();
+    }else if(ids.length===2){
+      dragged=true; // waehrend eines Pinch-Gestus nie als Tipp werten
+      var p1=pts[ids[0]],p2=pts[ids[1]];
+      pinchDist=Math.hypot(p2.x-p1.x,p2.y-p1.y);
+      pinchView={x:karteView.x,y:karteView.y,w:karteView.w,h:karteView.h};
+      pinchMid=svgPunkt((p1.x+p2.x)/2,(p1.y+p2.y)/2);
+    }
+  });
+  svg.addEventListener("pointermove",function(e){
+    if(!pts[e.pointerId]) return;
+    pts[e.pointerId]={x:e.clientX,y:e.clientY};
+    var ids=Object.keys(pts);
+    if(ids.length===1&&downPt){
+      var rect=svg.getBoundingClientRect();
+      var dxC=e.clientX-downPt.x, dyC=e.clientY-downPt.y;
+      if(Math.hypot(dxC,dyC)>4) dragged=true;
+      var dx=dxC/rect.width*downView.w, dy=dyC/rect.height*downView.h;
+      karteView=karteKlemmen({x:downView.x-dx,y:downView.y-dy,w:downView.w,h:downView.h});
+      anwenden();
+      e.preventDefault();
+    }else if(ids.length===2&&pinchDist>0){
+      var p1=pts[ids[0]],p2=pts[ids[1]];
+      var dist=Math.hypot(p2.x-p1.x,p2.y-p1.y);
+      var factor=pinchDist/Math.max(dist,1);
+      var newW=pinchView.w*factor;
+      var nx=pinchMid.x-(pinchMid.x-pinchView.x)*(newW/pinchView.w);
+      var ny=pinchMid.y-(pinchMid.y-pinchView.y)*(newW*KARTE_BASIS.h/KARTE_BASIS.w/pinchView.h);
+      karteView=karteKlemmen({x:nx,y:ny,w:newW,h:newW*KARTE_BASIS.h/KARTE_BASIS.w});
+      anwenden();
+      e.preventDefault();
+    }
+  });
+  function karteUp(e){
+    var warEinzeln=Object.keys(pts).length===1;
+    delete pts[e.pointerId];
+    var rest=Object.keys(pts).length;
+    if(rest<2) pinchDist=0;
+    if(rest===1){
+      var nurId=Object.keys(pts)[0];
+      downPt={x:pts[nurId].x,y:pts[nurId].y};
+      downView={x:karteView.x,y:karteView.y,w:karteView.w,h:karteView.h};
+      dragged=true; downTime=Date.now();
+    }
+    if(rest===0&&warEinzeln){
+      if(downPt&&!dragged&&Date.now()-downTime<600){
+        var el=document.elementFromPoint(e.clientX,e.clientY);
+        var g=el&&el.closest?el.closest("[data-schiffidx]"):null;
+        if(g){
+          var idx=+g.getAttribute("data-schiffidx");
+          state.schiffSel=(state.schiffSel===idx)?null:idx;
+          render();
+        }
+      }
+      downPt=null;
+    }
+  }
+  svg.addEventListener("pointerup",karteUp);
+  svg.addEventListener("pointercancel",karteUp);
+  svg.addEventListener("wheel",function(e){
+    e.preventDefault();
+    var mid=svgPunkt(e.clientX,e.clientY);
+    var factor=e.deltaY>0?1.15:1/1.15;
+    var newW=karteView.w*factor;
+    var nx=mid.x-(mid.x-karteView.x)*(newW/karteView.w);
+    var ny=mid.y-(mid.y-karteView.y)*(newW*KARTE_BASIS.h/KARTE_BASIS.w/karteView.h);
+    karteView=karteKlemmen({x:nx,y:ny,w:newW,h:newW*KARTE_BASIS.h/KARTE_BASIS.w});
+    anwenden();
+  },{passive:false});
+}
 function render(){
   var main=document.getElementById("lg-main");
   if(karteTimer){ clearInterval(karteTimer); karteTimer=null; }
+  if(state.tab!=="karte") karteView=null; // Zoom/Pan beim Verlassen des Tabs zuruecksetzen
   if(state.tab==="planer") main.innerHTML=planerHTML();
   else if(state.tab==="schweiz") main.innerHTML=schweizHTML();
   else if(state.tab==="karte"){
+    if(!karteView) karteView={x:KARTE_BASIS.x,y:KARTE_BASIS.y,w:KARTE_BASIS.w,h:KARTE_BASIS.h};
     main.innerHTML=karteHTML();
     karteStandText();
     karteTimer=setInterval(function(){
@@ -1094,13 +1250,7 @@ function bind(){
   });
 
   if(state.tab==="karte"){
-    document.querySelectorAll("[data-schiffidx]").forEach(function(el){
-      el.addEventListener("click",function(){
-        var idx=+this.getAttribute("data-schiffidx");
-        state.schiffSel=(state.schiffSel===idx)?null:idx;
-        render();
-      });
-    });
+    karteBindMap();
     return;
   }
   if(state.tab!=="planer") return;
