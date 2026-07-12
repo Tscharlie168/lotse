@@ -161,12 +161,12 @@ select,input,button{font-family:inherit;}
 .lg-xfer{margin:9px 0 4px;padding:7px 11px;background:rgba(98,208,232,.16);border-radius:8px;font-size:13px;color:#CDEAF4;}
 .lg-leg-kurs{display:flex;align-items:center;gap:8px;margin:6px 0 4px;}
 
-.lg-map-wrap{position:relative;background:#BEE1EE;border:1px solid var(--line);border-radius:0;overflow:hidden;margin:0 -16px 10px;touch-action:none;}
-.lg-map-wrap svg{display:block;width:100%;height:auto;}
+.lg-map-wrap{position:relative;background:#A9D4E8;border:1px solid var(--line);border-radius:0;overflow:hidden;margin:0 -16px 10px;touch-action:none;}
+.lg-map-wrap svg{display:block;width:100%;height:56vh;max-height:520px;}
 .lg-map-see{stroke:none;}
-.lg-map-see--obersee{fill:#BEE1EE;}
-.lg-map-see--ueberlingen{fill:#9FD6DC;}
-.lg-map-see--untersee{fill:#CBE9D3;}
+.lg-map-see--obersee{fill:#A9D4E8;}
+.lg-map-see--ueberlingen{fill:#5FBFCE;}
+.lg-map-see--untersee{fill:#9BDCAE;}
 .lg-map-hafen{fill:#6F97AC;}
 .lg-map-hafen--ch{fill:var(--navy);}
 .lg-map-hafen-label{font-family:'Inter',sans-serif;font-size:6.5px;fill:var(--navy);paint-order:stroke;stroke:#fff;stroke-width:2px;}
@@ -973,47 +973,23 @@ var KARTE_BASIS={x:0,y:0,w:440,h:320};
 var karteView=null; // aktueller viewBox-Ausschnitt (Zoom/Pan), null = zurueckgesetzt auf Vollansicht
 var karteMyPos=null; // {lat,lng} eigener Standort, falls ermittelt
 var karteLocStatus=null;
-// Grobe Zuordnung der Häfen zu den drei Seebecken, nur fürs stilisierte Kartenschema (keine exakte Küstenlinie)
-var REGION_OBERSEE=[0,2,3,4,5,6,7,8,9,10,11,12,28,29,30,31,32,33,34,35,36,37,38];
-var REGION_UEBERLINGER=[1,41,42,43]; // Mainau,Unteruhldingen,Dingelsdorf,Überlingen
-var REGION_UNTERSEE=[13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,39,40];
-// Hilfspunkte (keine echten Haltestellen) um die Buchten realistischer auszurunden, da nicht jede Bucht bis zur Spitze einen Fahrplan-Halt hat
-var REGION_EXTRA_UEBERLINGER=[[47.80,9.05],[47.775,9.10],[47.68,9.16]]; // Richtung Bodman/Sipplingen und Uebergang zu Konstanz
-var REGION_EXTRA_UNTERSEE=[[47.71,8.80],[47.805,8.95],[47.70,9.00]]; // Richtung Schaffhausen/Rhein, noerdlicher Buchtrand, Uebergang zu Konstanz
 // Schweizer Anlegestellen, nur zur optischen Orientierung ("wo bin ich gerade")
 var REGION_SCHWEIZ={12:1,13:1,14:1,16:1,17:1,19:1,22:1,24:1,25:1,27:1,28:1,29:1,30:1,31:1,32:1,33:1,34:1,35:1,36:1,37:1,38:1};
-function konvexeHuelle(pts){
-  var p=pts.slice().sort(function(a,b){return a[0]-b[0]||a[1]-b[1];});
-  function kreuz(o,a,b){return (a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);}
-  var lo=[];
-  for(var i=0;i<p.length;i++){
-    while(lo.length>=2&&kreuz(lo[lo.length-2],lo[lo.length-1],p[i])<=0) lo.pop();
-    lo.push(p[i]);
-  }
-  var up=[];
-  for(var i=p.length-1;i>=0;i--){
-    while(up.length>=2&&kreuz(up[up.length-2],up[up.length-1],p[i])<=0) up.pop();
-    up.push(p[i]);
-  }
-  up.pop(); lo.pop();
-  return lo.concat(up);
-}
-function huellePolster(huelle,polster){
-  var cx=0,cy=0;
-  huelle.forEach(function(p){cx+=p[0];cy+=p[1];});
-  cx/=huelle.length; cy/=huelle.length;
-  return huelle.map(function(p){
-    var dx=p[0]-cx,dy=p[1]-cy,len=Math.hypot(dx,dy)||1;
-    return [p[0]+dx/len*polster,p[1]+dy/len*polster];
-  });
-}
+// Vereinfachte, aber echte Seeumrisse (aus OpenStreetMap-Daten abgeleitet, Douglas-Peucker-vereinfacht, [lat,lng]).
+// BODENSEE_UMRISS = gesamte Wasserflaeche (Obersee+Ueberlinger See+Untersee) als Basisflaeche.
+// Die zwei folgenden Arrays sind Teilmengen derselben Kuestenlinie plus einer schematischen Trennlinie
+// an der jeweiligen Seeenge und werden als eigenfarbene Flaechen darueber gezeichnet.
+var BODENSEE_UMRISS=[[47.6577,8.8587],[47.6517,8.8704],[47.6523,8.8829],[47.6441,8.8919],[47.6434,8.9041],[47.6487,8.9166],[47.6464,8.9221],[47.6524,8.9314],[47.6564,8.9627],[47.6687,8.9814],[47.6755,9.0178],[47.6728,9.026],[47.6746,9.0687],[47.6706,9.0769],[47.6754,9.0855],[47.6666,9.0963],[47.6631,9.1394],[47.6689,9.1697],[47.6657,9.1784],[47.656,9.1818],[47.6497,9.1894],[47.6451,9.2118],[47.6353,9.2263],[47.6323,9.2444],[47.6128,9.2961],[47.5933,9.3266],[47.5707,9.3843],[47.5619,9.3847],[47.5645,9.3824],[47.5543,9.3802],[47.5505,9.3866],[47.5477,9.3816],[47.5504,9.3867],[47.5433,9.3906],[47.5235,9.4222],[47.5186,9.4378],[47.5133,9.4416],[47.5117,9.4351],[47.5064,9.436],[47.5058,9.4458],[47.4993,9.4518],[47.4946,9.4693],[47.4799,9.4862],[47.482,9.5389],[47.5042,9.5613],[47.4992,9.56],[47.5042,9.5625],[47.5002,9.5624],[47.5013,9.5686],[47.4953,9.5709],[47.4907,9.5863],[47.4878,9.5857],[47.4879,9.6091],[47.4956,9.6157],[47.4945,9.624],[47.5071,9.6446],[47.5032,9.6454],[47.4991,9.6379],[47.4924,9.6407],[47.4865,9.653],[47.4899,9.6485],[47.4925,9.6546],[47.4864,9.6676],[47.4912,9.662],[47.4916,9.668],[47.4947,9.6621],[47.4945,9.6683],[47.4977,9.665],[47.503,9.6666],[47.5144,9.6477],[47.5248,9.6433],[47.526,9.646],[47.5177,9.6516],[47.5056,9.6705],[47.4989,9.6724],[47.5018,9.6853],[47.4973,9.6787],[47.4919,9.681],[47.4928,9.6878],[47.4999,9.6853],[47.495,9.6882],[47.5003,9.6898],[47.5041,9.6849],[47.5066,9.6919],[47.5044,9.7419],[47.5085,9.7506],[47.5151,9.7538],[47.5296,9.7417],[47.5329,9.7281],[47.5343,9.7317],[47.5505,9.7127],[47.552,9.6829],[47.5486,9.6813],[47.5482,9.6915],[47.5422,9.6809],[47.5458,9.6753],[47.5525,9.6825],[47.5568,9.6794],[47.5567,9.6536],[47.5668,9.6393],[47.5662,9.6293],[47.5694,9.6308],[47.571,9.6275],[47.5697,9.6143],[47.5735,9.6067],[47.5841,9.6024],[47.5883,9.5963],[47.5841,9.5726],[47.5878,9.5505],[47.603,9.5298],[47.6154,9.5267],[47.6214,9.518],[47.6339,9.5157],[47.6498,9.4953],[47.6513,9.4717],[47.6484,9.4628],[47.655,9.4523],[47.6566,9.4354],[47.6657,9.4209],[47.6683,9.4072],[47.661,9.3492],[47.6824,9.2896],[47.7113,9.2385],[47.7233,9.2265],[47.7404,9.2252],[47.7669,9.1564],[47.7702,9.1382],[47.7827,9.1245],[47.7978,9.0871],[47.8151,9.0613],[47.8175,9.0394],[47.8054,9.0307],[47.7723,9.0797],[47.7593,9.1164],[47.7471,9.1358],[47.7486,9.1491],[47.7396,9.1596],[47.7345,9.1735],[47.7117,9.1812],[47.7055,9.1795],[47.6826,9.2133],[47.6762,9.2103],[47.666,9.2181],[47.663,9.2065],[47.6717,9.1616],[47.6649,9.14],[47.6673,9.1289],[47.6844,9.1143],[47.6855,9.1066],[47.6869,9.1098],[47.6867,9.0917],[47.69,9.1093],[47.7032,9.0994],[47.7435,8.9893],[47.7395,8.9833],[47.7339,9.0003],[47.7197,9.0147],[47.7264,9.0057],[47.7372,8.9599],[47.734,8.943],[47.7279,8.9397],[47.7227,8.9452],[47.7067,8.9936],[47.7005,9.0025],[47.6962,9.0064],[47.6869,8.9985],[47.6769,8.9743],[47.672,8.9712],[47.6675,8.9502],[47.6591,8.9381],[47.6603,8.925],[47.6521,8.895],[47.6577,8.8587]];
+var BODENSEE_UEBERLINGER_SEE=[[47.8065,9.0306],[47.7723,9.0797],[47.7593,9.1164],[47.7471,9.1358],[47.7486,9.1491],[47.7396,9.1596],[47.7345,9.1735],[47.7117,9.1812],[47.7055,9.1795],[47.7028,9.1866],[47.6976,9.1875],[47.6915,9.2021],[47.6826,9.2133],[47.6762,9.2103],[47.666,9.2181],[47.6934,9.2691],[47.7076,9.2438],[47.7221,9.2274],[47.7229,9.2297],[47.7233,9.2265],[47.7262,9.2287],[47.7331,9.2253],[47.7384,9.2264],[47.7447,9.2174],[47.7508,9.1928],[47.7669,9.1564],[47.7702,9.1382],[47.7827,9.1245],[47.793,9.1054],[47.7978,9.0871],[47.815,9.0615],[47.8175,9.0394],[47.8134,9.0392],[47.8124,9.0348],[47.8082,9.0348],[47.8065,9.0306]];
+var BODENSEE_UNTERSEE=[[47.6577,8.8587],[47.6517,8.8704],[47.6523,8.8829],[47.6441,8.8919],[47.6434,8.9041],[47.6487,8.9166],[47.6464,8.9221],[47.6524,8.9314],[47.6564,8.9627],[47.6687,8.9814],[47.6755,9.0178],[47.6728,9.026],[47.6746,9.0687],[47.6706,9.0769],[47.6754,9.0855],[47.6666,9.0963],[47.6631,9.1394],[47.6689,9.1697],[47.6657,9.1784],[47.656,9.1818],[47.7032,9.0994],[47.7435,8.9893],[47.7395,8.9833],[47.7339,9.0003],[47.7197,9.0147],[47.7264,9.0057],[47.7372,8.9599],[47.734,8.943],[47.7279,8.9397],[47.7227,8.9452],[47.7067,8.9936],[47.7005,9.0025],[47.6962,9.0064],[47.6869,8.9985],[47.6769,8.9743],[47.672,8.9712],[47.6675,8.9502],[47.6591,8.9381],[47.6603,8.925],[47.6521,8.895],[47.6577,8.8587]];
+// Rhein-Fortsetzung Richtung Schaffhausen (schmales Flussstueck, keine echten Umriss-Daten der Seeflaeche mehr, daher grob verjuengt)
+var BODENSEE_RHEIN_WEST=[[47.665,8.86],[47.7,8.8],[47.705,8.75],[47.706,8.7],[47.703,8.65],[47.699,8.628],[47.69,8.628],[47.693,8.65],[47.696,8.7],[47.693,8.75],[47.688,8.8],[47.65,8.86]];
 function karteBounds(){
   var latMin=90,latMax=-90,lngMin=180,lngMax=-180;
-  for(var i=0;i<COORDS.length;i++){
-    var la=COORDS[i][0],lo=COORDS[i][1];
-    if(la<latMin)latMin=la; if(la>latMax)latMax=la;
-    if(lo<lngMin)lngMin=lo; if(lo>lngMax)lngMax=lo;
-  }
+  function nimm(la,lo){ if(la<latMin)latMin=la; if(la>latMax)latMax=la; if(lo<lngMin)lngMin=lo; if(lo>lngMax)lngMax=lo; }
+  for(var i=0;i<COORDS.length;i++) nimm(COORDS[i][0],COORDS[i][1]);
+  BODENSEE_UMRISS.forEach(function(p){nimm(p[0],p[1]);});
+  BODENSEE_RHEIN_WEST.forEach(function(p){nimm(p[0],p[1]);});
   return {latMin:latMin,latMax:latMax,lngMin:lngMin,lngMax:lngMax};
 }
 var KARTE_PAD=26;
@@ -1045,15 +1021,13 @@ var WHEEL_SPOKES=(function(){
   return s;
 })();
 function karteHTML(){
-  function regionPfad(idxListe,extra,polster){
-    var pts=idxListe.map(function(i){return karteXY(COORDS[i][0],COORDS[i][1]);});
-    if(extra) extra.forEach(function(ll){pts.push(karteXY(ll[0],ll[1]));});
-    var huelle=huellePolster(konvexeHuelle(pts),polster);
-    return "M"+huelle.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join("L")+"Z";
+  function ringPfad(ring){
+    return "M"+ring.map(function(p){var xy=karteXY(p[0],p[1]);return xy[0].toFixed(1)+","+xy[1].toFixed(1);}).join("L")+"Z";
   }
-  var seeBg='<path class="lg-map-see lg-map-see--obersee" d="'+regionPfad(REGION_OBERSEE,null,18)+'"/>'+
-    '<path class="lg-map-see lg-map-see--ueberlingen" d="'+regionPfad(REGION_UEBERLINGER,REGION_EXTRA_UEBERLINGER,16)+'"/>'+
-    '<path class="lg-map-see lg-map-see--untersee" d="'+regionPfad(REGION_UNTERSEE,REGION_EXTRA_UNTERSEE,18)+'"/>';
+  var seeBg='<path class="lg-map-see lg-map-see--obersee" d="'+ringPfad(BODENSEE_UMRISS)+'"/>'+
+    '<path class="lg-map-see lg-map-see--untersee" d="'+ringPfad(BODENSEE_UNTERSEE)+'"/>'+
+    '<path class="lg-map-see lg-map-see--untersee" d="'+ringPfad(BODENSEE_RHEIN_WEST)+'"/>'+
+    '<path class="lg-map-see lg-map-see--ueberlingen" d="'+ringPfad(BODENSEE_UEBERLINGER_SEE)+'"/>';
   // Routenlinien: alle direkt aufeinanderfolgenden Haltepaare aus allen Kursen, einmalig
   var seen={}, lines="";
   for(var i=0;i<COURSES.length;i++){
@@ -1096,7 +1070,7 @@ function karteHTML(){
   }
   var h2='<section class="lg-panel">'+
     '<div class="lg-lead">Welche Schiffe sind laut Fahrplan gerade unterwegs? Nur Kurse aus diesem Fahrplan (BSB/SBS/VL/URh) — keine Live-Ortung, sondern aus den Fahrzeiten berechnet.</div>'+
-    '<div class="lg-map-wrap"><svg viewBox="'+(karteView?karteView.x.toFixed(1)+" "+karteView.y.toFixed(1)+" "+karteView.w.toFixed(1)+" "+karteView.h.toFixed(1):"0 0 "+KARTE_BASIS.w+" "+KARTE_BASIS.h)+'" preserveAspectRatio="xMidYMid meet">'+seeBg+lines+dots+boote+mein+'</svg>'+
+    '<div class="lg-map-wrap"><svg viewBox="'+(karteView?karteView.x.toFixed(1)+" "+karteView.y.toFixed(1)+" "+karteView.w.toFixed(1)+" "+karteView.h.toFixed(1):"0 0 "+KARTE_BASIS.w+" "+KARTE_BASIS.h)+'" preserveAspectRatio="xMidYMid slice">'+seeBg+lines+dots+boote+mein+'</svg>'+
     '<button type="button" class="lg-map-locate" id="lg-map-locate" title="Meinen Standort anzeigen">📍</button></div>'+
     (karteLocStatus?'<p class="lg-map-loc-status">'+esc(karteLocStatus)+'</p>':"")+
     '<p class="lg-map-hint">Mit dem Finger verschieben, mit zwei Fingern zoomen. Tippen zeigt Start &amp; Ziel.</p>'+
