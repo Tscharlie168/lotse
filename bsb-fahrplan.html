@@ -167,7 +167,7 @@ select,input,button{font-family:inherit;}
   <header class="lg-head">
     <div class="lg-head-inner">
       <a class="lg-back" id="backLink" href="./">&#8249; Zur&uuml;ck zum Lotse</a>
-      <div class="lg-eyebrow">Bodensee · Hauptsaison 2026 · 14. Mai – 13. Sep</div>
+      <div class="lg-eyebrow">Bodensee · Saison 2026 · 3. Apr – 18. Okt</div>
       <h1>BSB <span>Fahrplan</span></h1>
       <p class="lg-sub">Beide Richtungen, Zwischenhäfen und die Schweiz — sauber an einem Ort.</p>
     </div>
@@ -338,11 +338,54 @@ var COURSES = [
   {"no":"4006e","svc":"snack","line":"obersee","stops":[[41,"15:30","15:30"],[1,"15:45","15:45"]]},
   {"no":414,"svc":"restaurant","line":"obersee","stops":[[43,"16:05","16:05"],[42,"16:15","16:15"],[41,"16:35","16:35"],[1,"16:50","16:55"],[2,"17:15","17:25"],[0,"17:55","17:55"]]},
   {"no":406,"svc":"restaurant","line":"obersee","stops":[[43,"18:25","18:25"],[42,"18:35","18:35"],[41,"19:10","19:10"],[2,"19:30","19:35"],[0,"20:05","20:05"]]},
-  {"no":416,"svc":"restaurant","line":"obersee","stops":[[43,"19:40","19:40"],[42,"19:50","19:50"],[2,"20:30","20:30"],[0,"21:00","21:00"]]}
+  {"no":416,"svc":"restaurant","line":"obersee","stops":[[43,"19:40","19:40"],[42,"19:50","19:50"],[2,"20:30","20:30"],[0,"21:00","21:00"]]},
+  // === Konstanz ↔ Bregenz, zwei Nebensaison-Schnellkurse ohne Hauptsaison-
+  // Entsprechung, Quelle: VSU-Fahrplan 2026 S. 3, nur 14.9.–4.10. Sa/So
+  // (line "obersee", Gültigkeit siehe courseValidOn) ===
+  {"no":157,"svc":"restaurant","line":"obersee","stops":[[0,"14:40","14:40"],[2,"15:35","15:40"],[10,"17:20","17:25"],[11,"17:47","17:47"]]},
+  {"no":158,"svc":"snack","line":"obersee","stops":[[11,"9:15","9:15"],[10,"9:37","9:45"],[2,"11:25","11:35"],[1,"12:00","12:00"],[0,"12:30","12:30"]]},
+  // === Konstanz ↔ Überlingen, eigene Nebensaison-Kurse (andere Zeiten als
+  // die Hauptsaison-Kurse gleicher Nummer!), Quelle: VSU-Fahrplan 2026 S. 4,
+  // täglich 3.4.–13.5. und 14.9.–18.10. (line "ueberlingen-neben") ===
+  // Konstanz → Überlingen
+  {"no":411,"svc":"restaurant","line":"ueberlingen-neben","stops":[[0,"9:05","9:05"],[2,"9:35","9:45"],[1,"10:05","10:10"],[41,"10:20","10:20"],[42,"10:40","10:40"],[43,"10:55","10:55"]]},
+  {"no":"4001e","svc":"snack","line":"ueberlingen-neben","stops":[[1,"9:55","9:55"],[41,"10:10","10:10"]]},
+  {"no":401,"svc":"restaurant","line":"ueberlingen-neben","stops":[[0,"9:45","9:45"],[2,"10:15","10:15"]]},
+  {"no":"4003e","svc":"snack","line":"ueberlingen-neben","stops":[[1,"10:45","10:45"],[41,"11:00","11:00"]]},
+  {"no":"4005e","svc":"snack","line":"ueberlingen-neben","stops":[[1,"11:35","11:35"],[41,"11:50","11:50"]]},
+  {"no":403,"svc":"restaurant","line":"ueberlingen-neben","stops":[[0,"11:05","11:05"],[2,"11:35","11:45"],[1,"12:05","12:10"],[41,"12:20","12:20"],[42,"12:40","12:40"],[43,"12:55","12:55"]]},
+  {"no":"4007e","svc":"snack","line":"ueberlingen-neben","stops":[[1,"12:25","12:25"],[41,"12:40","12:40"]]},
+  {"no":"4009e","svc":"snack","line":"ueberlingen-neben","stops":[[1,"13:15","13:15"],[41,"13:30","13:30"]]},
+  {"no":413,"svc":"restaurant","line":"ueberlingen-neben","stops":[[0,"13:05","13:05"],[2,"13:35","13:45"],[1,"14:05","14:10"],[41,"14:25","14:25"],[42,"14:45","14:45"],[43,"15:00","15:00"]]},
+  {"no":405,"svc":"restaurant","line":"ueberlingen-neben","stops":[[0,"15:05","15:05"],[2,"15:35","15:45"],[1,"16:05","16:10"],[41,"16:25","16:25"],[43,"16:50","16:50"]]},
+  {"no":415,"svc":"restaurant","line":"ueberlingen-neben","stops":[[0,"17:05","17:05"],[2,"17:35","17:35"]]},
+  // Überlingen → Konstanz
+  {"no":"4000e","svc":"snack","line":"ueberlingen-neben","stops":[[41,"9:30","9:30"],[1,"9:45","9:45"]]},
+  {"no":402,"svc":"restaurant","line":"ueberlingen-neben","stops":[[2,"10:25","10:25"],[0,"10:55","10:55"]]},
+  {"no":"4002e","svc":"snack","line":"ueberlingen-neben","stops":[[41,"10:20","10:20"],[1,"10:35","10:35"]]},
+  {"no":"4004e","svc":"snack","line":"ueberlingen-neben","stops":[[41,"11:10","11:10"],[1,"11:25","11:25"]]},
+  {"no":412,"svc":"restaurant","line":"ueberlingen-neben","stops":[[43,"11:05","11:05"],[42,"11:15","11:15"],[41,"11:35","11:35"],[1,"11:45","11:50"],[2,"12:10","12:20"],[0,"12:50","12:50"]]},
+  {"no":"4006e","svc":"snack","line":"ueberlingen-neben","stops":[[41,"12:00","12:00"],[1,"12:15","12:15"]]},
+  {"no":"4008e","svc":"snack","line":"ueberlingen-neben","stops":[[41,"12:50","12:50"],[1,"13:05","13:05"]]},
+  {"no":404,"svc":"restaurant","line":"ueberlingen-neben","stops":[[43,"13:05","13:05"],[42,"13:15","13:15"],[41,"13:35","13:35"],[1,"13:45","13:50"],[2,"14:10","14:20"],[0,"14:50","14:50"]]},
+  {"no":414,"svc":"restaurant","line":"ueberlingen-neben","stops":[[43,"15:05","15:05"],[42,"15:15","15:15"],[41,"15:35","15:35"],[1,"15:50","15:55"],[2,"16:15","16:25"],[0,"16:55","16:55"]]},
+  {"no":416,"svc":"restaurant","line":"ueberlingen-neben","stops":[[2,"17:40","17:40"],[0,"18:10","18:10"]]},
+  {"no":406,"svc":"restaurant","line":"ueberlingen-neben","stops":[[43,"16:55","16:55"],[42,"17:10","17:10"],[1,"17:30","17:35"],[2,"18:05","18:05"],[0,"18:35","18:35"]]}
 ];
 
 var WEEKDAYS = ["So","Mo","Di","Mi","Do","Fr","Sa"];
-var SAISON_MIN="2026-05-14", SAISON_MAX="2026-09-13";
+/* Gesamter navigierbarer Zeitraum: fruehester Nebensaison-Start bis spaetestes
+   Nebensaison-Ende ueber alle Linien (siehe courseValidOn fuer die genauen
+   Gueltigkeitsfenster je Linie/Kurs). Hauptsaison bleibt 14.5.-13.9. */
+var SAISON_MIN="2026-04-03", SAISON_MAX="2026-10-18";
+/* Feiertage, die in die Nebensaison-Randzeiten (Apr/Mai, Sep/Okt) fallen und
+   auf Wochenend-Fahrplan schalten (Karfreitag, Ostern, Tag der Arbeit,
+   Tag der Deutschen Einheit). */
+var FEIERTAGE_NEBEN=["2026-04-03","2026-04-05","2026-04-06","2026-05-01","2026-10-03"];
+function nebenIstSoFeiertag(dObj,dStr){ var w=dObj.getDay(); return w===0||FEIERTAGE_NEBEN.indexOf(dStr)!==-1; }
+function nebenIstWeFeiertag(dObj,dStr){ var w=dObj.getDay(); return w===0||w===6||FEIERTAGE_NEBEN.indexOf(dStr)!==-1; }
+function nebenIstDoSoFeiertag(dObj,dStr){ var w=dObj.getDay(); return w===0||w===4||w===5||w===6||FEIERTAGE_NEBEN.indexOf(dStr)!==-1; }
+function nebenIstMiSoFeiertag(dObj,dStr){ var w=dObj.getDay(); return w===0||w>=3||FEIERTAGE_NEBEN.indexOf(dStr)!==-1; }
 function pad2(n){return n<10?"0"+n:""+n;}
 function todayISO(){var d=new Date();return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());}
 function nowMin(){var d=new Date();return d.getHours()*60+d.getMinutes();}
@@ -385,12 +428,80 @@ function findConnections(fromIdx,toIdx,date){
 }
 
 var MIN_UMSTIEG=5, MAX_WAIT=180, KNAPP=10;
+/* Nebensaison-Zusatzfenster je Kursnummer, Quelle: VSU-Fahrplan 2026 S. 3/4/8/13.
+   Bei "untersee", "sbs" und "radolfzell" verkehren in der Nebensaison
+   dieselben Kursnummern/Zeiten wie in der Hauptsaison, nur an weniger
+   Tagen und in einem zusaetzlichen Zeitfenster - deshalb hier nur die
+   Gueltigkeit erweitert, keine neuen Kurse noetig. */
+var UNTERSEE_558_533={558:1,533:1};
+var SBS_MEERSBURG_NR={7040:1,7011:1,7044:1,7021:1,7012:1,7041:1,7022:1,7045:1};
+var SBS_RORSCHACH_LINDAU_NR={302:1,72:1,304:1,312:1,306:1,303:1,73:1,305:1,313:1,7042:1,7043:1};
+var SBS_RORSCHACH_LINDAU_KEIN_WOCHENTAG={306:1,313:1}; // die spaeten Kurse fahren werktags in der Nebensaison nicht
+// Konstanz-Überlingen-Kurse: eigene Nebensaison-Zeiten unter "ueberlingen-neben",
+// deshalb hier von der obersee-Nebensaison-Erweiterung ausgenommen.
+var OBERSEE_UEB_ZWEIG={401:1,411:1,"4001e":1,403:1,"4003e":1,413:1,"4005e":1,"4007e":1,405:1,415:1,
+  402:1,412:1,"4002e":1,"4004e":1,404:1,"4006e":1,414:1,406:1,416:1};
 function courseValidOn(c,dObj,dStr){
   if(c.line==="untersee"){
-    if(dStr<"2026-05-14") return false;
-    if(dStr<="2026-06-26") return true;
-    if(dStr<="2026-09-13"){var w=dObj.getDay();return (w===0||w>=3);}
+    if(dStr>="2026-05-14"&&dStr<="2026-06-26") return true;
+    if(dStr>="2026-05-14"&&dStr<="2026-09-13"){var w=dObj.getDay();return (w===0||w>=3);}
+    // Nebensaison-Erweiterung fuer 528/536/550/558/525/533/543/551 (S. 13):
+    if(UNTERSEE_558_533[c.no]){
+      if((dStr>="2026-04-03"&&dStr<="2026-06-26")||(dStr>="2026-09-14"&&dStr<="2026-10-04"&&dStr!=="2026-10-03"))
+        return nebenIstSoFeiertag(dObj,dStr);
+      if(c.no===533&&dStr>="2026-10-05"&&dStr<="2026-10-18") return true;
+      return false;
+    }
+    if(dStr>="2026-04-03"&&dStr<="2026-04-30") return nebenIstDoSoFeiertag(dObj,dStr);
+    if(dStr>="2026-05-01"&&dStr<="2026-05-13") return true;
+    if(dStr>="2026-09-14"&&dStr<="2026-10-04") return true;
+    if(c.no===536&&dStr>="2026-10-05"&&dStr<="2026-10-18") return true;
     return false;
+  }
+  if(c.line==="radolfzell"){
+    // Radolfzell-Reichenau: Mi-So, 27.06.-13.09.2026 (Hauptsaison)
+    if(dStr>="2026-06-27"&&dStr<="2026-09-13"){var w2=dObj.getDay();return w2===0||w2>=3;}
+    // Nebensaison-Erweiterung (S. 13): 3.4.-26.6. und 14.9.-18.10., Mi-So/Feiertag
+    if((dStr>="2026-04-03"&&dStr<="2026-06-26")||(dStr>="2026-09-14"&&dStr<="2026-10-18"))
+      return nebenIstMiSoFeiertag(dObj,dStr);
+    return false;
+  }
+  if(c.line==="obersee"){
+    if(dStr>="2026-05-14"&&dStr<="2026-09-13") return true; // Hauptsaison: alle Kurse taeglich
+    // 157/158 (Schnellkurs): NUR 14.9.-4.10. Sa/So, keine Hauptsaison-Entsprechung (S. 3, Fußnote 1)
+    if(c.no===157||c.no===158){
+      if(dStr>="2026-09-14"&&dStr<="2026-10-04"){ var wo=dObj.getDay(); return wo===0||wo===6; }
+      return false;
+    }
+    // Nebensaison-Erweiterung (S. 3): dieselben Kursnummern, ausser den
+    // Konstanz-Ueberlingen-Kursen (eigene Zeiten, siehe "ueberlingen-neben")
+    if(!OBERSEE_UEB_ZWEIG[c.no] && ((dStr>="2026-04-03"&&dStr<="2026-05-13")||(dStr>="2026-09-14"&&dStr<="2026-10-18")))
+      return true;
+    return false;
+  }
+  if(c.line==="ueberlingen-neben"){
+    // Konstanz <-> Ueberlingen, eigene Nebensaison-Kurse (S. 4), taeglich
+    return (dStr>="2026-04-03"&&dStr<="2026-05-13")||(dStr>="2026-09-14"&&dStr<="2026-10-18");
+  }
+  if(c.line==="sbs"){
+    if(dStr>="2026-05-14"&&dStr<="2026-09-13") return true; // Hauptsaison: alle Kurse taeglich
+    // Nebensaison-Erweiterung (S. 8): dieselben Kursnummern, nur an
+    // weniger Tagen in den Randzeiten
+    if(SBS_MEERSBURG_NR[c.no]){
+      if((dStr>="2026-04-03"&&dStr<="2026-05-10")||(dStr>="2026-10-01"&&dStr<="2026-10-18"))
+        return nebenIstWeFeiertag(dObj,dStr);
+      return false;
+    }
+    if(SBS_RORSCHACH_LINDAU_NR[c.no]){
+      if((dStr>="2026-04-03"&&dStr<="2026-05-13")||(dStr>="2026-09-14"&&dStr<="2026-10-18")){
+        if(nebenIstWeFeiertag(dObj,dStr)) return true;
+      }
+      if(!SBS_RORSCHACH_LINDAU_KEIN_WOCHENTAG[c.no]&&dStr>="2026-09-14"&&dStr<="2026-10-02"){
+        var w4=dObj.getDay(); return w4>=1&&w4<=5;
+      }
+      return false;
+    }
+    return false; // andere sbs-Kurse (Rorschach-Rheineck, Kreuzlingen-Hagnau u.a.): nur Hauptsaison
   }
   if(c.line==="sbs-fr"){
     // Freitags 27.06–13.09.2026
@@ -412,12 +523,6 @@ function courseValidOn(c,dObj,dStr){
     if(dStr<"2026-06-27"||dStr>"2026-09-13") return false;
     return dObj.getDay()===4;
   }
-  if(c.line==="radolfzell"){
-    // Radolfzell-Reichenau: Mi-So, 27.06.-13.09.2026
-    if(dStr<"2026-06-27"||dStr>"2026-09-13") return false;
-    var w2=dObj.getDay();
-    return w2===0||w2>=3;
-  }
   if(c.line==="ueberlingen-fn3"){
     // Konstanz-Überlingen Kurse 461/462/463/464 (Fußnote 3):
     // 14.5.-3.7. nur Sa/So+Feiertag, 4.7.-13.9. Do-So
@@ -427,8 +532,7 @@ function courseValidOn(c,dObj,dStr){
     if(dStr<="2026-07-03") return w3===0||w3===6||FEIERTAGE.indexOf(dStr)!==-1;
     return w3===0||w3===4||w3===5||w3===6;
   }
-  return true; // obersee + sbs: täglich Hauptsaison (auch Romanshorn-Kreuzlingen-Meersburg
-  // und Rorschach-Rheineck, die laut PDF bis 4.10. fahren - deckt sich mit SAISON_MAX=13.9.)
+  return false; // alle Linien oben explizit behandelt
 }
 function legOf(c,fromIdx,toIdx){
   var pf=-1,pt=-1,j;
@@ -797,7 +901,7 @@ function schweizHTML(){
 
 function hinweiseHTML(){
   return '<section class="lg-panel">'+
-  '<div class="lg-card"><h3>Wann fahren die Schiffe?</h3><p>In der Hauptsaison (14.5.–13.9.) f&auml;hrt eure Linie Konstanz&harr;Bregenz <strong>t&auml;glich</strong>. Feiertage &auml;ndern daran nichts — anders als auf dem Untersee (Schaffhausen/Stein am Rhein), wo Wochentag/Feiertag den Plan bestimmen.</p></div>'+
+  '<div class="lg-card"><h3>Wann fahren die Schiffe?</h3><p>Die Linie Konstanz&harr;Bregenz f&auml;hrt vom 3.4.&ndash;18.10. <strong>t&auml;glich</strong> &mdash; in der Hauptsaison (14.5.&ndash;13.9.) am h&auml;ufigsten, in der Nebensaison (3.4.&ndash;13.5. und 14.9.&ndash;18.10.) mit weniger Kursen. Feiertage &auml;ndern daran nichts — anders als auf dem Untersee (Schaffhausen/Stein am Rhein), wo Wochentag/Feiertag den Plan bestimmen.</p></div>'+
   '<div class="lg-card"><h3>Untersee &amp; Rhein (Reichenau, Stein am Rhein)</h3><p>Diese Strecke ber&uuml;hrt <strong>Konstanz</strong> &mdash; dort wird umgestiegen. Sie f&auml;hrt <strong>14.5.&ndash;26.6. t&auml;glich</strong> und <strong>27.6.&ndash;13.9. nur Mi&ndash;So</strong>. Eigener Anbieter (URh) mit <strong>eigenen Tickets</strong>. Einzelne Sp&auml;tkurse fahren am 8.8. verk&uuml;rzt. Der Planer rechnet das Datum automatisch mit.</p></div>'+
   '<div class="lg-card lg-card--alert"><h3>Die zwei Sondertage</h3><ul>'+
   '<li><strong>18.7.</strong> — der 12:55-Kurs nach Bregenz (Kurs 143) und der 16:00-Kurs Richtung Friedrichshafen (Kurs 144) <strong>fallen aus</strong>. Durchgehende Fahrten Konstanz&harr;Bregenz nur mit Umstieg in Friedrichshafen.</li>'+
