@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0E3553">
+<title>Frosch &uuml;ber die Stra&szlig;e</title>
+<style>
+:root{--ink:#0A2233;--navy:#103A5A;--blue:#15679E;--azure:#2BA6C9;--sky:#EAF2F8;--paper:#F4F8FB;--line:#D8E5EF;--muted:#5C7488;}
+*{box-sizing:border-box;}
+html,body{margin:0;height:100%;}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--paper);line-height:1.5;-webkit-font-smoothing:antialiased;touch-action:manipulation;user-select:none;-webkit-user-select:none;}
+.app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;}
+
+.head{position:relative;background:linear-gradient(160deg,#0E3553 0%,#15679E 100%);color:#fff;padding:16px 18px 20px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:#0A2233;text-decoration:none;font-weight:600;font-size:15px;letter-spacing:.03em;text-transform:uppercase;background:#7FD5EA;border:1.5px solid #62D0E8;border-radius:999px;padding:9px 16px;cursor:pointer;}
+.back:active{background:#62D0E8;}
+.head h1{font-weight:800;font-size:28px;line-height:1;margin:12px 0 0;letter-spacing:.02em;}
+.head h1 span{color:#62D0E8;}
+
+.wrap{flex:1;display:flex;flex-direction:column;align-items:center;padding:12px;gap:10px;}
+
+.hud{width:100%;max-width:400px;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.stat{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 10px;text-align:center;}
+.stat span{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);}
+.stat b{font-size:20px;color:var(--navy);font-variant-numeric:tabular-nums;}
+
+.timebar{width:100%;max-width:400px;height:8px;background:var(--line);border-radius:999px;overflow:hidden;}
+.timebar i{display:block;height:100%;background:#3BB273;border-radius:999px;transition:width .12s linear,background .2s;}
+
+.boardwrap{position:relative;width:100%;max-width:400px;}
+canvas{display:block;width:100%;height:auto;border-radius:12px;box-shadow:0 6px 18px rgba(16,58,90,.18);background:#3BB273;}
+
+.over{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(10,34,51,.82);border-radius:12px;text-align:center;padding:16px;}
+.over.show{display:flex;}
+.over h2{margin:0;font-size:24px;color:#fff;}
+.over p{margin:0;font-size:15px;color:#CFE3F2;}
+
+.pad{width:100%;max-width:260px;display:grid;grid-template-columns:64px 64px 64px;grid-template-rows:56px 56px;gap:8px;justify-content:center;margin-top:2px;}
+.padbtn{border:none;border-radius:14px;background:#fff;border:1.5px solid var(--line);color:var(--navy);font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(16,58,90,.12);}
+.padbtn:active{background:var(--sky);}
+#padUp{grid-column:2;grid-row:1;}
+#padLeft{grid-column:1;grid-row:2;}
+#padDown{grid-column:2;grid-row:2;}
+#padRight{grid-column:3;grid-row:2;}
+
+.start{width:100%;max-width:400px;border:0;border-radius:999px;padding:13px;font-size:17px;font-weight:700;background:#7cf7c7;color:#07110d;cursor:pointer;}
+.tip{max-width:400px;font-size:12.5px;color:var(--muted);text-align:center;margin:0;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="head">
+    <button class="back" onclick="zurueck()">&lsaquo; Zur&uuml;ck</button>
+    <h1>Frosch &uuml;ber die <span>Stra&szlig;e</span></h1>
+  </header>
+
+  <div class="wrap">
+    <div class="hud">
+      <div class="stat"><span>Level</span><b id="hudLevel">1</b></div>
+      <div class="stat"><span>Punkte</span><b id="hudScore">0</b></div>
+      <div class="stat"><span>Leben</span><b id="hudLeben">3</b></div>
+    </div>
+    <div class="timebar"><i id="timeBar" style="width:100%"></i></div>
+
+    <div class="boardwrap">
+      <canvas id="board" width="360" height="520"></canvas>
+      <div class="over" id="over">
+        <h2 id="overTitel">Game Over</h2>
+        <p id="overText"></p>
+      </div>
+    </div>
+
+    <div class="pad">
+      <button class="padbtn" id="padUp">&#9650;</button>
+      <button class="padbtn" id="padLeft">&#9664;</button>
+      <button class="padbtn" id="padDown">&#9660;</button>
+      <button class="padbtn" id="padRight">&#9654;</button>
+    </div>
+
+    <button class="start" id="startBtn">Neues Spiel</button>
+    <p class="tip">Hopse mit den Pfeilen (oder den Tasten) &uuml;ber die Stra&szlig;e und den Fluss. Auf dem Fluss nur auf Baumst&auml;mmen und Schildkr&ouml;ten sicher &mdash; und Vorsicht, manche Schildkr&ouml;ten tauchen unter. Bring den Frosch in eine freie Seerose oben.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+var COLS=9, ROWS=13;
+var cvs=document.getElementById('board');
+var ctx=cvs.getContext('2d');
+var CELL=cvs.width/COLS; // quadratische Zellen
+
+// Zeilen von oben (0) nach unten (ROWS-1)
+var ROW_HOME=0;
+var ROW_RIVER=[1,2,3,4,5];
+var ROW_MEDIAN=6;
+var ROW_ROAD=[7,8,9,10,11];
+var ROW_START=12;
+
+var HOME_COLS=[0,2,4,6,8];
+
+var level=1, score=0, leben=3, spielAktiv=false;
+var frog, homes, lanes;
+var HOP_ZEIT=6.0; // Sekunden pro Sprung-Zeitfenster, wird mit Level knapper
+var hopZeitUebrig=HOP_ZEIT;
+var animT=0; // fuer Sprung-Tween
+var letzteZeit=0, rafId=0;
+
+function neuesFrog(){
+  return {col:4,row:ROW_START,x:4*CELL,y:ROW_START*CELL,vonCol:4,vonRow:ROW_START,tween:0,aufStamm:null};
+}
+
+function baueLanes(lvl){
+  var speedMul=1+ (lvl-1)*0.16;
+  var res=[];
+  // Fluss-Lanes: Stamm- oder Schildkroeten-Reihen, abwechselnd Richtung
+  var riverDefs=[
+    {typ:'stamm', laenge:3, luecke:1.6, speed:46, dir:1},
+    {typ:'schildkroete', laenge:2, luecke:1.4, speed:40, dir:-1, taucht:true},
+    {typ:'stamm', laenge:4, luecke:2.0, speed:34, dir:1},
+    {typ:'schildkroete', laenge:2, luecke:1.6, speed:52, dir:-1, taucht:false},
+    {typ:'stamm', laenge:2, luecke:1.5, speed:58, dir:1}
+  ];
+  ROW_RIVER.forEach(function(row,i){
+    var d=riverDefs[i];
+    res.push(baueLane(row,'river',d,speedMul));
+  });
+  // Strassen-Lanes
+  var roadDefs=[
+    {breite:1, luecke:2.2, speed:70, dir:-1},
+    {breite:2, luecke:2.6, speed:55, dir:1},
+    {breite:1, luecke:1.8, speed:95, dir:-1},
+    {breite:1.4, luecke:2.4, speed:65, dir:1},
+    {breite:1, luecke:2.0, speed:80, dir:-1}
+  ];
+  ROW_ROAD.forEach(function(row,i){
+    var d=roadDefs[i];
+    res.push(baueLane(row,'road',d,speedMul));
+  });
+  return res;
+}
+
+function baueLane(row,art,d,speedMul){
+  var breiteZellen = art==='river' ? d.laenge : d.breite;
+  var w = breiteZellen*CELL;
+  var luecke = d.luecke*CELL;
+  var speed = d.speed*speedMul*d.dir;
+  var stueckAbstand = w+luecke;
+  var anzahl = Math.ceil((cvs.width+stueckAbstand)/stueckAbstand)+1;
+  var objekte=[];
+  for(var i=0;i<anzahl;i++){
+    var x = i*stueckAbstand + (row%3)*17; // Versatz je Reihe, wirkt weniger gleichfoermig
+    objekte.push({x:x, w:w, tauchPhase: Math.random()*Math.PI*2});
+  }
+  return {row:row, art:art, speed:speed, objekte:objekte, stueckAbstand:stueckAbstand,
+    taucht: !!d.taucht, farbe: art==='road' ? laneAutoFarbe() : (d.typ==='schildkroete'?'#3E8E52':'#8B5A2B'),
+    typ: d.typ};
+}
+
+function laneAutoFarbe(){
+  var f=['#D8483A','#E08A2B','#C9A227','#5C7488','#7A4FB5','#2E8B3D'];
+  return f[(Math.random()*f.length)|0];
+}
+
+function startLevel(lvl){
+  level=lvl;
+  lanes=baueLanes(level);
+  homes=HOME_COLS.map(function(){return false;});
+  frog=neuesFrog();
+  hopZeitUebrig=Math.max(3.2, HOP_ZEIT - (level-1)*0.35);
+  updateHud();
+}
+
+function neuesSpiel(){
+  score=0; leben=3; spielAktiv=true;
+  document.getElementById('over').classList.remove('show');
+  startLevel(1);
+  letzteZeit=performance.now();
+  cancelAnimationFrame(rafId);
+  loop();
+}
+
+function updateHud(){
+  document.getElementById('hudLevel').textContent=level;
+  document.getElementById('hudScore').textContent=score;
+  document.getElementById('hudLeben').textContent=leben;
+}
+
+function updateTimeBar(){
+  var pct=Math.max(0,hopZeitUebrig/Math.max(3.2,HOP_ZEIT-(level-1)*0.35))*100;
+  var bar=document.getElementById('timeBar');
+  bar.style.width=pct+'%';
+  bar.style.background = pct<25 ? '#D8483A' : (pct<55 ? '#E08A2B' : '#3BB273');
+}
+
+// ---- Eingabe ----
+function versuchZug(dc,dr){
+  if(!spielAktiv || frog.tween>0) return;
+  var nc=frog.col+dc, nr=frog.row+dr;
+  if(nc<0||nc>=COLS||nr<0||nr>ROW_START) return;
+  frog.vonCol=frog.col; frog.vonRow=frog.row;
+  frog.col=nc; frog.row=nr;
+  frog.tween=1;
+  if(dr<0){ score+=10; } // Vorwaerts-Bonus
+  hopZeitUebrig=Math.max(3.2,HOP_ZEIT-(level-1)*0.35);
+  updateHud();
+}
+document.getElementById('padUp').addEventListener('click',function(){versuchZug(0,-1);});
+document.getElementById('padDown').addEventListener('click',function(){versuchZug(0,1);});
+document.getElementById('padLeft').addEventListener('click',function(){versuchZug(-1,0);});
+document.getElementById('padRight').addEventListener('click',function(){versuchZug(1,0);});
+window.addEventListener('keydown',function(e){
+  if(e.key==='ArrowUp'){versuchZug(0,-1);e.preventDefault();}
+  else if(e.key==='ArrowDown'){versuchZug(0,1);e.preventDefault();}
+  else if(e.key==='ArrowLeft'){versuchZug(-1,0);e.preventDefault();}
+  else if(e.key==='ArrowRight'){versuchZug(1,0);e.preventDefault();}
+});
+// Wischsteuerung
+(function(){
+  var sx=0,sy=0,active=false;
+  cvs.addEventListener('touchstart',function(e){ var t=e.changedTouches[0]; sx=t.clientX; sy=t.clientY; active=true; },{passive:true});
+  cvs.addEventListener('touchend',function(e){
+    if(!active) return; active=false;
+    var t=e.changedTouches[0]; var dx=t.clientX-sx, dy=t.clientY-sy;
+    if(Math.max(Math.abs(dx),Math.abs(dy))<24) return;
+    if(Math.abs(dx)>Math.abs(dy)) versuchZug(dx>0?1:-1,0); else versuchZug(0,dy>0?1:-1);
+  },{passive:true});
+})();
+
+// ---- Spiel-Loop ----
+function loop(t){
+  rafId=requestAnimationFrame(loop);
+  var now=t||performance.now();
+  var dt=Math.min(0.05,(now-letzteZeit)/1000);
+  letzteZeit=now;
+  if(!spielAktiv) { zeichnen(); return; }
+
+  lanes.forEach(function(lane){
+    lane.objekte.forEach(function(o){
+      o.x += lane.speed*dt;
+      if(lane.speed>0 && o.x>cvs.width) o.x -= lane.stueckAbstand*Math.ceil((cvs.width+lane.stueckAbstand)/lane.stueckAbstand+1);
+      if(lane.speed<0 && o.x+o.w<0) o.x += lane.stueckAbstand*Math.ceil((cvs.width+lane.stueckAbstand)/lane.stueckAbstand+1);
+      o.tauchPhase += dt*0.9;
+    });
+  });
+
+  if(frog.tween>0){
+    frog.tween=Math.max(0,frog.tween-dt*8);
+    var p=1-frog.tween;
+    frog.x=(frog.vonCol+(frog.col-frog.vonCol)*p)*CELL;
+    frog.y=(frog.vonRow+(frog.row-frog.vonRow)*p)*CELL;
+    if(frog.tween===0){ nachSprungPruefen(); }
+  } else {
+    frog.x=frog.col*CELL; frog.y=frog.row*CELL;
+    // Frosch treibt auf Stamm/Schildkroete mit
+    if(frog.aufStamm){
+      frog.x += frog.aufStamm.dx*dt;
+      frog.col = frog.x/CELL;
+      if(frog.col<-0.4 || frog.col>COLS-0.6){ lebenVerlieren('Ins Wasser getrieben.'); }
+      pruefeWasserUnterFrosch();
+    }
+    hopZeitUebrig -= dt;
+    updateTimeBar();
+    if(hopZeitUebrig<=0 && spielAktiv){ lebenVerlieren('Die Zeit ist abgelaufen.'); }
+  }
+
+  zeichnen();
+}
+
+function frogCellBox(){
+  return {x:frog.x, y:frog.y, w:CELL, h:CELL};
+}
+function overlap(a,bx,bw,by,bh){
+  return a.x < bx+bw && a.x+a.w > bx && a.y < by+bh && a.y+a.h > by;
+}
+
+function nachSprungPruefen(){
+  frog.aufStamm=null;
+  var row=frog.row;
+  if(ROW_ROAD.indexOf(row)!==-1){
+    var lane=lanes.filter(function(l){return l.row===row;})[0];
+    var box=frogCellBox();
+    var getroffen=lane.objekte.some(function(o){ return overlap(box,o.x,o.w,row*CELL,CELL); });
+    if(getroffen){ lebenVerlieren('Erwischt!'); return; }
+  } else if(ROW_RIVER.indexOf(row)!==-1){
+    pruefeWasserUnterFrosch();
+  } else if(row===ROW_HOME){
+    var slotIdx=HOME_COLS.indexOf(frog.col);
+    if(slotIdx===-1 || homes[slotIdx]){
+      lebenVerlieren('Daneben gesprungen.');
+      return;
+    }
+    homes[slotIdx]=true;
+    score+=100;
+    updateHud();
+    if(homes.every(function(h){return h;})){
+      levelGeschafft();
+      return;
+    }
+    frog.col=4; frog.row=ROW_START; frog.x=frog.col*CELL; frog.y=frog.row*CELL;
+    hopZeitUebrig=Math.max(3.2,HOP_ZEIT-(level-1)*0.35);
+  }
+}
+
+function pruefeWasserUnterFrosch(){
+  var row=frog.row;
+  var lane=lanes.filter(function(l){return l.row===row;})[0];
+  var box=frogCellBox();
+  var getragen=null;
+  lane.objekte.forEach(function(o){
+    if(overlap(box,o.x,o.w,row*CELL,CELL)){
+      var untergetaucht = lane.taucht && (Math.sin(o.tauchPhase)>0.75);
+      if(!untergetaucht) getragen=o;
+    }
+  });
+  if(getragen){ frog.aufStamm={dx:lane.speed}; }
+  else if(!frog.tween){ lebenVerlieren('Ins Wasser gefallen.'); }
+}
+
+function levelGeschafft(){
+  score+=250;
+  startLevel(level+1);
+}
+
+function lebenVerlieren(grund){
+  if(!spielAktiv) return;
+  leben--;
+  updateHud();
+  if(leben<=0){
+    spielAktiv=false;
+    document.getElementById('overTitel').textContent='Game Over';
+    document.getElementById('overText').textContent=grund+' Punktestand: '+score+' (Level '+level+'). Tippe auf „Neues Spiel“.';
+    document.getElementById('over').classList.add('show');
+    return;
+  }
+  frog=neuesFrog();
+  hopZeitUebrig=Math.max(3.2,HOP_ZEIT-(level-1)*0.35);
+}
+
+// ---- Zeichnen ----
+function zeichnen(){
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  // Hintergrund je Zeile
+  for(var r=0;r<ROWS;r++){
+    ctx.fillStyle = zeilenFarbe(r);
+    ctx.fillRect(0,r*CELL,cvs.width,CELL);
+  }
+  // Home-Slots
+  for(var h=0;h<HOME_COLS.length;h++){
+    var cx=HOME_COLS[h]*CELL+CELL/2, cy=ROW_HOME*CELL+CELL/2;
+    ctx.beginPath();
+    ctx.arc(cx,cy,CELL*0.36,0,Math.PI*2);
+    ctx.fillStyle = homes[h] ? '#2E8B3D' : '#1F6B33';
+    ctx.fill();
+    if(homes[h]){
+      ctx.fillStyle='#fff'; ctx.font=(CELL*0.5)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('\u{1F438}', cx, cy+1);
+    }
+  }
+  // Fahrzeuge / Staemme
+  lanes.forEach(function(lane){
+    lane.objekte.forEach(function(o){
+      if(lane.art==='road'){
+        ctx.fillStyle=lane.farbe;
+        roundRect(o.x,lane.row*CELL+CELL*0.15,o.w,CELL*0.7,6);
+      } else {
+        var untergetaucht = lane.taucht && Math.sin(o.tauchPhase)>0.75;
+        ctx.fillStyle = untergetaucht ? 'rgba(62,142,82,.35)' : lane.farbe;
+        roundRect(o.x,lane.row*CELL+CELL*0.2,o.w,CELL*0.6,8);
+      }
+    });
+  });
+  // Frosch
+  ctx.font=(CELL*0.72)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('\u{1F438}', frog.x+CELL/2, frog.y+CELL/2+1);
+}
+
+function roundRect(x,y,w,h,rad){
+  var r=Math.min(rad,h/2,w/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function zeilenFarbe(r){
+  if(r===ROW_HOME) return '#0B4A2A';
+  if(ROW_RIVER.indexOf(r)!==-1) return '#2E86AB';
+  if(r===ROW_MEDIAN) return '#3BB273';
+  if(ROW_ROAD.indexOf(r)!==-1) return '#4a4a4a';
+  return '#3BB273';
+}
+
+document.getElementById('startBtn').addEventListener('click', neuesSpiel);
+
+function zurueck(){
+  cancelAnimationFrame(rafId);
+  if(history.length>1){ history.back(); } else { location.href='index.html'; }
+}
+
+startLevel(1);
+zeichnen();
+</script>
+</body>
+</html>
