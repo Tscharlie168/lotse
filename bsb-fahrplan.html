@@ -934,6 +934,10 @@ function schweizHTML(){
    Position durch lineare Interpolation zwischen den beiden Haefen, zwischen
    denen sich das Schiff laut Fahrplan gerade befindet. Keine externe
    Ortungsquelle noetig - erfasst nur Kurse, die im Fahrplan stehen. */
+function fahrtwinkel(von,nach){
+  var a=karteXY(von[0],von[1]),b=karteXY(nach[0],nach[1]);
+  return Math.atan2(b[0]-a[0],-(b[1]-a[1]))*180/Math.PI;
+}
 function schiffePositionen(){
   var now=new Date();
   var dStr=now.getFullYear()+"-"+pad2(now.getMonth()+1)+"-"+pad2(now.getDate());
@@ -949,7 +953,10 @@ function schiffePositionen(){
       var arrS=toMin(stops[s][1]),depS=toMin(stops[s][2]);
       if(nowMinVal>=arrS&&nowMinVal<=depS){
         var p=COORDS[stops[s][0]];
-        out.push({no:c.no,svc:c.svc,line:c.line,lat:p[0],lng:p[1],
+        var kurs=0;
+        if(s<stops.length-1) kurs=fahrtwinkel(p,COORDS[stops[s+1][0]]);
+        else if(s>0) kurs=fahrtwinkel(COORDS[stops[s-1][0]],p);
+        out.push({no:c.no,svc:c.svc,line:c.line,lat:p[0],lng:p[1],heading:kurs,
           von:PORTS[stops[0][0]],bis:PORTS[stops[stops.length-1][0]],
           status:"liegt in "+PORTS[stops[s][0]]});
         break;
@@ -960,6 +967,7 @@ function schiffePositionen(){
           var frac=(nowMinVal-depS)/(arrNext-depS);
           var p1=COORDS[stops[s][0]],p2=COORDS[stops[s+1][0]];
           out.push({no:c.no,svc:c.svc,line:c.line,lat:p1[0]+(p2[0]-p1[0])*frac,lng:p1[1]+(p2[1]-p1[1])*frac,
+            heading:fahrtwinkel(p1,p2),
             von:PORTS[stops[0][0]],bis:PORTS[stops[stops.length-1][0]],
             status:"zwischen "+PORTS[stops[s][0]]+" und "+PORTS[stops[s+1][0]]});
           break;
@@ -1010,7 +1018,7 @@ function karteXY(lat,lng){
   var y=KARTE_PAD+(p.b.latMax-lat)*p.scale;
   return [x,y];
 }
-var BOOT_RUMPF="M0,-6 L2.6,-1.2 L2.4,4.4 L-2.4,4.4 L-2.6,-1.2 Z";
+var BOOT_RUMPF_X=3.4, BOOT_RUMPF_Y=8;
 // Grobe, schematische Naeherung der Landesgrenze (Mitte zwischen gegenueberliegenden Ufern) - keine amtliche Vermessung
 var GRENZE_CH=[[47.525,9.716],[47.565,9.486],[47.621,9.364],[47.655,9.20],[47.665,9.05],[47.6615,8.873],[47.696,8.687]];
 function karteHTML(){
@@ -1054,8 +1062,10 @@ function karteHTML(){
     var sel=state.schiffSel===idx?" is-sel":"";
     boote+='<g class="lg-map-schiff'+sel+'" data-schiffidx="'+idx+'" transform="translate('+pp[0].toFixed(1)+','+pp[1].toFixed(1)+')">'+
       '<circle class="lg-map-hit" cx="0" cy="0" r="9"/>'+
-      '<path class="lg-map-schiff-rumpf" d="'+BOOT_RUMPF+'"/>'+
-      '<rect class="lg-map-schiff-kabine" x="-1.3" y="-0.6" width="2.6" height="2.6" rx="0.6"/></g>';
+      '<g transform="rotate('+sh.heading.toFixed(1)+')">'+
+      '<rect class="lg-map-schiff-rumpf" x="-'+BOOT_RUMPF_X+'" y="-'+BOOT_RUMPF_Y+'" width="'+(BOOT_RUMPF_X*2)+'" height="'+(BOOT_RUMPF_Y*2)+'" rx="'+BOOT_RUMPF_X+'"/>'+
+      '<rect class="lg-map-schiff-kabine" x="-1.6" y="-3" width="3.2" height="4.5" rx="1"/>'+
+      '</g></g>';
   });
   var mein="";
   if(karteMyPos){
