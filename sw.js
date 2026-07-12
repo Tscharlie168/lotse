@@ -1,4 +1,7 @@
-/* Lotse – Service Worker (v20) – Stand: 12. Juli 2026
+/* Lotse – Service Worker (v21) – Stand: 12. Juli 2026
+   Neu gegenüber v20:
+   - Spiel "Frosch über die Straße" durch Sudoku ersetzt (zu schnell/
+     zeitkritisch für ältere Nutzer; Sudoku ist ohne Zeitdruck spielbar).
    Neu gegenüber v19:
    - Spiel "Kistenschieben" durch "Frosch über die Straße" ersetzt
      (Kistenschieben war trotz schwererer Level zu einfach).
@@ -49,7 +52,7 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v83';
+const CACHE = 'lotse-v84';
 const SHELL = [
   './',
   './index.html',
@@ -57,7 +60,7 @@ const SHELL = [
   './autofaehre.html',
   './tetris.html',
   './minesweeper.html',
-  './frosch.html',
+  './sudoku.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
@@ -92,7 +95,7 @@ self.addEventListener('fetch', e => {
       url.pathname.endsWith('/autofaehre.html')   ? './autofaehre.html'   :
       url.pathname.endsWith('/tetris.html')       ? './tetris.html'       :
       url.pathname.endsWith('/minesweeper.html')  ? './minesweeper.html'  :
-      url.pathname.endsWith('/frosch.html')       ? './frosch.html'       : './index.html';
+      url.pathname.endsWith('/sudoku.html')       ? './sudoku.html'       : './index.html';
     // zuerst Netz (frischer Stand), bei Offline die passende Kopie
     e.respondWith(
       fetch(req).then(resp => {
