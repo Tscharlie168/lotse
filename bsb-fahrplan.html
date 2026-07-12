@@ -1161,7 +1161,7 @@ function karteHTML(){
     }
   }
   var h2='<section class="lg-panel">'+
-    '<div class="lg-lead">Welche Schiffe sind laut Fahrplan gerade unterwegs? Nur Kurse aus diesem Fahrplan (BSB/SBS/VL/URh) — keine Live-Ortung, sondern aus den Fahrzeiten berechnet. Ein Tipp auf die Nadel zeigt die aktuelle Position.</div>'+
+    '<div class="lg-lead">Welche Schiffe sind laut Fahrplan gerade unterwegs? Ein Tipp auf die Nadel zeigt die aktuelle Position.</div>'+
     '<div class="lg-map-wrap"><svg viewBox="'+(karteView?karteView.x.toFixed(1)+" "+karteView.y.toFixed(1)+" "+karteView.w.toFixed(1)+" "+karteView.h.toFixed(1):"0 0 "+KARTE_BASIS.w+" "+KARTE_BASIS.h)+'" preserveAspectRatio="xMidYMid meet">'+seeBg+lines+dots+boote+mein+'</svg>'+
     '<button type="button" class="lg-map-locate" id="lg-map-locate" title="Meinen Standort anzeigen">📍</button></div>'+
     (karteLocStatus?'<p class="lg-map-loc-status">'+esc(karteLocStatus)+'</p>':"")+
