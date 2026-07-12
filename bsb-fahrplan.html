@@ -169,10 +169,9 @@ select,input,button{font-family:inherit;}
 .lg-map-schiff{cursor:pointer;}
 .lg-map-schiff path{fill:var(--red);stroke:#fff;stroke-width:.6;}
 .lg-map-schiff.is-sel path{fill:var(--gold);}
+.lg-map-schiff .lg-map-hit{fill:transparent;}
 .lg-map-stand{font-size:12.5px;color:var(--muted);text-align:center;margin:0 0 14px;}
-.lg-schiff-liste{display:flex;flex-direction:column;gap:8px;}
-.lg-schiff-item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;}
-.lg-schiff-item.is-sel{border-color:var(--gold);box-shadow:0 0 0 2px rgba(185,132,43,.25);}
+.lg-schiff-item{background:#fff;border:1px solid var(--gold);box-shadow:0 0 0 2px rgba(185,132,43,.25);border-radius:12px;padding:12px 14px;}
 .lg-schiff-item b{color:var(--navy);}
 .lg-schiff-item .lg-schiff-sub{font-size:13px;color:var(--muted);margin-top:2px;}
 .lg-map-empty{text-align:center;color:var(--muted);padding:30px 16px;}
@@ -1003,23 +1002,24 @@ function karteHTML(){
     var pp=xy(sh.lat,sh.lng);
     var sel=state.schiffSel===idx?" is-sel":"";
     boote+='<g class="lg-map-schiff'+sel+'" data-schiffidx="'+idx+'" transform="translate('+pp[0].toFixed(1)+','+pp[1].toFixed(1)+')">'+
+      '<circle class="lg-map-hit" cx="0" cy="0" r="7"/>'+
       '<path d="M-5,3 L5,3 L3.5,-2.5 L-3.5,-2.5 Z"/></g>';
   });
   var h2='<section class="lg-panel">'+
-    '<div class="lg-lead">Welche Schiffe sind laut Fahrplan gerade unterwegs? Nur Kurse aus diesem Fahrplan (BSB/SBS/VL/URh) — keine Live-Ortung, sondern aus den Fahrzeiten berechnet.</div>'+
+    '<div class="lg-lead">Welche Schiffe sind laut Fahrplan gerade unterwegs? Nur Kurse aus diesem Fahrplan (BSB/SBS/VL/URh) — keine Live-Ortung, sondern aus den Fahrzeiten berechnet. Tippe auf ein Schiff für Details.</div>'+
     '<div class="lg-map-wrap"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">'+lines+dots+boote+'</svg></div>'+
     '<p class="lg-map-stand" id="lg-karte-stand"></p>';
   if(!schiffe.length){
     h2+='<div class="lg-map-empty">Gerade ist kein Kurs aus dem Fahrplan unterwegs.</div>';
   }else{
-    h2+='<div class="lg-schiff-liste">';
-    schiffe.forEach(function(sh,idx){
-      var sel=state.schiffSel===idx?" is-sel":"";
-      h2+='<div class="lg-schiff-item'+sel+'" data-schiffidx="'+idx+'">'+
-        '<b>Kurs '+esc(sh.no)+'</b> '+svcTag(sh.svc)+
+    var sel=schiffe[state.schiffSel]?state.schiffSel:null;
+    if(sel===null){
+      h2+='<div class="lg-map-empty">'+schiffe.length+' Schiff'+(schiffe.length===1?"":"e")+' gerade unterwegs &mdash; tippe auf ein Symbol auf der Karte.</div>';
+    }else{
+      var sh=schiffe[sel];
+      h2+='<div class="lg-schiff-item"><b>Kurs '+esc(sh.no)+'</b> '+svcTag(sh.svc)+
         '<div class="lg-schiff-sub">'+esc(sh.von)+' &rarr; '+esc(sh.bis)+' &middot; '+esc(sh.status)+'</div></div>';
-    });
-    h2+='</div>';
+    }
   }
   h2+='</section>';
   return h2;
