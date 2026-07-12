@@ -1497,14 +1497,7 @@ try{
     <section class="view" id="v-motorrad">
       <button class="back" onclick="lotseZurueck()">‹ Zurück</button>
 
-      <h2 style="margin-top:6px;font-size:1.25rem">Werkstatt in der Nähe</h2>
-      <p style="color:var(--ink-soft);margin:0 0 12px">Der Knopf zeigt Motorradhändler und Werkstätten in Ihrer Umgebung.</p>
-      <a class="row row-accent" href="javascript:void(0)" onclick="findNear('motorradhaendler')" style="--acc:#4A4A57">
-        <div class="main"><b>Motorradhändler / Werkstatt suchen</b><small>Reparatur, Wartung, Ersatzteile</small></div>
-        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
-      </a>
-
-      <h2 style="margin-top:22px;font-size:1.25rem">Passstraßen &amp; Bergstrecken</h2>
+      <h2 style="margin-top:6px;font-size:1.25rem">Passstraßen &amp; Bergstrecken</h2>
       <p style="color:var(--ink-soft);margin:0 0 12px">Vor einer Passfahrt lohnt ein Blick auf die aktuelle Lage – Wintersperren, Baustellen oder Sperrungen ändern sich kurzfristig.</p>
       <div class="rows">
         <a class="row row-accent" href="https://www.alpenpaesse.de/verkehrsinfo" target="_blank" rel="noopener" style="--acc:#3C7A5C">
@@ -1520,6 +1513,13 @@ try{
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="14" rx="3"/><circle cx="12" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="9.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="13" r="1" fill="currentColor" stroke="none"/><path d="M12 16v6"/></svg></span>
         </a>
       </div>
+
+      <h2 style="margin-top:22px;font-size:1.25rem">Werkstatt in der Nähe</h2>
+      <p style="color:var(--ink-soft);margin:0 0 12px">Der Knopf zeigt Motorradhändler und Werkstätten in Ihrer Umgebung.</p>
+      <a class="row row-accent" href="javascript:void(0)" onclick="findNear('motorradhaendler')" style="--acc:#4A4A57">
+        <div class="main"><b>Motorradhändler / Werkstatt suchen</b><small>Reparatur, Wartung, Ersatzteile</small></div>
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
+      </a>
 
       <h2 style="margin-top:22px;font-size:1.25rem">Pannenhilfe rufen</h2>
       <div class="rows" id="panneNumsMoto"></div>
