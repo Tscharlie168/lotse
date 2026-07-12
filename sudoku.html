@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0E3553">
+<title>Sudoku</title>
+<style>
+:root{--ink:#0A2233;--navy:#103A5A;--blue:#15679E;--azure:#2BA6C9;--sky:#EAF2F8;--paper:#F4F8FB;--line:#D8E5EF;--muted:#5C7488;}
+*{box-sizing:border-box;}
+html,body{margin:0;height:100%;}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--paper);line-height:1.5;-webkit-font-smoothing:antialiased;touch-action:manipulation;user-select:none;-webkit-user-select:none;}
+.app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;}
+
+.head{position:relative;background:linear-gradient(160deg,#0E3553 0%,#15679E 100%);color:#fff;padding:16px 18px 20px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:#0A2233;text-decoration:none;font-weight:600;font-size:15px;letter-spacing:.03em;text-transform:uppercase;background:#7FD5EA;border:1.5px solid #62D0E8;border-radius:999px;padding:9px 16px;cursor:pointer;}
+.back:active{background:#62D0E8;}
+.head h1{font-weight:800;font-size:30px;line-height:1;margin:12px 0 0;letter-spacing:.02em;}
+
+.wrap{flex:1;display:flex;flex-direction:column;align-items:center;padding:12px;gap:12px;}
+
+.diffrow{width:100%;max-width:400px;display:flex;gap:8px;}
+.diffbtn{flex:1;border:1.5px solid var(--line);background:#fff;color:var(--navy);border-radius:12px;padding:12px 4px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;min-height:46px;}
+.diffbtn.on{background:var(--blue);border-color:var(--blue);color:#fff;}
+
+.hud{width:100%;max-width:400px;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.stat{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 10px;text-align:center;}
+.stat span{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);}
+.stat b{font-size:20px;color:var(--navy);font-variant-numeric:tabular-nums;}
+
+.boardwrap{position:relative;width:100%;max-width:400px;}
+#board{display:grid;grid-template-columns:repeat(9,1fr);width:100%;aspect-ratio:1/1;background:var(--navy);border:3px solid var(--navy);border-radius:10px;overflow:hidden;box-shadow:0 6px 18px rgba(16,58,90,.18);}
+.cell{background:#fff;display:flex;align-items:center;justify-content:center;font-size:clamp(16px,5vw,22px);font-weight:700;color:var(--navy);cursor:pointer;position:relative;border:.5px solid #E3ECF4;}
+.cell.given{color:var(--ink);background:#F1F5F9;cursor:default;}
+.cell.sel{background:#BEE3F5;}
+.cell.peer{background:#E3F1FA;}
+.cell.same{background:#CFEAD8;}
+.cell.err{color:#C0392B;background:#FBE0DC;}
+.cell.b-right{border-right:2.5px solid var(--navy);}
+.cell.b-bottom{border-bottom:2.5px solid var(--navy);}
+
+.over{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(244,248,251,.94);border-radius:10px;text-align:center;padding:16px;}
+.over.show{display:flex;}
+.over h2{margin:0;font-size:24px;color:var(--navy);}
+.over p{margin:0;font-size:15px;color:var(--muted);}
+
+.padrow{width:100%;max-width:400px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.padbtn{border:1.5px solid var(--line);background:#fff;color:var(--navy);border-radius:12px;font-size:20px;font-weight:700;min-height:52px;cursor:pointer;font-family:inherit;}
+.padbtn:active{background:var(--sky);}
+.padbtn.erase{font-size:22px;color:var(--muted);}
+
+.toolrow{width:100%;max-width:400px;display:flex;gap:8px;}
+.toolbtn{flex:1;border:1.5px solid var(--line);background:#fff;color:var(--navy);border-radius:12px;padding:12px 4px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;min-height:46px;}
+
+.start{width:100%;max-width:400px;border:0;border-radius:999px;padding:13px;font-size:17px;font-weight:700;background:#7cf7c7;color:#07110d;cursor:pointer;}
+.tip{max-width:400px;font-size:12.5px;color:var(--muted);text-align:center;margin:0;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="head">
+    <button class="back" onclick="zurueck()">&lsaquo; Zur&uuml;ck</button>
+    <h1>Sudoku</h1>
+  </header>
+
+  <div class="wrap">
+    <div class="diffrow">
+      <button class="diffbtn" id="dLeicht" onclick="waehleSchwierigkeit('leicht')">Leicht</button>
+      <button class="diffbtn" id="dMittel" onclick="waehleSchwierigkeit('mittel')">Mittel</button>
+      <button class="diffbtn" id="dSchwer" onclick="waehleSchwierigkeit('schwer')">Schwer</button>
+    </div>
+
+    <div class="hud">
+      <div class="stat"><span>Frei</span><b id="hudFrei">0</b></div>
+      <div class="stat"><span>Fehler</span><b id="hudFehler">0</b></div>
+    </div>
+
+    <div class="boardwrap">
+      <div id="board"></div>
+      <div class="over" id="over">
+        <h2 id="overTitel">Gel&ouml;st! &#127881;</h2>
+        <p id="overText"></p>
+      </div>
+    </div>
+
+    <div class="padrow">
+      <button class="padbtn" data-n="1">1</button>
+      <button class="padbtn" data-n="2">2</button>
+      <button class="padbtn" data-n="3">3</button>
+      <button class="padbtn" data-n="4">4</button>
+      <button class="padbtn" data-n="5">5</button>
+      <button class="padbtn" data-n="6">6</button>
+      <button class="padbtn" data-n="7">7</button>
+      <button class="padbtn" data-n="8">8</button>
+      <button class="padbtn" data-n="9">9</button>
+      <button class="padbtn erase" data-n="0">&#9003;</button>
+    </div>
+
+    <div class="toolrow">
+      <button class="toolbtn" id="btnPruefen">Pr&uuml;fen</button>
+      <button class="toolbtn" id="btnTipp">Tipp</button>
+    </div>
+
+    <button class="start" id="startBtn">Neues Spiel</button>
+    <p class="tip">Tippe ein leeres Feld an, dann eine Zahl darunter. In jeder Zeile, Spalte und jedem 3&times;3-Block darf jede Zahl 1&ndash;9 nur einmal vorkommen. Kein Zeitdruck &mdash; so viel Zeit lassen wie n&ouml;tig.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+var DIFF={ leicht:{leer:39}, mittel:{leer:47}, schwer:{leer:53} };
+var schwierigkeit='leicht';
+var loesung=[], raetsel=[], eingabe=[], given=[];
+var ausgewaehlt=-1, fehlerZahl=0;
+var boardEl=document.getElementById('board');
+
+function idx(r,c){ return r*9+c; }
+function shuffle(arr){
+  for(var i=arr.length-1;i>0;i--){ var j=(Math.random()*(i+1))|0; var t=arr[i]; arr[i]=arr[j]; arr[j]=t; }
+  return arr;
+}
+function isValid(grid,r,c,n){
+  for(var i=0;i<9;i++){
+    if(grid[idx(r,i)]===n) return false;
+    if(grid[idx(i,c)]===n) return false;
+  }
+  var br=(r/3|0)*3, bc=(c/3|0)*3;
+  for(var rr=br;rr<br+3;rr++){ for(var cc=bc;cc<bc+3;cc++){ if(grid[idx(rr,cc)]===n) return false; } }
+  return true;
+}
+function fillGrid(grid){
+  var empty=grid.indexOf(0);
+  if(empty===-1) return true;
+  var r=(empty/9)|0, c=empty%9;
+  var nums=shuffle([1,2,3,4,5,6,7,8,9]);
+  for(var k=0;k<nums.length;k++){
+    var n=nums[k];
+    if(isValid(grid,r,c,n)){
+      grid[empty]=n;
+      if(fillGrid(grid)) return true;
+      grid[empty]=0;
+    }
+  }
+  return false;
+}
+function zaehleLoesungen(grid,limit){
+  var empty=grid.indexOf(0);
+  if(empty===-1) return 1;
+  var r=(empty/9)|0, c=empty%9;
+  var summe=0;
+  for(var n=1;n<=9;n++){
+    if(isValid(grid,r,c,n)){
+      grid[empty]=n;
+      summe+=zaehleLoesungen(grid,limit-summe);
+      grid[empty]=0;
+      if(summe>=limit) return summe;
+    }
+  }
+  return summe;
+}
+function machePuzzle(loes,anzahlLeer){
+  var p=loes.slice();
+  var reihenfolge=shuffle([...Array(81).keys()]);
+  var entfernt=0;
+  for(var k=0;k<reihenfolge.length && entfernt<anzahlLeer;k++){
+    var i=reihenfolge[k];
+    var sicher=p[i];
+    p[i]=0;
+    var kopie=p.slice();
+    var anzahl=zaehleLoesungen(kopie,2);
+    if(anzahl===1){ entfernt++; } else { p[i]=sicher; }
+  }
+  return p;
+}
+
+function waehleSchwierigkeit(s){
+  schwierigkeit=s;
+  document.getElementById('dLeicht').classList.toggle('on', s==='leicht');
+  document.getElementById('dMittel').classList.toggle('on', s==='mittel');
+  document.getElementById('dSchwer').classList.toggle('on', s==='schwer');
+  start();
+}
+
+function start(){
+  document.getElementById('over').classList.remove('show');
+  loesung=new Array(81).fill(0);
+  fillGrid(loesung);
+  raetsel=machePuzzle(loesung, DIFF[schwierigkeit].leer);
+  eingabe=raetsel.slice();
+  given=raetsel.map(function(v){ return v!==0; });
+  ausgewaehlt=-1; fehlerZahl=0;
+  updateHud();
+  zeichnenBrett();
+}
+
+function updateHud(){
+  var frei=0;
+  for(var i=0;i<81;i++){ if(eingabe[i]===0) frei++; }
+  document.getElementById('hudFrei').textContent=frei;
+  document.getElementById('hudFehler').textContent=fehlerZahl;
+}
+
+function zeichnenBrett(){
+  boardEl.innerHTML='';
+  var frag=document.createDocumentFragment();
+  for(var r=0;r<9;r++){ for(var c=0;c<9;c++){
+    var i=idx(r,c);
+    var d=document.createElement('div');
+    d.className='cell';
+    if(c===2||c===5) d.classList.add('b-right');
+    if(r===2||r===5) d.classList.add('b-bottom');
+    if(given[i]) d.classList.add('given');
+    d.dataset.i=i;
+    d.textContent = eingabe[i]!==0 ? eingabe[i] : '';
+    d.addEventListener('click', onZelleClick);
+    frag.appendChild(d);
+  }}
+  boardEl.appendChild(frag);
+  malenMarkierungen();
+}
+
+function onZelleClick(e){
+  var i=+e.currentTarget.dataset.i;
+  ausgewaehlt=i;
+  malenMarkierungen();
+}
+
+function malenMarkierungen(){
+  var kinder=boardEl.children;
+  var selR=-1, selC=-1, selVal=0;
+  if(ausgewaehlt>=0){ selR=(ausgewaehlt/9)|0; selC=ausgewaehlt%9; selVal=eingabe[ausgewaehlt]; }
+  for(var k=0;k<kinder.length;k++){
+    var d=kinder[k], i=+d.dataset.i, r=(i/9)|0, c=i%9;
+    d.classList.remove('sel','peer','same','err');
+    if(i===ausgewaehlt) d.classList.add('sel');
+    else if(ausgewaehlt>=0 && (r===selR || c===selC || ((r/3|0)===(selR/3|0) && (c/3|0)===(selC/3|0)))) d.classList.add('peer');
+    if(selVal!==0 && eingabe[i]===selVal && i!==ausgewaehlt) d.classList.add('same');
+    if(!given[i] && eingabe[i]!==0 && eingabe[i]!==loesung[i]) d.classList.add('err');
+  }
+}
+
+function setzeZahl(n){
+  if(ausgewaehlt<0 || given[ausgewaehlt]) return;
+  eingabe[ausgewaehlt]=n;
+  boardEl.children[ausgewaehlt].textContent = n!==0 ? n : '';
+  if(n!==0 && n!==loesung[ausgewaehlt]){ fehlerZahl++; }
+  updateHud();
+  malenMarkierungen();
+  pruefeFertig();
+}
+
+document.querySelectorAll('.padbtn').forEach(function(b){
+  b.addEventListener('click', function(){ setzeZahl(+this.dataset.n); });
+});
+window.addEventListener('keydown',function(e){
+  if(e.key>='1'&&e.key<='9'){ setzeZahl(+e.key); }
+  else if(e.key==='Backspace'||e.key==='Delete'){ setzeZahl(0); }
+});
+
+function pruefeFertig(){
+  for(var i=0;i<81;i++){ if(eingabe[i]===0 || eingabe[i]!==loesung[i]) return; }
+  document.getElementById('overTitel').textContent='Gelöst! \u{1F389}';
+  document.getElementById('overText').textContent='Fehlversuche: '+fehlerZahl+'. Tippe auf „Neues Spiel“ für die nächste Runde.';
+  document.getElementById('over').classList.add('show');
+}
+
+document.getElementById('btnPruefen').addEventListener('click', function(){
+  var kinder=boardEl.children;
+  var neueFehler=0;
+  for(var k=0;k<kinder.length;k++){
+    var d=kinder[k], i=+d.dataset.i;
+    d.classList.remove('err');
+    if(!given[i] && eingabe[i]!==0 && eingabe[i]!==loesung[i]){ d.classList.add('err'); neueFehler++; }
+  }
+  if(neueFehler===0){
+    document.getElementById('overTitel').textContent='Bisher alles richtig';
+    document.getElementById('overText').textContent='Weiter so! Es sind noch Felder frei.';
+  } else {
+    document.getElementById('overTitel').textContent=neueFehler+' Fehler gefunden';
+    document.getElementById('overText').textContent='Die rot markierten Felder stimmen noch nicht.';
+  }
+  var over=document.getElementById('over');
+  over.classList.add('show');
+  setTimeout(function(){ over.classList.remove('show'); },1800);
+});
+
+document.getElementById('btnTipp').addEventListener('click', function(){
+  var kandidaten=[];
+  for(var i=0;i<81;i++){ if(!given[i] && eingabe[i]!==loesung[i]) kandidaten.push(i); }
+  if(!kandidaten.length) return;
+  var i=kandidaten[(Math.random()*kandidaten.length)|0];
+  ausgewaehlt=i;
+  setzeZahl(loesung[i]);
+});
+
+document.getElementById('startBtn').addEventListener('click', start);
+
+function zurueck(){
+  if(history.length>1){ history.back(); } else { location.href='index.html'; }
+}
+
+waehleSchwierigkeit('leicht');
+</script>
+</body>
+</html>
