@@ -163,19 +163,20 @@ select,input,button{font-family:inherit;}
 
 .lg-map-wrap{position:relative;background:#A9D4E8;border:1px solid var(--line);border-radius:0;overflow:hidden;margin:0 -16px 10px;touch-action:none;}
 .lg-map-wrap svg{display:block;width:100%;height:56vh;max-height:520px;}
-.lg-map-see{stroke:none;}
-.lg-map-see--obersee{fill:#A9D4E8;}
-.lg-map-see--ueberlingen{fill:#5FBFCE;}
-.lg-map-see--untersee{fill:#9BDCAE;}
+.lg-map-see{stroke-width:1.1;stroke-linejoin:round;}
+.lg-map-see--obersee{fill:#A9D4E8;stroke:#7EB6D9;}
+.lg-map-see--ueberlingen{fill:#5FBFCE;stroke:#379AAA;}
+.lg-map-see--untersee{fill:#9BDCAE;stroke:#63BB80;}
+.lg-map-kontur{fill:none;stroke:var(--navy);stroke-width:1.3;stroke-linejoin:round;opacity:.55;}
+.lg-map-grenze{fill:none;stroke:var(--navy);stroke-width:1.1;stroke-dasharray:3,2.4;opacity:.6;}
 .lg-map-hafen{fill:#6F97AC;}
 .lg-map-hafen--ch{fill:var(--navy);}
 .lg-map-hafen-label{font-family:'Inter',sans-serif;font-size:6.5px;fill:var(--navy);paint-order:stroke;stroke:#fff;stroke-width:2px;}
 .lg-map-linie{stroke:rgba(255,255,255,.65);stroke-width:1;fill:none;}
 .lg-map-schiff{cursor:pointer;}
-.lg-map-schiff .lg-map-schiff-ring{fill:var(--red);stroke:#fff;stroke-width:.8;}
-.lg-map-schiff.is-sel .lg-map-schiff-ring{fill:var(--gold);}
-.lg-map-schiff .lg-map-schiff-hub{fill:#fff;}
-.lg-map-schiff .lg-map-schiff-spoke{stroke:#fff;stroke-width:1.1;}
+.lg-map-schiff .lg-map-schiff-rumpf{fill:var(--red);stroke:#fff;stroke-width:.8;stroke-linejoin:round;}
+.lg-map-schiff.is-sel .lg-map-schiff-rumpf{fill:var(--gold);}
+.lg-map-schiff .lg-map-schiff-kabine{fill:#fff;opacity:.9;}
 .lg-map-schiff .lg-map-hit{fill:transparent;}
 .lg-map-mich{fill:#2B6FE0;stroke:#fff;stroke-width:1;}
 .lg-map-mich-halo{fill:rgba(43,111,224,.28);animation:lgPuls 2.2s ease-out infinite;}
@@ -1009,25 +1010,23 @@ function karteXY(lat,lng){
   var y=KARTE_PAD+(p.b.latMax-lat)*p.scale;
   return [x,y];
 }
-var WHEEL_R=5, WHEEL_TICK=7.6, WHEEL_HUB=1.6;
-var WHEEL_SPOKES=(function(){
-  var s="";
-  for(var a=0;a<360;a+=45){
-    var rad=a*Math.PI/180;
-    var x1=(Math.cos(rad)*WHEEL_R).toFixed(1), y1=(Math.sin(rad)*WHEEL_R).toFixed(1);
-    var x2=(Math.cos(rad)*WHEEL_TICK).toFixed(1), y2=(Math.sin(rad)*WHEEL_TICK).toFixed(1);
-    s+='<line class="lg-map-schiff-spoke" x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'"/>';
-  }
-  return s;
-})();
+var BOOT_RUMPF="M0,-6 L2.6,-1.2 L2.4,4.4 L-2.4,4.4 L-2.6,-1.2 Z";
+// Grobe, schematische Naeherung der Landesgrenze (Mitte zwischen gegenueberliegenden Ufern) - keine amtliche Vermessung
+var GRENZE_CH=[[47.525,9.716],[47.565,9.486],[47.621,9.364],[47.655,9.20],[47.665,9.05],[47.6615,8.873],[47.696,8.687]];
 function karteHTML(){
   function ringPfad(ring){
     return "M"+ring.map(function(p){var xy=karteXY(p[0],p[1]);return xy[0].toFixed(1)+","+xy[1].toFixed(1);}).join("L")+"Z";
   }
+  function linPfad(ring){
+    return ring.map(function(p,i){var xy=karteXY(p[0],p[1]);return (i===0?"M":"L")+xy[0].toFixed(1)+","+xy[1].toFixed(1);}).join("");
+  }
   var seeBg='<path class="lg-map-see lg-map-see--obersee" d="'+ringPfad(BODENSEE_UMRISS)+'"/>'+
     '<path class="lg-map-see lg-map-see--untersee" d="'+ringPfad(BODENSEE_UNTERSEE)+'"/>'+
     '<path class="lg-map-see lg-map-see--untersee" d="'+ringPfad(BODENSEE_RHEIN_WEST)+'"/>'+
-    '<path class="lg-map-see lg-map-see--ueberlingen" d="'+ringPfad(BODENSEE_UEBERLINGER_SEE)+'"/>';
+    '<path class="lg-map-see lg-map-see--ueberlingen" d="'+ringPfad(BODENSEE_UEBERLINGER_SEE)+'"/>'+
+    '<path class="lg-map-kontur" d="'+ringPfad(BODENSEE_UMRISS)+'"/>'+
+    '<path class="lg-map-kontur" d="'+ringPfad(BODENSEE_RHEIN_WEST)+'"/>'+
+    '<path class="lg-map-grenze" d="'+linPfad(GRENZE_CH)+'"/>';
   // Routenlinien: alle direkt aufeinanderfolgenden Haltepaare aus allen Kursen, einmalig
   var seen={}, lines="";
   for(var i=0;i<COURSES.length;i++){
@@ -1055,9 +1054,8 @@ function karteHTML(){
     var sel=state.schiffSel===idx?" is-sel":"";
     boote+='<g class="lg-map-schiff'+sel+'" data-schiffidx="'+idx+'" transform="translate('+pp[0].toFixed(1)+','+pp[1].toFixed(1)+')">'+
       '<circle class="lg-map-hit" cx="0" cy="0" r="9"/>'+
-      WHEEL_SPOKES+
-      '<circle class="lg-map-schiff-ring" r="'+WHEEL_R+'"/>'+
-      '<circle class="lg-map-schiff-hub" r="'+WHEEL_HUB+'"/></g>';
+      '<path class="lg-map-schiff-rumpf" d="'+BOOT_RUMPF+'"/>'+
+      '<rect class="lg-map-schiff-kabine" x="-1.3" y="-0.6" width="2.6" height="2.6" rx="0.6"/></g>';
   });
   var mein="";
   if(karteMyPos){
@@ -1069,7 +1067,7 @@ function karteHTML(){
     }
   }
   var h2='<section class="lg-panel">'+
-    '<div class="lg-lead">Welche Schiffe sind laut Fahrplan gerade unterwegs? Nur Kurse aus diesem Fahrplan (BSB/SBS/VL/URh) — keine Live-Ortung, sondern aus den Fahrzeiten berechnet.</div>'+
+    '<div class="lg-lead">Welche Schiffe sind laut Fahrplan gerade unterwegs? Nur Kurse aus diesem Fahrplan (BSB/SBS/VL/URh) — keine Live-Ortung, sondern aus den Fahrzeiten berechnet. Die gestrichelte Linie zeigt schematisch etwa die Landesgrenze zur Schweiz.</div>'+
     '<div class="lg-map-wrap"><svg viewBox="'+(karteView?karteView.x.toFixed(1)+" "+karteView.y.toFixed(1)+" "+karteView.w.toFixed(1)+" "+karteView.h.toFixed(1):"0 0 "+KARTE_BASIS.w+" "+KARTE_BASIS.h)+'" preserveAspectRatio="xMidYMid slice">'+seeBg+lines+dots+boote+mein+'</svg>'+
     '<button type="button" class="lg-map-locate" id="lg-map-locate" title="Meinen Standort anzeigen">📍</button></div>'+
     (karteLocStatus?'<p class="lg-map-loc-status">'+esc(karteLocStatus)+'</p>':"")+
