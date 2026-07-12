@@ -187,8 +187,8 @@ select,input,button{font-family:inherit;}
 .lg-map-stand{font-size:12.5px;color:var(--muted);text-align:center;margin:0 0 14px;}
 .lg-schiff-item{background:#fff;border:1px solid var(--gold);box-shadow:0 0 0 2px rgba(185,132,43,.25);border-radius:12px;padding:12px 14px;text-align:center;}
 .lg-schiff-item b{color:var(--navy);font-size:16px;}
-.lg-flotte-toggle{width:100%;background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 18px;font-size:17px;font-weight:700;color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;}
-.lg-flotte-toggle .lg-flotte-chev{color:var(--muted);font-size:13px;transition:transform .15s;transform:rotate(180deg);}
+.lg-flotte-toggle{width:100%;background:var(--blue);border:none;border-radius:12px;padding:18px 18px;font-size:17px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;box-shadow:0 3px 10px rgba(21,103,158,.35);}
+.lg-flotte-toggle .lg-flotte-chev{color:#fff;opacity:.8;font-size:13px;transition:transform .15s;transform:rotate(180deg);}
 .lg-flotte-toggle.is-open .lg-flotte-chev{transform:rotate(0deg);}
 .lg-flotte{margin-top:14px;}
 .lg-flotte-reederei{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:16px;font-weight:700;color:var(--navy);margin:20px 0 8px;}
@@ -1161,7 +1161,7 @@ function karteHTML(){
     }
   }
   var h2='<section class="lg-panel">'+
-    '<div class="lg-lead">Welche Schiffe sind laut Fahrplan gerade unterwegs? Nur Kurse aus diesem Fahrplan (BSB/SBS/VL/URh) — keine Live-Ortung, sondern aus den Fahrzeiten berechnet. Die gestrichelte Linie zeigt schematisch etwa die Landesgrenze zur Schweiz.</div>'+
+    '<div class="lg-lead">Welche Schiffe sind laut Fahrplan gerade unterwegs? Nur Kurse aus diesem Fahrplan (BSB/SBS/VL/URh) — keine Live-Ortung, sondern aus den Fahrzeiten berechnet. Ein Tipp auf die Nadel zeigt die aktuelle Position.</div>'+
     '<div class="lg-map-wrap"><svg viewBox="'+(karteView?karteView.x.toFixed(1)+" "+karteView.y.toFixed(1)+" "+karteView.w.toFixed(1)+" "+karteView.h.toFixed(1):"0 0 "+KARTE_BASIS.w+" "+KARTE_BASIS.h)+'" preserveAspectRatio="xMidYMid meet">'+seeBg+lines+dots+boote+mein+'</svg>'+
     '<button type="button" class="lg-map-locate" id="lg-map-locate" title="Meinen Standort anzeigen">📍</button></div>'+
     (karteLocStatus?'<p class="lg-map-loc-status">'+esc(karteLocStatus)+'</p>':"")+
