@@ -52,7 +52,7 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v84';
+const CACHE = 'lotse-v85';
 const SHELL = [
   './',
   './index.html',
