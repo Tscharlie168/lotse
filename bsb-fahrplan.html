@@ -160,6 +160,22 @@ select,input,button{font-family:inherit;}
 .lg-via b{color:#fff;font-family:'IBM Plex Mono',monospace;}
 .lg-xfer{margin:9px 0 4px;padding:7px 11px;background:rgba(98,208,232,.16);border-radius:8px;font-size:13px;color:#CDEAF4;}
 .lg-leg-kurs{display:flex;align-items:center;gap:8px;margin:6px 0 4px;}
+
+.lg-map-wrap{background:#DCEEF5;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px;}
+.lg-map-wrap svg{display:block;width:100%;height:auto;}
+.lg-map-hafen{fill:#8FB9CC;}
+.lg-map-hafen-label{font-family:'Inter',sans-serif;font-size:6.5px;fill:var(--muted);}
+.lg-map-linie{stroke:#B7D6E2;stroke-width:1;fill:none;}
+.lg-map-schiff{cursor:pointer;}
+.lg-map-schiff path{fill:var(--red);stroke:#fff;stroke-width:.6;}
+.lg-map-schiff.is-sel path{fill:var(--gold);}
+.lg-map-stand{font-size:12.5px;color:var(--muted);text-align:center;margin:0 0 14px;}
+.lg-schiff-liste{display:flex;flex-direction:column;gap:8px;}
+.lg-schiff-item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;}
+.lg-schiff-item.is-sel{border-color:var(--gold);box-shadow:0 0 0 2px rgba(185,132,43,.25);}
+.lg-schiff-item b{color:var(--navy);}
+.lg-schiff-item .lg-schiff-sub{font-size:13px;color:var(--muted);margin-top:2px;}
+.lg-map-empty{text-align:center;color:var(--muted);padding:30px 16px;}
 </style>
 </head>
 <body>
@@ -177,6 +193,7 @@ select,input,button{font-family:inherit;}
   <nav class="lg-tabs">
     <button data-tab="planer" class="is-active">Verbindung</button>
     <button data-tab="schweiz">Schweiz</button>
+    <button data-tab="karte">Karte</button>
     <button data-tab="hinweise">Hinweise</button>
   </nav>
 
@@ -603,7 +620,7 @@ function planJourneys(fromIdx,toIdx,dStr){
 }
 
 // ---- state ----
-var state={tab:"planer",from:6,to:11,date:defaultDate(),open:null,favs:[],locStatus:null,schweizDest:null,schweizRet:null,picker:null};
+var state={tab:"planer",from:6,to:11,date:defaultDate(),open:null,favs:[],locStatus:null,schweizDest:null,schweizRet:null,picker:null,schiffSel:null};
 try{var f=localStorage.getItem("lgg-favs");if(f)state.favs=JSON.parse(f);}catch(e){}
 function saveFavs(){try{localStorage.setItem("lgg-favs",JSON.stringify(state.favs));}catch(e){}}
 
@@ -899,6 +916,115 @@ function schweizHTML(){
   return h;
 }
 
+/* ====================== Karte: "Welches Schiff ist das?" ======================
+   Berechnet rein aus den vorhandenen Fahrplandaten (Kurszeiten + Hafen-
+   koordinaten), welche Kurse gerade jetzt unterwegs sind, und schaetzt die
+   Position durch lineare Interpolation zwischen den beiden Haefen, zwischen
+   denen sich das Schiff laut Fahrplan gerade befindet. Keine externe
+   Ortungsquelle noetig - erfasst nur Kurse, die im Fahrplan stehen. */
+function schiffePositionen(){
+  var now=new Date();
+  var dStr=now.getFullYear()+"-"+pad2(now.getMonth()+1)+"-"+pad2(now.getDate());
+  var dObj=new Date(dStr+"T12:00:00");
+  var nowMinVal=now.getHours()*60+now.getMinutes();
+  var out=[];
+  for(var i=0;i<COURSES.length;i++){
+    var c=COURSES[i];
+    if(!courseValidOn(c,dObj,dStr)) continue;
+    var stops=c.stops;
+    if(stops.length<2) continue;
+    for(var s=0;s<stops.length;s++){
+      var arrS=toMin(stops[s][1]),depS=toMin(stops[s][2]);
+      if(nowMinVal>=arrS&&nowMinVal<=depS){
+        var p=COORDS[stops[s][0]];
+        out.push({no:c.no,svc:c.svc,line:c.line,lat:p[0],lng:p[1],
+          von:PORTS[stops[0][0]],bis:PORTS[stops[stops.length-1][0]],
+          status:"liegt in "+PORTS[stops[s][0]]});
+        break;
+      }
+      if(s<stops.length-1){
+        var arrNext=toMin(stops[s+1][1]);
+        if(nowMinVal>depS&&nowMinVal<arrNext){
+          var frac=(nowMinVal-depS)/(arrNext-depS);
+          var p1=COORDS[stops[s][0]],p2=COORDS[stops[s+1][0]];
+          out.push({no:c.no,svc:c.svc,line:c.line,lat:p1[0]+(p2[0]-p1[0])*frac,lng:p1[1]+(p2[1]-p1[1])*frac,
+            von:PORTS[stops[0][0]],bis:PORTS[stops[stops.length-1][0]],
+            status:"zwischen "+PORTS[stops[s][0]]+" und "+PORTS[stops[s+1][0]]});
+          break;
+        }
+      }
+    }
+  }
+  return out;
+}
+var KARTE_LABEL_HAFEN=[0,2,5,10,11,12,27,28,30,39,43]; // Konstanz,Meersburg,FN,Lindau,Bregenz,Kreuzlingen,Schaffhausen,Romanshorn,Rorschach,Radolfzell,Überlingen
+function karteBounds(){
+  var latMin=90,latMax=-90,lngMin=180,lngMax=-180;
+  for(var i=0;i<COORDS.length;i++){
+    var la=COORDS[i][0],lo=COORDS[i][1];
+    if(la<latMin)latMin=la; if(la>latMax)latMax=la;
+    if(lo<lngMin)lngMin=lo; if(lo>lngMax)lngMax=lo;
+  }
+  return {latMin:latMin,latMax:latMax,lngMin:lngMin,lngMax:lngMax};
+}
+function karteHTML(){
+  var b=karteBounds();
+  var W=440,H=320,PAD=26;
+  var latMid=(b.latMin+b.latMax)/2, cosLat=Math.cos(latMid*Math.PI/180);
+  var spanX=(b.lngMax-b.lngMin)*cosLat, spanY=(b.latMax-b.latMin);
+  var scale=Math.min((W-2*PAD)/spanX,(H-2*PAD)/spanY);
+  function xy(lat,lng){
+    var x=PAD+(lng-b.lngMin)*cosLat*scale;
+    var y=PAD+(b.latMax-lat)*scale;
+    return [x,y];
+  }
+  // Routenlinien: alle direkt aufeinanderfolgenden Haltepaare aus allen Kursen, einmalig
+  var seen={}, lines="";
+  for(var i=0;i<COURSES.length;i++){
+    var st=COURSES[i].stops;
+    for(var s=0;s<st.length-1;s++){
+      var a=st[s][0],c2=st[s+1][0],key=Math.min(a,c2)+"-"+Math.max(a,c2);
+      if(seen[key]) continue; seen[key]=true;
+      var p1=xy(COORDS[a][0],COORDS[a][1]),p2=xy(COORDS[c2][0],COORDS[c2][1]);
+      lines+='<line class="lg-map-linie" x1="'+p1[0].toFixed(1)+'" y1="'+p1[1].toFixed(1)+'" x2="'+p2[0].toFixed(1)+'" y2="'+p2[1].toFixed(1)+'"/>';
+    }
+  }
+  var dots="";
+  for(var h=0;h<PORTS.length;h++){
+    var pp=xy(COORDS[h][0],COORDS[h][1]);
+    dots+='<circle class="lg-map-hafen" cx="'+pp[0].toFixed(1)+'" cy="'+pp[1].toFixed(1)+'" r="2.2"/>';
+    if(KARTE_LABEL_HAFEN.indexOf(h)!==-1){
+      dots+='<text class="lg-map-hafen-label" x="'+(pp[0]+4).toFixed(1)+'" y="'+(pp[1]+2.5).toFixed(1)+'">'+esc(PORTS[h])+'</text>';
+    }
+  }
+  var schiffe=schiffePositionen();
+  var boote="";
+  schiffe.forEach(function(sh,idx){
+    var pp=xy(sh.lat,sh.lng);
+    var sel=state.schiffSel===idx?" is-sel":"";
+    boote+='<g class="lg-map-schiff'+sel+'" data-schiffidx="'+idx+'" transform="translate('+pp[0].toFixed(1)+','+pp[1].toFixed(1)+')">'+
+      '<path d="M-5,3 L5,3 L3.5,-2.5 L-3.5,-2.5 Z"/></g>';
+  });
+  var h2='<section class="lg-panel">'+
+    '<div class="lg-lead">Welche Schiffe sind laut Fahrplan gerade unterwegs? Nur Kurse aus diesem Fahrplan (BSB/SBS/VL/URh) — keine Live-Ortung, sondern aus den Fahrzeiten berechnet.</div>'+
+    '<div class="lg-map-wrap"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">'+lines+dots+boote+'</svg></div>'+
+    '<p class="lg-map-stand" id="lg-karte-stand"></p>';
+  if(!schiffe.length){
+    h2+='<div class="lg-map-empty">Gerade ist kein Kurs aus dem Fahrplan unterwegs.</div>';
+  }else{
+    h2+='<div class="lg-schiff-liste">';
+    schiffe.forEach(function(sh,idx){
+      var sel=state.schiffSel===idx?" is-sel":"";
+      h2+='<div class="lg-schiff-item'+sel+'" data-schiffidx="'+idx+'">'+
+        '<b>Kurs '+esc(sh.no)+'</b> '+svcTag(sh.svc)+
+        '<div class="lg-schiff-sub">'+esc(sh.von)+' &rarr; '+esc(sh.bis)+' &middot; '+esc(sh.status)+'</div></div>';
+    });
+    h2+='</div>';
+  }
+  h2+='</section>';
+  return h2;
+}
+
 function hinweiseHTML(){
   return '<section class="lg-panel">'+
   '<div class="lg-card"><h3>Wann fahren die Schiffe?</h3><p>Die Linie Konstanz&harr;Bregenz f&auml;hrt vom 3.4.&ndash;18.10. <strong>t&auml;glich</strong> &mdash; in der Hauptsaison (14.5.&ndash;13.9.) am h&auml;ufigsten, in der Nebensaison (3.4.&ndash;13.5. und 14.9.&ndash;18.10.) mit weniger Kursen. Feiertage &auml;ndern daran nichts — anders als auf dem Untersee (Schaffhausen/Stein am Rhein), wo Wochentag/Feiertag den Plan bestimmen.</p></div>'+
@@ -914,10 +1040,28 @@ function hinweiseHTML(){
   '</section>';
 }
 
+var karteTimer=null;
+function karteStandText(){
+  var el=document.getElementById("lg-karte-stand");
+  if(!el) return;
+  var n=new Date();
+  el.textContent="Stand: "+pad2(n.getHours())+":"+pad2(n.getMinutes())+" Uhr · aktualisiert sich von selbst";
+}
 function render(){
   var main=document.getElementById("lg-main");
+  if(karteTimer){ clearInterval(karteTimer); karteTimer=null; }
   if(state.tab==="planer") main.innerHTML=planerHTML();
   else if(state.tab==="schweiz") main.innerHTML=schweizHTML();
+  else if(state.tab==="karte"){
+    main.innerHTML=karteHTML();
+    karteStandText();
+    karteTimer=setInterval(function(){
+      if(state.tab!=="karte") return;
+      main.innerHTML=karteHTML();
+      karteStandText();
+      bind();
+    },60000);
+  }
   else main.innerHTML=hinweiseHTML();
   bind();
 }
@@ -949,6 +1093,16 @@ function bind(){
     state.schweizRet=iso;render();
   });
 
+  if(state.tab==="karte"){
+    document.querySelectorAll("[data-schiffidx]").forEach(function(el){
+      el.addEventListener("click",function(){
+        var idx=+this.getAttribute("data-schiffidx");
+        state.schiffSel=(state.schiffSel===idx)?null:idx;
+        render();
+      });
+    });
+    return;
+  }
   if(state.tab!=="planer") return;
   var date=document.getElementById("lg-date");
   date.addEventListener("change",function(){if(this.value){state.date=this.value;state.open=null;render();}});
