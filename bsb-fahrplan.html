@@ -163,6 +163,8 @@ select,input,button{font-family:inherit;}
 
 .lg-map-wrap{position:relative;background:#A9D4E8;border:1px solid var(--line);border-radius:0;overflow:hidden;margin:0 -16px 10px;touch-action:none;}
 .lg-map-wrap svg{display:block;width:100%;height:56vh;max-height:520px;}
+.lg-map-wrap.is-vollbild{position:fixed;inset:0;z-index:1000;margin:0;border-radius:0;}
+.lg-map-wrap.is-vollbild svg{width:100%;height:100%;max-height:none;}
 .lg-map-see{stroke-width:1.1;stroke-linejoin:round;}
 .lg-map-see--obersee{fill:#A9D4E8;stroke:#7EB6D9;}
 .lg-map-see--ueberlingen{fill:#5FBFCE;stroke:#379AAA;}
@@ -182,11 +184,15 @@ select,input,button{font-family:inherit;}
 .lg-map-mich-halo{fill:rgba(43,111,224,.28);animation:lgPuls 2.2s ease-out infinite;}
 @keyframes lgPuls{0%{r:5;opacity:.6;}100%{r:15;opacity:0;}}
 .lg-map-locate{position:absolute;top:10px;right:10px;width:38px;height:38px;border-radius:50%;border:none;background:#fff;box-shadow:0 2px 6px rgba(16,58,90,.3);font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
-.lg-map-loc-status{font-size:11.5px;color:var(--muted);text-align:center;margin:8px 0 0;}
+.lg-map-fs{position:absolute;top:10px;left:10px;width:38px;height:38px;border-radius:50%;border:none;background:#fff;box-shadow:0 2px 6px rgba(16,58,90,.3);font-size:16px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
 .lg-map-hint{font-size:11.5px;color:var(--muted);text-align:center;margin:8px 0;}
 .lg-map-stand{font-size:12.5px;color:var(--muted);text-align:center;margin:0 0 14px;}
-.lg-schiff-item{background:#fff;border:1px solid var(--gold);box-shadow:0 0 0 2px rgba(185,132,43,.25);border-radius:12px;padding:12px 14px;text-align:center;}
-.lg-schiff-item b{color:var(--navy);font-size:16px;}
+.lg-map-info{position:absolute;left:10px;right:10px;bottom:10px;background:rgba(255,255,255,.96);border-radius:12px;padding:10px 14px;box-shadow:0 2px 8px rgba(16,58,90,.25);font-size:13px;color:var(--muted);text-align:center;}
+.lg-map-info.is-sel{border:1px solid var(--gold);box-shadow:0 0 0 2px rgba(185,132,43,.25),0 2px 8px rgba(16,58,90,.25);}
+.lg-map-info b{color:var(--navy);font-size:16px;}
+.lg-map-wrap.is-vollbild .lg-map-info{font-size:15px;padding:13px 16px;bottom:max(10px,env(safe-area-inset-bottom));}
+.lg-map-wrap.is-vollbild .lg-map-info b{font-size:19px;}
+.lg-map-wrap.is-vollbild .lg-map-fs,.lg-map-wrap.is-vollbild .lg-map-locate{top:max(10px,env(safe-area-inset-top));}
 .lg-flotte-toggle{width:100%;background:var(--blue);border:none;border-radius:12px;padding:18px 18px;font-size:17px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;box-shadow:0 3px 10px rgba(21,103,158,.35);}
 .lg-flotte-toggle .lg-flotte-chev{color:#fff;opacity:.8;font-size:13px;transition:transform .15s;transform:rotate(180deg);}
 .lg-flotte-toggle.is-open .lg-flotte-chev{transform:rotate(0deg);}
@@ -203,7 +209,6 @@ select,input,button{font-family:inherit;}
 .lg-flotte-info{padding:10px 13px 12px;}
 .lg-flotte-specs{font-size:13px;color:var(--muted);line-height:1.6;}
 .lg-flotte-credit{font-size:10px;color:var(--muted);opacity:.65;margin-top:6px;}
-.lg-map-empty{text-align:center;color:var(--muted);padding:30px 16px;}
 </style>
 </head>
 <body>
@@ -998,6 +1003,7 @@ var KARTE_BASIS={x:0,y:0,w:440,h:320};
 var karteView=null; // aktueller viewBox-Ausschnitt (Zoom/Pan), null = zurueckgesetzt auf Vollansicht
 var karteMyPos=null; // {lat,lng} eigener Standort, falls ermittelt
 var karteLocStatus=null;
+var karteVollbild=false;
 var karteFlotteOffen=false;
 var karteFlotteSel=null;
 // Schweizer Anlegestellen, nur zur optischen Orientierung ("wo bin ich gerade")
@@ -1160,24 +1166,31 @@ function karteHTML(){
         '<circle class="lg-map-mich-halo" r="5"/><circle class="lg-map-mich" r="4"/></g>';
     }
   }
-  var h2='<section class="lg-panel">'+
-    '<div class="lg-lead">Welche Schiffe sind laut Fahrplan gerade unterwegs? Ein Tipp auf die Nadel zeigt die aktuelle Position.</div>'+
-    '<div class="lg-map-wrap"><svg viewBox="'+(karteView?karteView.x.toFixed(1)+" "+karteView.y.toFixed(1)+" "+karteView.w.toFixed(1)+" "+karteView.h.toFixed(1):"0 0 "+KARTE_BASIS.w+" "+KARTE_BASIS.h)+'" preserveAspectRatio="xMidYMid meet">'+seeBg+lines+dots+boote+mein+'</svg>'+
-    '<button type="button" class="lg-map-locate" id="lg-map-locate" title="Meinen Standort anzeigen">📍</button></div>'+
-    (karteLocStatus?'<p class="lg-map-loc-status">'+esc(karteLocStatus)+'</p>':"")+
-    '<p class="lg-map-hint">Mit dem Finger verschieben, mit zwei Fingern zoomen. Tippen zeigt Start &amp; Ziel.</p>'+
-    '<p class="lg-map-stand" id="lg-karte-stand"></p>';
-  if(!schiffe.length){
-    h2+='<div class="lg-map-empty">Gerade ist kein Kurs aus dem Fahrplan unterwegs.</div>';
+  var infoSel=false, infoTxt;
+  if(karteLocStatus){
+    infoTxt=esc(karteLocStatus);
+  }else if(!schiffe.length){
+    infoTxt="Gerade ist kein Kurs aus dem Fahrplan unterwegs.";
   }else{
     var sel=schiffe[state.schiffSel]?state.schiffSel:null;
     if(sel===null){
-      h2+='<div class="lg-map-empty">'+schiffe.length+' Schiff'+(schiffe.length===1?"":"e")+' gerade unterwegs &mdash; tippe auf ein Symbol auf der Karte.</div>';
+      infoTxt=schiffe.length+' Schiff'+(schiffe.length===1?"":"e")+' gerade unterwegs &mdash; tippe auf ein Symbol auf der Karte.';
     }else{
       var sh=schiffe[sel];
-      h2+='<div class="lg-schiff-item"><b>'+esc(sh.von)+' &rarr; '+esc(sh.bis)+'</b></div>';
+      infoSel=true;
+      infoTxt='<b>'+esc(sh.von)+' &rarr; '+esc(sh.bis)+'</b>';
     }
   }
+  var h2='<section class="lg-panel">'+
+    '<div class="lg-lead">Welche Schiffe sind laut Fahrplan gerade unterwegs? Ein Tipp auf die Nadel zeigt die aktuelle Position.</div>'+
+    '<div class="lg-map-wrap'+(karteVollbild?" is-vollbild":"")+'" id="lg-map-wrap">'+
+    '<svg viewBox="'+(karteView?karteView.x.toFixed(1)+" "+karteView.y.toFixed(1)+" "+karteView.w.toFixed(1)+" "+karteView.h.toFixed(1):"0 0 "+KARTE_BASIS.w+" "+KARTE_BASIS.h)+'" preserveAspectRatio="xMidYMid meet">'+seeBg+lines+dots+boote+mein+'</svg>'+
+    '<button type="button" class="lg-map-fs" id="lg-map-fs" title="'+(karteVollbild?"Vollbild verlassen":"Vollbild anzeigen")+'">'+(karteVollbild?"&#10005;":"&#9974;")+'</button>'+
+    '<button type="button" class="lg-map-locate" id="lg-map-locate" title="Meinen Standort anzeigen">📍</button>'+
+    '<div class="lg-map-info'+(infoSel?" is-sel":"")+'">'+infoTxt+'</div>'+
+    '</div>'+
+    '<p class="lg-map-hint">Mit dem Finger verschieben, mit zwei Fingern zoomen. Tippen zeigt Start &amp; Ziel.</p>'+
+    '<p class="lg-map-stand" id="lg-karte-stand"></p>';
   h2+='<button type="button" class="lg-flotte-toggle'+(karteFlotteOffen?" is-open":"")+'" id="lg-flotte-toggle">'+
     '<span>&#x26F4; Welche Schiffe gibt es? (Flotte)</span><span class="lg-flotte-chev">&#9650;</span></button>';
   if(karteFlotteOffen) h2+=flotteHTML();
@@ -1239,6 +1252,13 @@ function karteBindMap(){
     karteView=karteKlemmen({x:mid[0]-w/2,y:mid[1]-h/2,w:w,h:h});
     svg.setAttribute("viewBox",karteView.x.toFixed(1)+" "+karteView.y.toFixed(1)+" "+karteView.w.toFixed(1)+" "+karteView.h.toFixed(1));
   }
+  var fsBtn=document.getElementById("lg-map-fs");
+  if(fsBtn) fsBtn.addEventListener("click",function(){
+    karteVollbild=!karteVollbild;
+    karteView=null; // Kartenausschnitt neu an die geaenderte Groesse anpassen
+    document.body.style.overflow=karteVollbild?"hidden":"";
+    render();
+  });
   var flotteToggle=document.getElementById("lg-flotte-toggle");
   if(flotteToggle) flotteToggle.addEventListener("click",function(){
     karteFlotteOffen=!karteFlotteOffen;
@@ -1364,7 +1384,7 @@ function karteBindMap(){
 function render(){
   var main=document.getElementById("lg-main");
   if(karteTimer){ clearInterval(karteTimer); karteTimer=null; }
-  if(state.tab!=="karte"){ karteView=null; karteFlotteOffen=false; karteFlotteSel=null; } // Zoom/Pan/Flotte beim Verlassen des Tabs zuruecksetzen
+  if(state.tab!=="karte"){ karteView=null; karteFlotteOffen=false; karteFlotteSel=null; if(karteVollbild){ karteVollbild=false; document.body.style.overflow=""; } } // Zoom/Pan/Flotte/Vollbild beim Verlassen des Tabs zuruecksetzen
   if(state.tab==="planer") main.innerHTML=planerHTML();
   else if(state.tab==="schweiz") main.innerHTML=schweizHTML();
   else if(state.tab==="karte"){
@@ -1489,6 +1509,15 @@ document.querySelectorAll(".lg-tabs button").forEach(function(btn){
 })();
 
 function zurueckLotse(){ if(history.length>1){ history.back(); } else { location.href='index.html'; } }
+
+document.addEventListener("keydown",function(e){
+  if(e.key==="Escape"&&karteVollbild){
+    karteVollbild=false;
+    karteView=null;
+    document.body.style.overflow="";
+    render();
+  }
+});
 
 render();
 </script>
