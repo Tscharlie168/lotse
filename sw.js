@@ -1,4 +1,8 @@
-/* Lotse – Service Worker (v23) – Stand: 14. Juli 2026
+/* Lotse – Service Worker (v24) – Stand: 14. Juli 2026
+   Neu gegenüber v23:
+   - Impressum immer erreichbar: kleiner "Impressum"-Knopf im Kopfbereich
+     (auf jeder Ansicht sichtbar, ohne Scrollen), Startseiten-Fußzeile
+     jetzt "Impressum & Rechtliches" statt "Rechtliches & Kontakt".
    Neu gegenüber v22:
    - Impressum, Haftungsausschluss und Urheberrecht vervollständigt
      (Wetter-/Produktdaten-Haftung, Quellenangaben für Gedichte, Zitate,
@@ -61,7 +65,7 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v87';
+const CACHE = 'lotse-v88';
 const SHELL = [
   './',
   './index.html',
