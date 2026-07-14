@@ -1,4 +1,7 @@
-/* Lotse – Service Worker (v24) – Stand: 14. Juli 2026
+/* Lotse – Service Worker (v25) – Stand: 14. Juli 2026
+   Neu gegenüber v24:
+   - Kopfzeile: Untertitel auf "Die Anlaufstelle" gekürzt und Impressum-
+     Knopf verkleinert, damit beides nebeneinander in eine Zeile passt.
    Neu gegenüber v23:
    - Impressum immer erreichbar: kleiner "Impressum"-Knopf im Kopfbereich
      (auf jeder Ansicht sichtbar, ohne Scrollen), Startseiten-Fußzeile
@@ -65,7 +68,7 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v88';
+const CACHE = 'lotse-v89';
 const SHELL = [
   './',
   './index.html',
