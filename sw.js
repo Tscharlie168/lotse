@@ -1,4 +1,9 @@
-/* Lotse – Service Worker (v21) – Stand: 12. Juli 2026
+/* Lotse – Service Worker (v22) – Stand: 14. Juli 2026
+   Neu gegenüber v21:
+   - Datenschutzerklärung ergänzt (Wetterdienste, Barcode-Scanner, Quiz-
+     Spiele, eingebundene CDN-Bausteine, lokale Datenspeicherung) sowie
+     Impressum/Datenschutz-Hinweis auf den Fahrplan-Seiten (Autofähre,
+     BSB-Fahrplan) ergänzt.
    Neu gegenüber v20:
    - Spiel "Frosch über die Straße" durch Sudoku ersetzt (zu schnell/
      zeitkritisch für ältere Nutzer; Sudoku ist ohne Zeitdruck spielbar).
@@ -52,7 +57,7 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v85';
+const CACHE = 'lotse-v86';
 const SHELL = [
   './',
   './index.html',
