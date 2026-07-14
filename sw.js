@@ -1,4 +1,7 @@
-/* Lotse – Service Worker (v25) – Stand: 14. Juli 2026
+/* Lotse – Service Worker (v26) – Stand: 14. Juli 2026
+   Neu gegenüber v25:
+   - BSB-Fahrplan/Karte: Vollbild-Modus ergänzt; Info zum ausgewählten
+     Schiff (Von → Bis) liegt jetzt direkt auf der Karte statt darunter.
    Neu gegenüber v24:
    - Kopfzeile: Untertitel auf "Die Anlaufstelle" gekürzt und Impressum-
      Knopf verkleinert, damit beides nebeneinander in eine Zeile passt.
@@ -68,7 +71,7 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v89';
+const CACHE = 'lotse-v90';
 const SHELL = [
   './',
   './index.html',
