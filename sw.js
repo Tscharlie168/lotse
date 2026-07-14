@@ -1,4 +1,8 @@
-/* Lotse – Service Worker (v22) – Stand: 14. Juli 2026
+/* Lotse – Service Worker (v23) – Stand: 14. Juli 2026
+   Neu gegenüber v22:
+   - Impressum, Haftungsausschluss und Urheberrecht vervollständigt
+     (Wetter-/Produktdaten-Haftung, Quellenangaben für Gedichte, Zitate,
+     Gemälde-Quiz, Musikquiz und Fotos).
    Neu gegenüber v21:
    - Datenschutzerklärung ergänzt (Wetterdienste, Barcode-Scanner, Quiz-
      Spiele, eingebundene CDN-Bausteine, lokale Datenspeicherung) sowie
@@ -57,7 +61,7 @@
    Wichtig: Die Zahl in CACHE bei jeder Änderung an den SHELL-Dateien um eins
    erhöhen, damit alte gespeicherte Kopien sauber ersetzt werden. */
 
-const CACHE = 'lotse-v86';
+const CACHE = 'lotse-v87';
 const SHELL = [
   './',
   './index.html',
