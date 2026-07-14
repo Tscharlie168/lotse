@@ -29,7 +29,6 @@ select,input,button{font-family:inherit;}
 .lg-tabs button.is-active{color:var(--blue);border-bottom-color:var(--azure);}
 
 .lg-panel{padding:18px 16px 8px;}
-.lg-lead{font-size:14px;color:var(--navy);background:#fff;border:1px solid var(--line);border-left:4px solid var(--azure);border-radius:10px;padding:12px 14px;margin:0 0 16px;}
 .lg-szw-head{margin:0 0 12px;}
 .lg-szw-label{display:block;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:23px;font-weight:700;color:var(--navy);margin-bottom:4px;}
 .lg-szw-sub{margin:0;font-size:14px;color:var(--muted);}
@@ -1182,7 +1181,6 @@ function karteHTML(){
     }
   }
   var h2='<section class="lg-panel">'+
-    '<div class="lg-lead">Welche Schiffe sind laut Fahrplan gerade unterwegs? Ein Tipp auf die Nadel zeigt die aktuelle Position.</div>'+
     '<div class="lg-map-wrap'+(karteVollbild?" is-vollbild":"")+'" id="lg-map-wrap">'+
     '<svg viewBox="'+(karteView?karteView.x.toFixed(1)+" "+karteView.y.toFixed(1)+" "+karteView.w.toFixed(1)+" "+karteView.h.toFixed(1):"0 0 "+KARTE_BASIS.w+" "+KARTE_BASIS.h)+'" preserveAspectRatio="xMidYMid meet">'+seeBg+lines+dots+boote+mein+'</svg>'+
     '<button type="button" class="lg-map-fs" id="lg-map-fs" title="'+(karteVollbild?"Vollbild verlassen":"Vollbild anzeigen")+'">'+(karteVollbild?"&#10005;":"&#9974;")+'</button>'+
